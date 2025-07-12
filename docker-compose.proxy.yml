@@ -1,0 +1,19 @@
+services:
+  markdown-converter:
+    build: .
+    container_name: markdown-converter
+    restart: always
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - markdown-converter-network
+    volumes:
+      - ./server/downloads:/usr/src/app/server/downloads
+      - ./server/temp:/usr/src/app/server/temp
+    environment:
+      - NODE_ENV=production
+
+networks:
+  markdown-converter-network:
+    external: true
+    name: nginx-proxy-manager
