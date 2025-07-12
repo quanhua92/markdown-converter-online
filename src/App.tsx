@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast, Toaster } from 'sonner'
-import { Download, FileText, Presentation, File, Loader2, X, BookOpen, Code, Zap } from 'lucide-react'
+import { Download, FileText, Presentation, File, Loader2, X, BookOpen, Code, Zap, Copy, ChevronDown } from 'lucide-react'
 
 function App() {
   const [markdown, setMarkdown] = useState(`---
@@ -168,6 +168,165 @@ Happy converting! 🎉`)
     setMarkdown('')
   }
 
+  const templates = {
+    presentation: `---
+theme: default
+paginate: true
+---
+
+# My Presentation
+Welcome to my markdown converter!
+
+---
+
+## Features
+- Convert markdown to PowerPoint
+- Convert markdown to HTML
+- Convert markdown to Word
+- Convert markdown to PDF
+
+---
+
+## How to Use
+1. Write your markdown content
+2. Select output format
+3. Click convert
+4. Download your file
+
+---
+
+## Thank You!
+Happy converting! 🎉`,
+    
+    document: `# Document Title
+
+## Introduction
+This is a sample markdown document that showcases various formatting options.
+
+## Headers
+You can create multiple levels of headers using # symbols.
+
+### Subsection
+This is a third-level header.
+
+## Text Formatting
+- **Bold text** for emphasis
+- *Italic text* for subtle emphasis
+- \`inline code\` for technical terms
+- ~~Strikethrough~~ for deleted content
+
+## Lists
+### Unordered List
+- First item
+- Second item
+  - Nested item
+  - Another nested item
+- Third item
+
+### Ordered List
+1. First step
+2. Second step
+3. Third step
+
+## Code Blocks
+\`\`\`javascript
+function hello() {
+    console.log("Hello, World!");
+}
+\`\`\`
+
+## Links and Images
+[Visit our website](https://example.com)
+
+## Tables
+| Feature | Description | Status |
+|---------|-------------|--------|
+| PDF | Portable Document Format | ✅ |
+| Word | Microsoft Word Document | ✅ |
+| HTML | Web Page | ✅ |
+| PowerPoint | Presentation Slides | ✅ |
+
+## Conclusion
+This template demonstrates the power of markdown for creating structured documents.`,
+
+    article: `# Article Title: The Power of Markdown
+
+**Published:** $(date)  
+**Author:** Your Name
+
+## Abstract
+This article explores the versatility and power of Markdown as a lightweight markup language for creating formatted documents.
+
+## Introduction
+Markdown has revolutionized the way we write and format text. Its simplicity and readability make it an ideal choice for:
+
+- Technical documentation
+- Blog posts and articles
+- README files
+- Academic papers
+
+## Key Benefits
+
+### 1. Simplicity
+Markdown syntax is intuitive and easy to learn. Unlike complex word processors, Markdown focuses on content over formatting.
+
+### 2. Portability
+Markdown files are plain text, making them:
+- Version control friendly
+- Platform independent
+- Future-proof
+
+### 3. Flexibility
+Convert to multiple formats:
+- **HTML** for web publishing
+- **PDF** for sharing and printing
+- **Word** for collaborative editing
+- **PowerPoint** for presentations
+
+## Technical Examples
+
+### Code Snippet
+\`\`\`python
+def convert_markdown(content):
+    """Convert markdown to various formats"""
+    return processor.convert(content)
+\`\`\`
+
+### Mathematical Expressions
+While not all converters support it, you can include LaTeX-style math:
+\`$E = mc^2$\`
+
+## Best Practices
+
+> **Tip:** Keep your markdown files organized with clear hierarchical structure using headers.
+
+1. **Use descriptive headers** - They become your document outline
+2. **Keep paragraphs concise** - Break up long text blocks
+3. **Use lists effectively** - They improve readability
+4. **Include code examples** - When writing technical content
+
+## Conclusion
+Markdown strikes the perfect balance between simplicity and functionality. Whether you're writing documentation, articles, or presentations, Markdown provides a clean, efficient way to create professional content.
+
+---
+
+*Happy writing with Markdown!*`
+  }
+
+  const applyTemplate = (templateKey: string) => {
+    setMarkdown(templates[templateKey as keyof typeof templates])
+    toast.success(`${templateKey.charAt(0).toUpperCase() + templateKey.slice(1)} template applied!`)
+  }
+
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success(`${label} copied to clipboard!`)
+    } catch (error) {
+      toast.error('Failed to copy to clipboard')
+    }
+  }
+
   const GuidesPage = () => (
     <div className="space-y-8">
       <div className="text-center">
@@ -193,7 +352,17 @@ Happy converting! 🎉`)
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <h4 className="font-semibold mb-2">Headers</h4>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-semibold">Headers</h4>
+                <Button
+                  onClick={() => copyToClipboard(`# Header 1\n## Header 2\n### Header 3`, "Headers example")}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2"
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </div>
               <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
 {`# Header 1
 ## Header 2
@@ -201,7 +370,17 @@ Happy converting! 🎉`)
               </pre>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Text Formatting</h4>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-semibold">Text Formatting</h4>
+                <Button
+                  onClick={() => copyToClipboard(`**Bold text**\n*Italic text*\n\`inline code\``, "Text formatting example")}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2"
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </div>
               <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
 {`**Bold text**
 *Italic text*
@@ -209,7 +388,17 @@ Happy converting! 🎉`)
               </pre>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Lists</h4>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-semibold">Lists</h4>
+                <Button
+                  onClick={() => copyToClipboard(`- Bullet point 1\n- Bullet point 2\n\n1. Numbered item\n2. Numbered item`, "Lists example")}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2"
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </div>
               <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
 {`- Bullet point 1
 - Bullet point 2
@@ -219,7 +408,17 @@ Happy converting! 🎉`)
               </pre>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Code Blocks</h4>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-semibold">Code Blocks</h4>
+                <Button
+                  onClick={() => copyToClipboard(`\`\`\`javascript\nconsole.log("Hello!");\n\`\`\``, "Code blocks example")}
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2"
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </div>
               <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
 {`\`\`\`javascript
 console.log("Hello!");
@@ -229,7 +428,17 @@ console.log("Hello!");
           </div>
           
           <div className="mt-6">
-            <h4 className="font-semibold mb-2">PowerPoint Slides (Marp)</h4>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-semibold">PowerPoint Slides (Marp)</h4>
+              <Button
+                onClick={() => copyToClipboard(`---\ntheme: default\n---\n\n# Slide 1 Title\nContent for first slide\n\n---\n\n# Slide 2 Title\n- Point 1\n- Point 2`, "Marp slides example")}
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </div>
             <p className="text-sm text-gray-600 mb-2">For PowerPoint conversion, use `---` to separate slides:</p>
             <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
 {`---
@@ -322,6 +531,74 @@ Content-Type: application/json
           </div>
         </CardContent>
       </Card>
+
+      {/* LLM Prompt Guide */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5" />
+            LLM Conversion Prompts
+          </CardTitle>
+          <CardDescription>
+            Use these prompts with ChatGPT, Claude, or other LLMs to convert articles to Marp format
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-semibold">Article to Presentation Prompt</h4>
+              <Button
+                onClick={() => copyToClipboard(`Convert this article into a Marp presentation format with the following requirements:
+
+1. Start with frontmatter using theme "default" and enable pagination
+2. Create engaging slide titles that summarize key points  
+3. Break content into digestible slides (aim for 6-12 slides total)
+4. Use bullet points, numbered lists, and short paragraphs
+5. Include slide separators (---) between each slide
+6. Make the first slide an attractive title slide with the article's main topic
+7. End with a conclusion or "Thank You" slide
+8. Ensure each slide has a clear focus and isn't overcrowded
+
+Please maintain the core information and key insights from the original article while making it presentation-friendly.
+
+[PASTE YOUR ARTICLE TEXT HERE]`, "LLM conversion prompt")}
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </div>
+            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto whitespace-pre-wrap">
+{`Convert this article into a Marp presentation format with the following requirements:
+
+1. Start with frontmatter using theme "default" and enable pagination
+2. Create engaging slide titles that summarize key points  
+3. Break content into digestible slides (aim for 6-12 slides total)
+4. Use bullet points, numbered lists, and short paragraphs
+5. Include slide separators (---) between each slide
+6. Make the first slide an attractive title slide with the article's main topic
+7. End with a conclusion or "Thank You" slide
+8. Ensure each slide has a clear focus and isn't overcrowded
+
+Please maintain the core information and key insights from the original article while making it presentation-friendly.
+
+[PASTE YOUR ARTICLE TEXT HERE]`}
+            </pre>
+          </div>
+
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <h4 className="font-semibold text-yellow-800 mb-2">🎯 Pro Tips for LLM Conversion</h4>
+            <ul className="text-sm text-yellow-700 space-y-1">
+              <li>• Copy the prompt above and paste your article text at the bottom</li>
+              <li>• Ask the LLM to focus on visual hierarchy and readability</li>
+              <li>• Request specific slide counts if you have time constraints</li>
+              <li>• For technical content, ask for code examples in separate slides</li>
+              <li>• Request bullet points over long paragraphs for better presentation flow</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 
@@ -338,24 +615,24 @@ Content-Type: application/json
               Convert markdown to PowerPoint, HTML, Word, or PDF
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button
               onClick={() => setCurrentView('converter')}
               variant={currentView === 'converter' ? 'default' : 'outline'}
-              size="sm"
-              className="flex items-center gap-2"
+              size="default"
+              className="flex items-center gap-2 px-4 py-2"
             >
               <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Converter</span>
+              Converter
             </Button>
             <Button
               onClick={() => setCurrentView('guides')}
               variant={currentView === 'guides' ? 'default' : 'outline'}
-              size="sm"
-              className="flex items-center gap-2"
+              size="default"
+              className="flex items-center gap-2 px-4 py-2"
             >
               <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Guides</span>
+              Guides
             </Button>
           </div>
         </div>
@@ -378,23 +655,49 @@ Content-Type: application/json
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <Textarea
-                value={markdown}
-                onChange={(e) => setMarkdown(e.target.value)}
-                placeholder="Enter your markdown here..."
-                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm"
-              />
-              <div className="flex justify-end">
-                <Button
-                  onClick={clearMarkdown}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  disabled={!markdown.trim()}
-                >
-                  <X className="h-4 w-4" />
-                  Clear
-                </Button>
+              <div className="relative">
+                <Textarea
+                  value={markdown}
+                  onChange={(e) => setMarkdown(e.target.value)}
+                  placeholder="Enter your markdown here..."
+                  className="min-h-[200px] sm:min-h-[300px] font-mono text-sm pr-24"
+                />
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <Select onValueChange={applyTemplate}>
+                    <SelectTrigger className="w-32 h-8 text-xs">
+                      <SelectValue placeholder="Templates" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="presentation">
+                        <div className="flex items-center gap-2">
+                          <Presentation className="h-3 w-3" />
+                          Presentation
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="document">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-3 w-3" />
+                          Document
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="article">
+                        <div className="flex items-center gap-2">
+                          <File className="h-3 w-3" />
+                          Article
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={clearMarkdown}
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-3"
+                    disabled={!markdown.trim()}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -464,8 +767,8 @@ Content-Type: application/json
             <Button 
               onClick={handleConvert}
               disabled={isConverting || !markdown.trim()}
-              size="lg"
-              className="w-full sm:w-auto px-6 sm:px-8"
+              size="default"
+              className="w-full sm:w-auto px-6 py-2 h-10"
             >
               {isConverting ? (
                 <>
@@ -483,8 +786,8 @@ Content-Type: application/json
             <Button 
               onClick={clearResult}
               variant="outline"
-              size="lg"
-              className="w-full sm:w-auto px-6 sm:px-8"
+              size="default"
+              className="w-full sm:w-auto px-6 py-2 h-10"
             >
               <FileText className="mr-2 h-4 w-4" />
               Convert Another File
@@ -523,18 +826,17 @@ Content-Type: application/json
                 <div className="flex gap-2 w-full sm:w-auto">
                   <Button
                     onClick={handleDownload}
-                    className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none"
-                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none h-10 px-6"
+                    size="default"
                   >
                     <Download className="mr-2 h-4 w-4" />
-                    <span className="hidden sm:inline">Download</span>
-                    <span className="sm:hidden">Download</span>
+                    Download
                   </Button>
                   <Button
                     onClick={clearResult}
                     variant="outline"
-                    size="sm"
-                    className="px-3"
+                    size="default"
+                    className="h-10 px-3"
                   >
                     <X className="h-4 w-4" />
                   </Button>
