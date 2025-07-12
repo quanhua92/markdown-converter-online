@@ -15,21 +15,12 @@ const app = express();
 const PORT = 3000;
 
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'", "https:", "data:"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    },
-  },
+  contentSecurityPolicy: false,  // Disable CSP completely for reverse proxy
 }));
-app.use(cors({ origin: process.env.NODE_ENV === 'production' ? false : 'http://localhost:5173' }));
+app.use(cors({ 
+  origin: true,  // Allow all origins for reverse proxy
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
@@ -153,6 +144,49 @@ app.get('/api/health', (_req, res) => {
 // Test route to verify routing works
 app.get('/test', (_req, res) => {
   res.send('Test route works!');
+});
+
+// Debug route that shows working JavaScript
+app.get('/debug', (_req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .success { color: green; font-size: 18px; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Debug Page</h1>
+  <div id="status">JavaScript not loaded</div>
+  <div id="app">PLACEHOLDER</div>
+  <button onclick="testAPI()">Test API</button>
+  
+  <script>
+    console.log('Debug script loaded');
+    document.getElementById('status').innerHTML = '<span class="success">✅ JavaScript is working!</span>';
+    document.getElementById('app').innerHTML = '<h2 class="success">✅ DOM manipulation works!</h2>';
+    
+    function testAPI() {
+      fetch('/api/health')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('app').innerHTML += '<p class="success">✅ API works: ' + data.status + '</p>';
+        })
+        .catch(err => {
+          document.getElementById('app').innerHTML += '<p class="error">❌ API failed: ' + err.message + '</p>';
+        });
+    }
+    
+    // Auto test on load
+    setTimeout(testAPI, 1000);
+  </script>
+</body>
+</html>
+  `);
 });
 
 // Setup static file serving (called after all routes are defined)
