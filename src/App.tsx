@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast, Toaster } from 'sonner'
-import { Download, FileText, Presentation, File, Loader2, X, BookOpen, Code, Zap, Copy, ChevronDown } from 'lucide-react'
+import { Download, FileText, Presentation, File, Loader2, X, BookOpen, Code, Zap, Copy, ChevronDown, Sun, Moon } from 'lucide-react'
 
 function App() {
   const [markdown, setMarkdown] = useState(`---
@@ -53,6 +53,34 @@ Happy converting! 🎉`)
     stderr?: string;
     stdout?: string;
   } | null>(null)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
+
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme')
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      setIsDarkMode(true)
+      document.documentElement.classList.add('dark')
+    } else {
+      setIsDarkMode(false)
+      document.documentElement.classList.remove('dark')
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = !isDarkMode
+    setIsDarkMode(newTheme)
+    
+    if (newTheme) {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    }
+  }
 
   const formatConfig = {
     pptx: { 
@@ -347,10 +375,10 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
   const GuidesPage = () => (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
           📚 Conversion Guides
         </h1>
-        <p className="text-lg md:text-xl text-gray-600">
+        <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300">
           Learn how to use the markdown converter effectively
         </p>
       </div>
@@ -431,7 +459,7 @@ Content for first slide
                   <Copy className="h-3 w-3" />
                 </Button>
               </div>
-              <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+              <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`# Header 1
 ## Header 2
 ### Header 3`}
@@ -449,7 +477,7 @@ Content for first slide
                   <Copy className="h-3 w-3" />
                 </Button>
               </div>
-              <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+              <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`**Bold text**
 *Italic text*
 \`inline code\``}
@@ -467,7 +495,7 @@ Content for first slide
                   <Copy className="h-3 w-3" />
                 </Button>
               </div>
-              <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+              <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`- Bullet point 1
 - Bullet point 2
 
@@ -487,7 +515,7 @@ Content for first slide
                   <Copy className="h-3 w-3" />
                 </Button>
               </div>
-              <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+              <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`\`\`\`javascript
 console.log("Hello!");
 \`\`\``}
@@ -507,8 +535,8 @@ console.log("Hello!");
                 <Copy className="h-3 w-3" />
               </Button>
             </div>
-            <p className="text-sm text-gray-600 mb-2">For PowerPoint conversion, use `---` to separate slides:</p>
-            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">For PowerPoint conversion, use `---` to separate slides:</p>
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`---
 theme: default
 ---
@@ -540,14 +568,14 @@ Content for first slide
         <CardContent className="space-y-4">
           <div>
             <h4 className="font-semibold mb-2">Base URL</h4>
-            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`${window.location.origin}/api`}
             </pre>
           </div>
 
           <div>
             <h4 className="font-semibold mb-2">Convert to PDF, Word, or HTML</h4>
-            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`POST /api/convert/pandoc
 Content-Type: application/json
 
@@ -560,7 +588,7 @@ Content-Type: application/json
 
           <div>
             <h4 className="font-semibold mb-2">Convert to PowerPoint</h4>
-            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`POST /api/convert/marp
 Content-Type: application/json
 
@@ -572,7 +600,7 @@ Content-Type: application/json
 
           <div>
             <h4 className="font-semibold mb-2">Response Format</h4>
-            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`{
   "success": true,
   "downloadUrl": "/api/download/filename.pdf",
@@ -583,14 +611,14 @@ Content-Type: application/json
 
           <div>
             <h4 className="font-semibold mb-2">Download File</h4>
-            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto">
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto dark:text-gray-100">
 {`GET /api/download/{filename}`}
             </pre>
           </div>
 
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">💡 Tips</h4>
-            <ul className="text-sm text-blue-700 space-y-1">
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">💡 Tips</h4>
+            <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
               <li>• Files are automatically deleted after 1 hour</li>
               <li>• Maximum markdown size: 10MB</li>
               <li>• Rate limit: 100 requests per 15 minutes</li>
@@ -639,7 +667,7 @@ Please maintain the core information and key insights from the original article 
                 <Copy className="h-3 w-3" />
               </Button>
             </div>
-            <pre className="bg-gray-100 p-3 rounded text-sm overflow-x-auto whitespace-pre-wrap">
+            <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded text-sm overflow-x-auto whitespace-pre-wrap dark:text-gray-100">
 {`Convert this article into a Marp presentation format with the following requirements:
 
 1. Start with frontmatter using theme "default" and enable pagination
@@ -659,9 +687,9 @@ Please maintain the core information and key insights from the original article 
             </pre>
           </div>
 
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <h4 className="font-semibold text-yellow-800 mb-2">🎯 Pro Tips for LLM Conversion</h4>
-            <ul className="text-sm text-yellow-700 space-y-1">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+            <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">🎯 Pro Tips for LLM Conversion</h4>
+            <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
               <li>• Copy the prompt above and paste your article text at the bottom</li>
               <li>• Ask the LLM to focus on visual hierarchy and readability</li>
               <li>• Request specific slide counts if you have time constraints</li>
@@ -675,19 +703,19 @@ Please maintain the core information and key insights from the original article 
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 sm:py-8 lg:py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-4 sm:py-8 lg:py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
           <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
               Markdown Converter
             </h1>
-            <p className="text-sm sm:text-base lg:text-xl text-gray-600 mt-1">
+            <p className="text-sm sm:text-base lg:text-xl text-gray-600 dark:text-gray-300 mt-1">
               Convert markdown to PowerPoint, HTML, Word, or PDF
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <Button
               onClick={() => setCurrentView('converter')}
               variant={currentView === 'converter' ? 'default' : 'outline'}
@@ -705,6 +733,19 @@ Please maintain the core information and key insights from the original article 
             >
               <BookOpen className="h-4 w-4" />
               Guides
+            </Button>
+            <Button
+              onClick={toggleTheme}
+              variant="outline"
+              size="default"
+              className="flex items-center gap-2 px-3 py-2"
+              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDarkMode ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
@@ -807,7 +848,7 @@ Please maintain the core information and key insights from the original article 
                         </Badge>
                       </div>
                       <h3 className="font-semibold text-sm sm:text-base">{config.label}</h3>
-                      <p className="text-xs sm:text-sm text-gray-600 mt-1 hidden sm:block">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 hidden sm:block">
                         {config.description}
                       </p>
                     </CardContent>
@@ -888,8 +929,8 @@ Please maintain the core information and key insights from the original article 
                     })()}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 text-sm sm:text-base truncate">{downloadResult.filename}</p>
-                    <p className="text-xs sm:text-sm text-gray-500">
+                    <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{downloadResult.filename}</p>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                       Generated {downloadResult.timestamp.toLocaleTimeString()}
                     </p>
                   </div>
@@ -913,7 +954,7 @@ Please maintain the core information and key insights from the original article 
                 </div>
               </div>
               
-              <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-green-700">
+              <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-green-700 dark:text-green-300">
                 <p>💡 <strong>Tip:</strong> Your file will be automatically cleaned up from the server after 1 hour for security.</p>
               </div>
             </CardContent>
@@ -936,24 +977,24 @@ Please maintain the core information and key insights from the original article 
               <div className="space-y-4">
                 {conversionError.details && (
                   <div>
-                    <h4 className="font-semibold text-red-800 mb-2">Error Details:</h4>
-                    <pre className="bg-red-100 p-3 rounded text-sm overflow-x-auto text-red-700">
+                    <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Error Details:</h4>
+                    <pre className="bg-red-100 dark:bg-red-900/20 p-3 rounded text-sm overflow-x-auto text-red-700 dark:text-red-300">
                       {conversionError.details}
                     </pre>
                   </div>
                 )}
                 {conversionError.stderr && (
                   <div>
-                    <h4 className="font-semibold text-red-800 mb-2">Standard Error:</h4>
-                    <pre className="bg-red-100 p-3 rounded text-sm overflow-x-auto text-red-700">
+                    <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Standard Error:</h4>
+                    <pre className="bg-red-100 dark:bg-red-900/20 p-3 rounded text-sm overflow-x-auto text-red-700 dark:text-red-300">
                       {conversionError.stderr}
                     </pre>
                   </div>
                 )}
                 {conversionError.stdout && (
                   <div>
-                    <h4 className="font-semibold text-red-800 mb-2">Standard Output:</h4>
-                    <pre className="bg-red-100 p-3 rounded text-sm overflow-x-auto text-red-700">
+                    <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Standard Output:</h4>
+                    <pre className="bg-red-100 dark:bg-red-900/20 p-3 rounded text-sm overflow-x-auto text-red-700 dark:text-red-300">
                       {conversionError.stdout}
                     </pre>
                   </div>
@@ -973,7 +1014,7 @@ Please maintain the core information and key insights from the original article 
           </Card>
         )}
 
-        <div className="mt-8 text-center text-sm text-gray-500">
+        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
           <p>Powered by Marp CLI and Pandoc • Built with React and Express</p>
         </div>
           </>
