@@ -1,11 +1,8 @@
-version: '3.8'
 services:
   markdown-converter:
     build: .
     ports:
       - "3000:3001"
-    volumes:
-      - ./server/downloads:/usr/src/app/server/downloads
     environment:
       - NODE_ENV=production
     restart: unless-stopped

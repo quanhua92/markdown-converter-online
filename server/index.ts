@@ -15,9 +15,17 @@ const app = express();
 const PORT = 3001;
 
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: process.env.NODE_ENV === 'production' ? false : 'http://localhost:5173' }));
 app.use(express.json({ limit: '10mb' }));
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  const distPath = path.join(__dirname, '../dist');
+  app.use(express.static(distPath));
+  
+  // Handle client-side routing - this should be after API routes
+}
 
 const downloadsDir = path.join(__dirname, 'downloads');
 const tempDir = path.join(__dirname, 'temp');
@@ -116,5 +124,13 @@ app.get('/api/download/:filename', async (req, res) => {
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// Handle client-side routing in production (after all API routes)
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (_req, res) => {
+    const distPath = path.join(__dirname, '../dist');
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

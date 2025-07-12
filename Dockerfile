@@ -25,7 +25,7 @@ WORKDIR /usr/src/app
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 
-RUN pnpm add -g @marp-team/marp-cli
+RUN npm install -g @marp-team/marp-cli
 
 COPY . .
 RUN pnpm run client:build
