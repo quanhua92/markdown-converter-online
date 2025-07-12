@@ -18,3 +18,18 @@ server/dist/
 server/downloads/
 server/temp/
 *.pptx
+
+# Debug and test files
+debug-*.html
+debug-*.sh
+test-*.sh
+test-*.html
+test-*.md
+test-*.docx
+start-*.sh
+docker-compose.test.yml
+server/minimal.js
+src/App-debug.tsx
+src/App-simple.tsx
+src/main-debug.tsx
+src/main-test.tsx
