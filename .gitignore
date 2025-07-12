@@ -26,6 +26,9 @@ test-*.sh
 test-*.html
 test-*.md
 test-*.docx
+test.html
+test.md
+test.docx
 start-*.sh
 docker-compose.test.yml
 server/minimal.js
