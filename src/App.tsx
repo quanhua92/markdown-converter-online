@@ -47,6 +47,12 @@ Happy converting! 🎉`)
     format: string;
     timestamp: Date;
   } | null>(null)
+  const [conversionError, setConversionError] = useState<{
+    message: string;
+    details?: string;
+    stderr?: string;
+    stdout?: string;
+  } | null>(null)
 
   const formatConfig = {
     pptx: { 
@@ -86,6 +92,7 @@ Happy converting! 🎉`)
     }
 
     setIsConverting(true)
+    setConversionError(null) // Clear previous errors
     const config = formatConfig[selectedFormat as keyof typeof formatConfig]
     
     try {
@@ -105,6 +112,15 @@ Happy converting! 🎉`)
 
       if (!response.ok) {
         const errorData = await response.json()
+        
+        // Store detailed error information
+        setConversionError({
+          message: errorData.error || `Conversion failed (${response.status})`,
+          details: errorData.details,
+          stderr: errorData.stderr,
+          stdout: errorData.stdout
+        })
+        
         throw new Error(errorData.error || `Conversion failed (${response.status})`)
       }
 
@@ -162,6 +178,7 @@ Happy converting! 🎉`)
 
   const clearResult = () => {
     setDownloadResult(null)
+    setConversionError(null)
   }
 
   const clearMarkdown = () => {
@@ -341,13 +358,64 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
       {/* Markdown Format Guide */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Code className="h-5 w-5" />
-            Markdown Format Guide
-          </CardTitle>
-          <CardDescription>
-            Learn the markdown syntax supported by our converter
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Code className="h-5 w-5" />
+                Markdown Format Guide
+              </CardTitle>
+              <CardDescription>
+                Learn the markdown syntax supported by our converter
+              </CardDescription>
+            </div>
+            <Button
+              onClick={() => copyToClipboard(`# Markdown Format Rules
+
+## Headers
+# Header 1
+## Header 2
+### Header 3
+
+## Text Formatting
+**Bold text**
+*Italic text*
+\`inline code\`
+
+## Lists
+- Bullet point 1
+- Bullet point 2
+
+1. Numbered item
+2. Numbered item
+
+## Code Blocks
+\`\`\`javascript
+console.log("Hello!");
+\`\`\`
+
+## PowerPoint Slides (Marp)
+For PowerPoint conversion, use --- to separate slides:
+
+---
+theme: default
+---
+
+# Slide 1 Title
+Content for first slide
+
+---
+
+# Slide 2 Title
+- Point 1
+- Point 2`, "Complete markdown guide")}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Copy className="h-4 w-4" />
+              Copy All Rules
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -561,7 +629,9 @@ Content-Type: application/json
 
 Please maintain the core information and key insights from the original article while making it presentation-friendly.
 
-[PASTE YOUR ARTICLE TEXT HERE]`, "LLM conversion prompt")}
+---
+
+# PASTE YOUR ARTICLE TEXT BELOW THIS LINE`, "LLM conversion prompt")}
                 variant="ghost"
                 size="sm"
                 className="h-6 px-2"
@@ -583,7 +653,9 @@ Please maintain the core information and key insights from the original article 
 
 Please maintain the core information and key insights from the original article while making it presentation-friendly.
 
-[PASTE YOUR ARTICLE TEXT HERE]`}
+---
+
+# PASTE YOUR ARTICLE TEXT BELOW THIS LINE`}
             </pre>
           </div>
 
@@ -655,50 +727,50 @@ Please maintain the core information and key insights from the original article 
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="relative">
-                <Textarea
-                  value={markdown}
-                  onChange={(e) => setMarkdown(e.target.value)}
-                  placeholder="Enter your markdown here..."
-                  className="min-h-[200px] sm:min-h-[300px] font-mono text-sm pr-24"
-                />
-                <div className="absolute top-2 right-2 flex gap-2">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
                   <Select onValueChange={applyTemplate}>
-                    <SelectTrigger className="w-32 h-8 text-xs">
-                      <SelectValue placeholder="Templates" />
+                    <SelectTrigger className="w-40 h-9">
+                      <SelectValue placeholder="Load Template" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="presentation">
                         <div className="flex items-center gap-2">
-                          <Presentation className="h-3 w-3" />
+                          <Presentation className="h-4 w-4" />
                           Presentation
                         </div>
                       </SelectItem>
                       <SelectItem value="document">
                         <div className="flex items-center gap-2">
-                          <FileText className="h-3 w-3" />
+                          <FileText className="h-4 w-4" />
                           Document
                         </div>
                       </SelectItem>
                       <SelectItem value="article">
                         <div className="flex items-center gap-2">
-                          <File className="h-3 w-3" />
+                          <File className="h-4 w-4" />
                           Article
                         </div>
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button
-                    onClick={clearMarkdown}
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-3"
-                    disabled={!markdown.trim()}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
                 </div>
+                <Button
+                  onClick={clearMarkdown}
+                  size="sm"
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  disabled={!markdown.trim()}
+                >
+                  <X className="h-4 w-4" />
+                  Clear
+                </Button>
               </div>
+              <Textarea
+                value={markdown}
+                onChange={(e) => setMarkdown(e.target.value)}
+                placeholder="Enter your markdown here..."
+                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm"
+              />
             </div>
           </CardContent>
         </Card>
@@ -768,7 +840,7 @@ Please maintain the core information and key insights from the original article 
               onClick={handleConvert}
               disabled={isConverting || !markdown.trim()}
               size="default"
-              className="w-full sm:w-auto px-6 py-2 h-10"
+              className="w-full sm:w-auto px-6 py-2 h-10 bg-green-600 hover:bg-green-700 text-white"
             >
               {isConverting ? (
                 <>
@@ -785,9 +857,8 @@ Please maintain the core information and key insights from the original article 
           ) : (
             <Button 
               onClick={clearResult}
-              variant="outline"
               size="default"
-              className="w-full sm:w-auto px-6 py-2 h-10"
+              className="w-full sm:w-auto px-6 py-2 h-10 bg-green-600 hover:bg-green-700 text-white"
             >
               <FileText className="mr-2 h-4 w-4" />
               Convert Another File
@@ -834,9 +905,8 @@ Please maintain the core information and key insights from the original article 
                   </Button>
                   <Button
                     onClick={clearResult}
-                    variant="outline"
                     size="default"
-                    className="h-10 px-3"
+                    className="h-10 px-3 bg-green-600 hover:bg-green-700 text-white"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -845,6 +915,59 @@ Please maintain the core information and key insights from the original article 
               
               <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-green-700">
                 <p>💡 <strong>Tip:</strong> Your file will be automatically cleaned up from the server after 1 hour for security.</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Conversion Error Debug Section */}
+        {conversionError && (
+          <Card className="mt-6 sm:mt-8 border-red-200 bg-red-50">
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-red-800 text-lg sm:text-xl">
+                <X className="h-5 w-5" />
+                Conversion Failed
+              </CardTitle>
+              <CardDescription className="text-red-700 text-sm sm:text-base">
+                {conversionError.message}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {conversionError.details && (
+                  <div>
+                    <h4 className="font-semibold text-red-800 mb-2">Error Details:</h4>
+                    <pre className="bg-red-100 p-3 rounded text-sm overflow-x-auto text-red-700">
+                      {conversionError.details}
+                    </pre>
+                  </div>
+                )}
+                {conversionError.stderr && (
+                  <div>
+                    <h4 className="font-semibold text-red-800 mb-2">Standard Error:</h4>
+                    <pre className="bg-red-100 p-3 rounded text-sm overflow-x-auto text-red-700">
+                      {conversionError.stderr}
+                    </pre>
+                  </div>
+                )}
+                {conversionError.stdout && (
+                  <div>
+                    <h4 className="font-semibold text-red-800 mb-2">Standard Output:</h4>
+                    <pre className="bg-red-100 p-3 rounded text-sm overflow-x-auto text-red-700">
+                      {conversionError.stdout}
+                    </pre>
+                  </div>
+                )}
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => setConversionError(null)}
+                    size="sm"
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Dismiss
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
