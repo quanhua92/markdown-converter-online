@@ -21,7 +21,7 @@ app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
-  const distPath = path.join(__dirname, '../dist');
+  const distPath = path.join(__dirname, '../../dist');
   app.use(express.static(distPath));
   
   // Handle client-side routing - this should be after API routes
@@ -128,7 +128,7 @@ app.get('/api/health', (_req, res) => {
 // Handle client-side routing in production (after all API routes)
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (_req, res) => {
-    const distPath = path.join(__dirname, '../dist');
+    const distPath = path.join(__dirname, '../../dist');
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
