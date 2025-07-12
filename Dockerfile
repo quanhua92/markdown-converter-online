@@ -73,8 +73,6 @@ RUN npm install -g pnpm && \
 # Copy built artifacts from builder stage
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/server/dist ./server/dist
-COPY --from=builder /usr/src/app/server/minimal.js ./server/
-COPY --from=builder /usr/src/app/server/tsconfig.json ./server/
 
 # Create runtime directories and user
 RUN mkdir -p server/downloads server/temp && \
