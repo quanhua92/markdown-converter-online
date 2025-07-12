@@ -99,7 +99,7 @@ test_conversion() {
         -X POST \
         -H "Content-Type: application/json" \
         -d "$test_content" \
-        "http://localhost:3000$endpoint" > "$temp_file" 2>/dev/null; then
+        "http://localhost:3001$endpoint" > "$temp_file" 2>/dev/null; then
         
         local http_code=$(tail -n1 "$temp_file")
         local response_body=$(sed '$d' "$temp_file")
@@ -111,7 +111,7 @@ test_conversion() {
             if [ "$download_url" != "null" ] && [ "$download_url" != "" ]; then
                 # Download the file
                 local output_file="test-output.$expected_extension"
-                if curl -s -f --max-time 30 "http://localhost:3000$download_url" -o "$output_file" 2>/dev/null; then
+                if curl -s -f --max-time 30 "http://localhost:3001$download_url" -o "$output_file" 2>/dev/null; then
                     if [ -f "$output_file" ] && [ -s "$output_file" ]; then
                         local file_size=$(du -h "$output_file" | cut -f1)
                         print_success "$format conversion - File: $output_file ($file_size)"
@@ -158,7 +158,7 @@ test_conversion() {
 test_health() {
     print_test "API Health Check"
     
-    if response=$(curl -s --max-time 5 "http://localhost:3000/api/health" 2>/dev/null); then
+    if response=$(curl -s --max-time 5 "http://localhost:3001/api/health" 2>/dev/null); then
         if echo "$response" | jq -e '.status == "OK"' >/dev/null 2>&1; then
             print_success "API is healthy and responding"
             test_results_health="PASS"
@@ -177,7 +177,7 @@ test_health() {
 test_web_interface() {
     print_test "Web Interface Accessibility"
     
-    if curl -s -I --max-time 10 "http://localhost:3000/" 2>/dev/null | grep -q "HTTP/1.1 200"; then
+    if curl -s -I --max-time 10 "http://localhost:3001/" 2>/dev/null | grep -q "HTTP/1.1 200"; then
         print_success "Web interface is accessible"
         test_results_web="PASS"
     else
@@ -203,7 +203,7 @@ main() {
     # Wait for server to be ready
     echo -e "${YELLOW}Waiting for server to be ready...${NC}"
     for i in {1..10}; do
-        if curl -s --max-time 2 "http://localhost:3000/api/health" >/dev/null 2>&1; then
+        if curl -s --max-time 2 "http://localhost:3001/api/health" >/dev/null 2>&1; then
             echo -e "${GREEN}Server is ready!${NC}\n"
             break
         fi

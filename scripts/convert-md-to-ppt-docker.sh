@@ -6,7 +6,7 @@
 set -e  # Exit on any error
 
 # Configuration
-API_URL="http://localhost:3000"
+API_URL="http://localhost:3001"
 DOWNLOADS_DIR="./downloads"
 
 # Colors for output

@@ -28,7 +28,7 @@ curl -s -w "\n%{http_code}" \
     -X POST \
     -H "Content-Type: application/json" \
     -d "$markdown_content" \
-    "http://localhost:3000/api/convert/marp" > "$temp_response_file" &
+    "http://localhost:3001/api/convert/marp" > "$temp_response_file" &
 
 curl_pid=$!
 
@@ -75,7 +75,7 @@ if [ "$http_code" -eq 200 ]; then
         echo -e "${BLUE}Downloading PowerPoint file...${NC}"
         output_file="docker-test-presentation.pptx"
         
-        if curl -s -f --max-time 30 "http://localhost:3000${download_url}" -o "$output_file"; then
+        if curl -s -f --max-time 30 "http://localhost:3001${download_url}" -o "$output_file"; then
             echo -e "${GREEN}PowerPoint file downloaded successfully!${NC}"
             echo -e "${GREEN}File saved as: $output_file${NC}"
             echo "File size: $(du -h "$output_file" | cut -f1)"

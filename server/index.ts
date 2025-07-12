@@ -17,15 +17,37 @@ const PORT = 3001;
 app.use(helmet());
 app.use(cors({ origin: process.env.NODE_ENV === 'production' ? false : 'http://localhost:5173' }));
 app.use(express.json({ limit: '10mb' }));
-app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
-// Serve static files in production
+// Serve static files in production BEFORE rate limiting
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '../../dist');
-  app.use(express.static(distPath));
+  console.log('Production mode: serving static files from', distPath);
   
-  // Handle client-side routing - this should be after API routes
+  // Check if the directory exists
+  try {
+    await fs.access(distPath);
+    console.log('✓ Dist directory exists:', distPath);
+    
+    // List files in dist directory
+    const files = await fs.readdir(distPath);
+    console.log('Files in dist directory:', files);
+  } catch (error) {
+    console.error('✗ Dist directory does not exist:', distPath);
+  }
+  
+  // Serve static files with logging
+  app.use('/', (req, res, next) => {
+    console.log('Static file request:', req.url);
+    next();
+  }, express.static(distPath, { 
+    index: ['index.html'],
+    setHeaders: (res, path) => {
+      console.log('Serving static file:', path);
+    }
+  }));
 }
+
+app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 const downloadsDir = path.join(__dirname, 'downloads');
 const tempDir = path.join(__dirname, 'temp');
@@ -54,9 +76,12 @@ app.post('/api/convert/marp', async (req, res) => {
       if (error) {
         console.error('Marp conversion error:', error.message);
         console.error('Stderr:', stderr);
+        console.error('Stdout:', stdout);
         return res.status(500).json({ 
           error: 'Conversion failed - browser or marp issue',
-          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+          details: error.message,
+          stderr: stderr,
+          stdout: stdout
         });
       }
       
@@ -91,9 +116,12 @@ app.post('/api/convert/pandoc', async (req, res) => {
       if (error) {
         console.error('Pandoc conversion error:', error.message);
         console.error('Stderr:', stderr);
+        console.error('Stdout:', stdout);
         return res.status(500).json({ 
           error: `Conversion failed for ${format} format`,
-          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+          details: error.message,
+          stderr: stderr,
+          stdout: stdout
         });
       }
       
@@ -127,9 +155,11 @@ app.get('/api/health', (_req, res) => {
 
 // Handle client-side routing in production (after all API routes)
 if (process.env.NODE_ENV === 'production') {
-  app.get('*', (_req, res) => {
+  app.get('/', (req, res) => {
     const distPath = path.join(__dirname, '../../dist');
-    res.sendFile(path.join(distPath, 'index.html'));
+    const indexPath = path.join(distPath, 'index.html');
+    console.log('Serving index.html for root path from:', indexPath);
+    res.sendFile(indexPath);
   });
 }
 
