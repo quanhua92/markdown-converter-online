@@ -39,6 +39,13 @@ Happy converting! 🎉`)
 
   const [selectedFormat, setSelectedFormat] = useState<string>('pptx')
   const [isConverting, setIsConverting] = useState(false)
+  const [downloadResult, setDownloadResult] = useState<{
+    success: boolean;
+    downloadUrl: string;
+    filename: string;
+    format: string;
+    timestamp: Date;
+  } | null>(null)
 
   const formatConfig = {
     pptx: { 
@@ -103,25 +110,16 @@ Happy converting! 🎉`)
       const result = await response.json()
       
       if (result.success && result.downloadUrl) {
+        // Store download result for UI display
+        setDownloadResult({
+          success: true,
+          downloadUrl: result.downloadUrl,
+          filename: result.filename,
+          format: selectedFormat,
+          timestamp: new Date()
+        })
+        
         toast.success(`${config.label} file ready for download!`)
-        
-        // Download the file
-        const downloadResponse = await fetch(result.downloadUrl)
-        if (!downloadResponse.ok) {
-          throw new Error('Failed to download file')
-        }
-        
-        const blob = await downloadResponse.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = result.filename || `document.${selectedFormat}`
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
-        
-        toast.success('File downloaded successfully!')
       } else {
         throw new Error('Invalid response from server')
       }
@@ -135,6 +133,35 @@ Happy converting! 🎉`)
 
   const currentConfig = formatConfig[selectedFormat as keyof typeof formatConfig]
   const IconComponent = currentConfig.icon
+
+  const handleDownload = async () => {
+    if (!downloadResult) return
+    
+    try {
+      const downloadResponse = await fetch(downloadResult.downloadUrl)
+      if (!downloadResponse.ok) {
+        throw new Error('Failed to download file')
+      }
+      
+      const blob = await downloadResponse.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = downloadResult.filename
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      toast.success('File downloaded successfully!')
+    } catch (error) {
+      toast.error('Download failed. Please try again.')
+    }
+  }
+
+  const clearResult = () => {
+    setDownloadResult(null)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
@@ -228,25 +255,90 @@ Happy converting! 🎉`)
         </Card>
 
         <div className="text-center">
-          <Button 
-            onClick={handleConvert}
-            disabled={isConverting || !markdown.trim()}
-            size="lg"
-            className="px-8"
-          >
-            {isConverting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Converting...
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" />
-                Convert to {currentConfig.label}
-              </>
-            )}
-          </Button>
+          {!downloadResult ? (
+            <Button 
+              onClick={handleConvert}
+              disabled={isConverting || !markdown.trim()}
+              size="lg"
+              className="px-8"
+            >
+              {isConverting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Converting...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  Convert to {currentConfig.label}
+                </>
+              )}
+            </Button>
+          ) : (
+            <Button 
+              onClick={clearResult}
+              variant="outline"
+              size="lg"
+              className="px-8"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Convert Another File
+            </Button>
+          )}
         </div>
+
+        {/* Download Result UI */}
+        {downloadResult && (
+          <Card className="mt-8 border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-800">
+                <Download className="h-5 w-5" />
+                Conversion Complete!
+              </CardTitle>
+              <CardDescription className="text-green-700">
+                Your {formatConfig[downloadResult.format as keyof typeof formatConfig].label} file is ready for download
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 bg-white rounded-lg border">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    {(() => {
+                      const IconComponent = formatConfig[downloadResult.format as keyof typeof formatConfig].icon
+                      return IconComponent ? <IconComponent className="h-6 w-6 text-green-600" /> : null
+                    })()}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{downloadResult.filename}</p>
+                    <p className="text-sm text-gray-500">
+                      Generated {downloadResult.timestamp.toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleDownload}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                  </Button>
+                  <Button
+                    onClick={clearResult}
+                    variant="outline"
+                    size="sm"
+                  >
+                    ✕
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="mt-4 text-sm text-green-700">
+                <p>💡 <strong>Tip:</strong> Your file will be automatically cleaned up from the server after 1 hour for security.</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>Powered by Marp CLI and Pandoc • Built with React and Express</p>
