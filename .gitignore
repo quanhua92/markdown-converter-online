@@ -1,0 +1,19 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+count.txt
+.env
+.nitro
+.tanstack
+
+# Temporary files
+server.log
+test-output.*
+test_simple.md
+sample_presentation.md
+downloads/
+server/dist/
+server/downloads/
+server/temp/
