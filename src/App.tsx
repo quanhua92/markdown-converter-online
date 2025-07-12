@@ -703,7 +703,7 @@ Please maintain the core information and key insights from the original article 
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-4 sm:py-8 lg:py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-gray-900 dark:to-indigo-950 py-4 sm:py-8 lg:py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
@@ -720,7 +720,7 @@ Please maintain the core information and key insights from the original article 
               onClick={() => setCurrentView('converter')}
               variant={currentView === 'converter' ? 'default' : 'outline'}
               size="default"
-              className="flex items-center gap-2 px-4 py-2"
+              className={`flex items-center gap-2 px-4 py-2 ${currentView === 'converter' ? 'btn-gradient' : 'btn-elegant'}`}
             >
               <FileText className="h-4 w-4" />
               Converter
@@ -729,7 +729,7 @@ Please maintain the core information and key insights from the original article 
               onClick={() => setCurrentView('guides')}
               variant={currentView === 'guides' ? 'default' : 'outline'}
               size="default"
-              className="flex items-center gap-2 px-4 py-2"
+              className={`flex items-center gap-2 px-4 py-2 ${currentView === 'guides' ? 'btn-gradient' : 'btn-elegant'}`}
             >
               <BookOpen className="h-4 w-4" />
               Guides
@@ -738,7 +738,7 @@ Please maintain the core information and key insights from the original article 
               onClick={toggleTheme}
               variant="outline"
               size="default"
-              className="flex items-center gap-2 px-3 py-2"
+              className="flex items-center gap-2 px-3 py-2 btn-elegant"
               title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDarkMode ? (
@@ -756,7 +756,7 @@ Please maintain the core information and key insights from the original article 
           <>
             {/* Converter Content */}
 
-        <Card className="mb-8">
+        <Card className="mb-8 card-elegant">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
@@ -771,7 +771,7 @@ Please maintain the core information and key insights from the original article 
               <div className="flex justify-between items-center">
                 <div className="flex gap-2">
                   <Select onValueChange={applyTemplate}>
-                    <SelectTrigger className="w-40 h-9">
+                    <SelectTrigger className="w-40 h-9 input-elegant">
                       <SelectValue placeholder="Load Template" />
                     </SelectTrigger>
                     <SelectContent>
@@ -799,7 +799,7 @@ Please maintain the core information and key insights from the original article 
                 <Button
                   onClick={clearMarkdown}
                   size="sm"
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  className="flex items-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                   disabled={!markdown.trim()}
                 >
                   <X className="h-4 w-4" />
@@ -810,13 +810,13 @@ Please maintain the core information and key insights from the original article 
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
                 placeholder="Enter your markdown here..."
-                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm"
+                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm input-elegant"
               />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="mb-8">
+        <Card className="mb-8 card-elegant">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <IconComponent className="h-5 w-5" />
@@ -835,8 +835,8 @@ Please maintain the core information and key insights from the original article 
                 return (
                   <Card 
                     key={format}
-                    className={`cursor-pointer transition-all hover:shadow-md ${
-                      isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                    className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 card-elegant ${
+                      isSelected ? 'ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30' : ''
                     }`}
                     onClick={() => setSelectedFormat(format)}
                   >
@@ -858,7 +858,7 @@ Please maintain the core information and key insights from the original article 
             </div>
 
             <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full input-elegant">
                 <SelectValue placeholder="Select output format" />
               </SelectTrigger>
               <SelectContent>
@@ -881,7 +881,7 @@ Please maintain the core information and key insights from the original article 
               onClick={handleConvert}
               disabled={isConverting || !markdown.trim()}
               size="default"
-              className="w-full sm:w-auto px-6 py-2 h-10 bg-green-600 hover:bg-green-700 text-white"
+              className="w-full sm:w-auto px-6 py-2 h-10 btn-gradient hover:scale-105"
             >
               {isConverting ? (
                 <>
@@ -899,7 +899,7 @@ Please maintain the core information and key insights from the original article 
             <Button 
               onClick={clearResult}
               size="default"
-              className="w-full sm:w-auto px-6 py-2 h-10 bg-green-600 hover:bg-green-700 text-white"
+              className="w-full sm:w-auto px-6 py-2 h-10 btn-elegant hover:scale-105"
             >
               <FileText className="mr-2 h-4 w-4" />
               Convert Another File
@@ -909,7 +909,7 @@ Please maintain the core information and key insights from the original article 
 
         {/* Download Result UI - Mobile First */}
         {downloadResult && (
-          <Card className="mt-6 sm:mt-8 border-green-200 bg-green-50">
+          <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 card-elegant">
             <CardHeader className="pb-3 sm:pb-6">
               <CardTitle className="flex items-center gap-2 text-green-800 text-lg sm:text-xl">
                 <Download className="h-5 w-5" />
@@ -920,7 +920,7 @@ Please maintain the core information and key insights from the original article 
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-white rounded-lg border gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border gap-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
                     {(() => {
@@ -938,7 +938,7 @@ Please maintain the core information and key insights from the original article 
                 <div className="flex gap-2 w-full sm:w-auto">
                   <Button
                     onClick={handleDownload}
-                    className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-none h-10 px-6"
+                    className="btn-gradient flex-1 sm:flex-none h-10 px-6 hover:scale-105"
                     size="default"
                   >
                     <Download className="mr-2 h-4 w-4" />
@@ -947,7 +947,7 @@ Please maintain the core information and key insights from the original article 
                   <Button
                     onClick={clearResult}
                     size="default"
-                    className="h-10 px-3 bg-green-600 hover:bg-green-700 text-white"
+                    className="h-10 px-3 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -963,7 +963,7 @@ Please maintain the core information and key insights from the original article 
 
         {/* Conversion Error Debug Section */}
         {conversionError && (
-          <Card className="mt-6 sm:mt-8 border-red-200 bg-red-50">
+          <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700 card-elegant">
             <CardHeader className="pb-3 sm:pb-6">
               <CardTitle className="flex items-center gap-2 text-red-800 text-lg sm:text-xl">
                 <X className="h-5 w-5" />
@@ -1003,7 +1003,7 @@ Please maintain the core information and key insights from the original article 
                   <Button
                     onClick={() => setConversionError(null)}
                     size="sm"
-                    className="bg-red-600 hover:bg-red-700 text-white"
+                    className="btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                   >
                     <X className="mr-2 h-4 w-4" />
                     Dismiss
