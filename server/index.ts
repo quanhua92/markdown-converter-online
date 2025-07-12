@@ -144,7 +144,7 @@ app.get('/test', (_req, res) => {
 // Setup static file serving (called after all routes are defined)
 async function setupStaticFiles() {
   if (process.env.NODE_ENV === 'production') {
-    const distPath = path.join(__dirname, '../dist');
+    const distPath = path.join(__dirname, '../../dist');
     console.log('Setting up static files from:', distPath);
     
     try {

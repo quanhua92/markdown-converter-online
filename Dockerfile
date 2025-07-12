@@ -85,4 +85,4 @@ RUN mkdir -p server/downloads server/temp && \
 USER appuser
 
 EXPOSE 3001
-CMD ["node", "server/minimal.js"]
+CMD ["node", "server/dist/index.js"]
