@@ -792,6 +792,15 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                       Preview
                     </Button>
                     <Button
+                      onClick={handlePrint}
+                      size="sm"
+                      className="flex items-center gap-2 btn-elegant"
+                      disabled={!markdown.trim()}
+                    >
+                      <Printer className="h-4 w-4" />
+                      Print
+                    </Button>
+                    <Button
                       onClick={clearMarkdown}
                       size="sm"
                       className="flex items-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
@@ -894,6 +903,15 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   >
                     <Eye className="h-4 w-4" />
                     Preview
+                  </Button>
+                  <Button
+                    onClick={handlePrint}
+                    size="sm"
+                    className="flex items-center gap-2 btn-elegant"
+                    disabled={!markdown.trim()}
+                  >
+                    <Printer className="h-4 w-4" />
+                    Print
                   </Button>
                   <Button
                     onClick={clearMarkdown}
