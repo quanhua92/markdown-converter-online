@@ -14,6 +14,12 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
+// Debug ALL requests at the very top
+app.use((req, res, next) => {
+  console.log('🔍 ALL REQUESTS:', req.method, req.originalUrl);
+  next();
+});
+
 app.use(helmet({
   contentSecurityPolicy: false,  // Disable CSP completely for reverse proxy
 }));
@@ -273,7 +279,7 @@ app.get('/debug', (_req, res) => {
 // Setup static file serving (called after all routes are defined)
 async function setupStaticFiles() {
   if (process.env.NODE_ENV === 'production') {
-    const distPath = path.join(__dirname, '../../dist');
+    const distPath = path.resolve('dist');
     console.log('Setting up static files from:', distPath);
     
     try {
@@ -281,8 +287,18 @@ async function setupStaticFiles() {
       const files = await fs.readdir(distPath);
       console.log('Static files available:', files);
       
+      // Debug middleware to log all requests
+      app.use('*', (req, res, next) => {
+        console.log('📥 Request:', req.method, req.originalUrl, req.path);
+        next();
+      });
+      
       // Serve static files
-      app.use(express.static(distPath));
+      app.use(express.static(distPath, {
+        setHeaders: (res, path) => {
+          console.log('📁 Serving static file:', path);
+        }
+      }));
       
       // Handle client-side routing for SPA
       app.get('*', (req, res) => {
@@ -291,8 +307,10 @@ async function setupStaticFiles() {
           return res.status(404).json({ error: 'API endpoint not found' });
         }
         
-        console.log('Serving index.html for:', req.path);
-        res.sendFile(path.join(distPath, 'index.html'));
+        console.log('SPA fallback triggered for:', req.path);
+        const indexPath = path.join(distPath, 'index.html');
+        console.log('Sending file:', indexPath);
+        res.sendFile(indexPath);
       });
       
       console.log('✓ Static file serving configured');
@@ -305,13 +323,16 @@ async function setupStaticFiles() {
 // Async startup function
 async function startServer() {
   try {
+    console.log('🚀 Starting server...');
     // Ensure directories exist
     await fs.mkdir(downloadsDir, { recursive: true });
     await fs.mkdir(tempDir, { recursive: true });
     console.log('✓ Server directories created');
 
     // Setup static file serving AFTER all routes
+    console.log('🔧 Setting up static files...');
     await setupStaticFiles();
+    console.log('🔧 Static files setup complete');
 
     // Start the server
     app.listen(PORT, () => {
@@ -319,7 +340,10 @@ async function startServer() {
       console.log('✓ Server startup complete');
     });
   } catch (error) {
-    console.error('Server startup failed:', error);
+    console.error('❌ Server startup failed:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', error.stack);
+    }
     process.exit(1);
   }
 }
