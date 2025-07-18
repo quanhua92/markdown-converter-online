@@ -753,7 +753,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                   <div className="flex gap-2">
                     <Select onValueChange={applyTemplate}>
                       <SelectTrigger className="w-40 h-9 input-elegant">
@@ -781,7 +781,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       onClick={() => setShowConverterPreview(!showConverterPreview)}
                       size="sm"
@@ -866,7 +866,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <div className="flex gap-2">
                   <Select onValueChange={applyTemplate}>
                     <SelectTrigger className="w-40 h-9 input-elegant">
@@ -894,7 +894,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     onClick={() => setShowConverterPreview(!showConverterPreview)}
                     size="sm"
