@@ -3,9 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
 import { toast, Toaster } from 'sonner'
-import { Download, FileText, Presentation, File, Loader2, X, BookOpen, Code, Zap, Copy, ChevronDown, Sun, Moon } from 'lucide-react'
+import { Download, FileText, Presentation, File, Loader2, X, BookOpen, Code, Zap, Copy, ChevronDown, Sun, Moon, Settings, ToggleLeft, ToggleRight } from 'lucide-react'
 
 function App() {
   const [markdown, setMarkdown] = useState(`---
@@ -54,6 +57,38 @@ Happy converting! 🎉`)
     stdout?: string;
   } | null>(null)
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false)
+  const [conversionOptions, setConversionOptions] = useState<{
+    // Marp options
+    theme?: string;
+    imageScale?: number;
+    browserTimeout?: number;
+    browser?: string;
+    // Pandoc options
+    margin?: string;
+    fontSize?: string;
+    toc?: boolean;
+    tocDepth?: number;
+    colorLinks?: boolean;
+    paperSize?: string;
+    selfContained?: boolean;
+    sectionDivs?: boolean;
+    citeproc?: boolean;
+  }>({
+    theme: 'default',
+    imageScale: 2,
+    browserTimeout: 60000,
+    browser: 'chrome',
+    margin: '1in',
+    fontSize: '12pt',
+    toc: false,
+    tocDepth: 2,
+    colorLinks: true,
+    paperSize: 'a4paper',
+    selfContained: false,
+    sectionDivs: false,
+    citeproc: false
+  })
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -125,8 +160,8 @@ Happy converting! 🎉`)
     
     try {
       const payload = selectedFormat === 'pptx' 
-        ? { markdown }
-        : { markdown, format: selectedFormat }
+        ? { markdown, options: conversionOptions }
+        : { markdown, format: selectedFormat, options: conversionOptions }
       
       toast.info(`Converting to ${config.label}...`)
       
@@ -872,6 +907,200 @@ Please maintain the core information and key insights from the original article 
                 ))}
               </SelectContent>
             </Select>
+            
+            {/* Advanced Options */}
+            <Collapsible open={showAdvancedOptions} onOpenChange={setShowAdvancedOptions}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full flex items-center justify-between mt-4 btn-elegant">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Advanced Options
+                  </div>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedOptions ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-4 mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                {selectedFormat === 'pptx' ? (
+                  /* Marp Options */
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="theme">Theme</Label>
+                        <Select value={conversionOptions.theme} onValueChange={(value) => setConversionOptions({...conversionOptions, theme: value})}>
+                          <SelectTrigger className="input-elegant">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="default">Default</SelectItem>
+                            <SelectItem value="gaia">Gaia</SelectItem>
+                            <SelectItem value="uncover">Uncover</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="imageScale">Image Scale</Label>
+                        <Select value={conversionOptions.imageScale?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, imageScale: parseInt(value)})}>
+                          <SelectTrigger className="input-elegant">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1">1x (Standard)</SelectItem>
+                            <SelectItem value="2">2x (High Quality)</SelectItem>
+                            <SelectItem value="3">3x (Ultra High)</SelectItem>
+                            <SelectItem value="4">4x (Maximum)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="browser">Browser</Label>
+                        <Select value={conversionOptions.browser} onValueChange={(value) => setConversionOptions({...conversionOptions, browser: value})}>
+                          <SelectTrigger className="input-elegant">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="auto">Auto</SelectItem>
+                            <SelectItem value="chrome">Chrome</SelectItem>
+                            <SelectItem value="firefox">Firefox</SelectItem>
+                            <SelectItem value="edge">Edge</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="browserTimeout">Browser Timeout</Label>
+                        <Select value={conversionOptions.browserTimeout?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, browserTimeout: parseInt(value)})}>
+                          <SelectTrigger className="input-elegant">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="30000">30 seconds</SelectItem>
+                            <SelectItem value="60000">60 seconds</SelectItem>
+                            <SelectItem value="90000">90 seconds</SelectItem>
+                            <SelectItem value="120000">120 seconds</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Pandoc Options */
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {selectedFormat === 'pdf' && (
+                        <>
+                          <div>
+                            <Label htmlFor="margin">Page Margins</Label>
+                            <Select value={conversionOptions.margin} onValueChange={(value) => setConversionOptions({...conversionOptions, margin: value})}>
+                              <SelectTrigger className="input-elegant">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="0.5in">0.5 inch</SelectItem>
+                                <SelectItem value="1in">1 inch</SelectItem>
+                                <SelectItem value="1.5in">1.5 inches</SelectItem>
+                                <SelectItem value="2in">2 inches</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label htmlFor="fontSize">Font Size</Label>
+                            <Select value={conversionOptions.fontSize} onValueChange={(value) => setConversionOptions({...conversionOptions, fontSize: value})}>
+                              <SelectTrigger className="input-elegant">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="10pt">10pt</SelectItem>
+                                <SelectItem value="11pt">11pt</SelectItem>
+                                <SelectItem value="12pt">12pt</SelectItem>
+                                <SelectItem value="14pt">14pt</SelectItem>
+                                <SelectItem value="16pt">16pt</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label htmlFor="paperSize">Paper Size</Label>
+                            <Select value={conversionOptions.paperSize} onValueChange={(value) => setConversionOptions({...conversionOptions, paperSize: value})}>
+                              <SelectTrigger className="input-elegant">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="a4paper">A4</SelectItem>
+                                <SelectItem value="letterpaper">Letter</SelectItem>
+                                <SelectItem value="a3paper">A3</SelectItem>
+                                <SelectItem value="a5paper">A5</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </>
+                      )}
+                      {selectedFormat === 'html' && (
+                        <>
+                          <div className="flex items-center space-x-2">
+                            <Switch 
+                              id="selfContained" 
+                              checked={conversionOptions.selfContained} 
+                              onCheckedChange={(checked) => setConversionOptions({...conversionOptions, selfContained: checked})}
+                            />
+                            <Label htmlFor="selfContained">Self-contained HTML</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Switch 
+                              id="sectionDivs" 
+                              checked={conversionOptions.sectionDivs} 
+                              onCheckedChange={(checked) => setConversionOptions({...conversionOptions, sectionDivs: checked})}
+                            />
+                            <Label htmlFor="sectionDivs">Section divs</Label>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="toc" 
+                          checked={conversionOptions.toc} 
+                          onCheckedChange={(checked) => setConversionOptions({...conversionOptions, toc: checked})}
+                        />
+                        <Label htmlFor="toc">Table of Contents</Label>
+                      </div>
+                      {conversionOptions.toc && (
+                        <div className="ml-6">
+                          <Label htmlFor="tocDepth">TOC Depth</Label>
+                          <Select value={conversionOptions.tocDepth?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, tocDepth: parseInt(value)})}>
+                            <SelectTrigger className="input-elegant w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">1 level</SelectItem>
+                              <SelectItem value="2">2 levels</SelectItem>
+                              <SelectItem value="3">3 levels</SelectItem>
+                              <SelectItem value="4">4 levels</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      {selectedFormat === 'pdf' && (
+                        <div className="flex items-center space-x-2">
+                          <Switch 
+                            id="colorLinks" 
+                            checked={conversionOptions.colorLinks} 
+                            onCheckedChange={(checked) => setConversionOptions({...conversionOptions, colorLinks: checked})}
+                          />
+                          <Label htmlFor="colorLinks">Colored Links</Label>
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="citeproc" 
+                          checked={conversionOptions.citeproc} 
+                          onCheckedChange={(checked) => setConversionOptions({...conversionOptions, citeproc: checked})}
+                        />
+                        <Label htmlFor="citeproc">Citation Processing</Label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           </CardContent>
         </Card>
 
@@ -1000,14 +1229,24 @@ Please maintain the core information and key insights from the original article 
                   </div>
                 )}
                 <div className="flex justify-end">
-                  <Button
-                    onClick={() => setConversionError(null)}
-                    size="sm"
-                    className="btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Dismiss
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setConversionError(null)}
+                      size="sm"
+                      className="btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Dismiss
+                    </Button>
+                    <Button
+                      onClick={() => setShowAdvancedOptions(true)}
+                      size="sm"
+                      className="btn-elegant"
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Check Options
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>

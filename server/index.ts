@@ -31,7 +31,7 @@ const tempDir = path.join(__dirname, 'temp');
 // Marp conversion endpoint
 app.post('/api/convert/marp', async (req, res) => {
   try {
-    const { markdown } = req.body;
+    const { markdown, options = {} } = req.body;
     if (!markdown) return res.status(400).json({ error: 'Markdown required' });
 
     const filename = `presentation_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
@@ -40,18 +40,40 @@ app.post('/api/convert/marp', async (req, res) => {
 
     await fs.writeFile(mdPath, markdown, 'utf8');
 
-    // Enhanced Marp command with proper Chrome configuration
-    const marpCommand = `npx @marp-team/marp-cli "${mdPath}" --output "${pptxPath}" --no-stdin ` +
-      `--chrome-arg=--no-sandbox ` +
-      `--chrome-arg=--disable-dev-shm-usage ` +
-      `--chrome-arg=--disable-gpu ` +
-      `--chrome-arg=--headless ` +
-      `--chrome-arg=--disable-web-security ` +
-      `--chrome-arg=--disable-features=VizDisplayCompositor ` +
-      `--chrome-arg=--run-all-compositor-stages-before-draw ` +
-      `--chrome-arg=--disable-background-timer-throttling ` +
-      `--chrome-arg=--disable-renderer-backgrounding ` +
-      `--chrome-arg=--disable-backgrounding-occluded-windows`;
+    // Build Marp command with options
+    let marpCommand = `npx @marp-team/marp-cli "${mdPath}" --output "${pptxPath}" --no-stdin`;
+    
+    // Add theme option
+    if (options.theme && ['default', 'gaia', 'uncover'].includes(options.theme)) {
+      marpCommand += ` --theme ${options.theme}`;
+    }
+    
+    // Add image scale option
+    if (options.imageScale && [1, 2, 3, 4].includes(options.imageScale)) {
+      marpCommand += ` --image-scale ${options.imageScale}`;
+    }
+    
+    // Add browser timeout option
+    if (options.browserTimeout && options.browserTimeout >= 30000 && options.browserTimeout <= 120000) {
+      marpCommand += ` --browser-timeout ${options.browserTimeout}`;
+    }
+    
+    // Add browser selection option
+    if (options.browser && ['auto', 'chrome', 'firefox', 'edge'].includes(options.browser)) {
+      marpCommand += ` --browser ${options.browser}`;
+    }
+    
+    // Add Chrome configuration for headless operation
+    marpCommand += ` --chrome-arg=--no-sandbox` +
+      ` --chrome-arg=--disable-dev-shm-usage` +
+      ` --chrome-arg=--disable-gpu` +
+      ` --chrome-arg=--headless` +
+      ` --chrome-arg=--disable-web-security` +
+      ` --chrome-arg=--disable-features=VizDisplayCompositor` +
+      ` --chrome-arg=--run-all-compositor-stages-before-draw` +
+      ` --chrome-arg=--disable-background-timer-throttling` +
+      ` --chrome-arg=--disable-renderer-backgrounding` +
+      ` --chrome-arg=--disable-backgrounding-occluded-windows`;
     
     exec(marpCommand, { timeout: 30000 }, async (error, stdout, stderr) => {
       await fs.unlink(mdPath);
@@ -84,7 +106,7 @@ app.post('/api/convert/marp', async (req, res) => {
 // Pandoc conversion endpoint
 app.post('/api/convert/pandoc', async (req, res) => {
   try {
-    const { markdown, format } = req.body;
+    const { markdown, format, options = {} } = req.body;
     if (!markdown || !format) return res.status(400).json({ error: 'Markdown and format required' });
 
     const filename = `document_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
@@ -93,10 +115,69 @@ app.post('/api/convert/pandoc', async (req, res) => {
 
     await fs.writeFile(mdPath, markdown, 'utf8');
 
-    // Use PDF engine for better PDF generation
-    const pandocCmd = format === 'pdf' 
-      ? `pandoc "${mdPath}" -o "${outputPath}" --pdf-engine=xelatex`
-      : `pandoc "${mdPath}" -o "${outputPath}"`;
+    // Build Pandoc command with options
+    let pandocCmd = `pandoc "${mdPath}" -o "${outputPath}"`;
+    
+    // PDF-specific options
+    if (format === 'pdf') {
+      pandocCmd += ` --pdf-engine=xelatex`;
+      
+      // Add margins
+      if (options.margin && ['0.5in', '1in', '1.5in', '2in'].includes(options.margin)) {
+        pandocCmd += ` -V geometry:margin=${options.margin}`;
+      }
+      
+      // Add font size
+      if (options.fontSize && ['10pt', '11pt', '12pt', '14pt', '16pt'].includes(options.fontSize)) {
+        pandocCmd += ` -V fontsize=${options.fontSize}`;
+      }
+      
+      // Add table of contents
+      if (options.toc) {
+        pandocCmd += ` --toc`;
+        if (options.tocDepth && [1, 2, 3, 4].includes(options.tocDepth)) {
+          pandocCmd += ` --toc-depth=${options.tocDepth}`;
+        }
+      }
+      
+      // Add colored links
+      if (options.colorLinks) {
+        pandocCmd += ` -V colorlinks=true -V linkcolor=blue -V urlcolor=blue`;
+      }
+      
+      // Add paper size
+      if (options.paperSize && ['a4paper', 'letterpaper', 'a3paper', 'a5paper'].includes(options.paperSize)) {
+        pandocCmd += ` -V geometry:${options.paperSize}`;
+      }
+    }
+    
+    // HTML-specific options
+    if (format === 'html') {
+      pandocCmd += ` --standalone`;
+      
+      // Add table of contents
+      if (options.toc) {
+        pandocCmd += ` --toc`;
+        if (options.tocDepth && [1, 2, 3, 4].includes(options.tocDepth)) {
+          pandocCmd += ` --toc-depth=${options.tocDepth}`;
+        }
+      }
+      
+      // Add self-contained option
+      if (options.selfContained) {
+        pandocCmd += ` --self-contained`;
+      }
+      
+      // Add section divs
+      if (options.sectionDivs) {
+        pandocCmd += ` --section-divs`;
+      }
+    }
+    
+    // Citation processing for all formats
+    if (options.citeproc) {
+      pandocCmd += ` --citeproc`;
+    }
     
     exec(pandocCmd, { timeout: 15000 }, async (error, stdout, stderr) => {
       await fs.unlink(mdPath);
