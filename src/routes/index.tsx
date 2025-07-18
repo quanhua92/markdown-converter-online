@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
-import { Download, FileText, Presentation, File, Loader2 } from 'lucide-react'
+import { Download, FileText, Presentation, File, Loader2, Edit3 } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -107,6 +107,20 @@ Questions?`)
             <Badge variant="secondary">Marp PowerPoint</Badge>
             <Badge variant="secondary">Pandoc PDF</Badge>
             <Badge variant="secondary">DOCX Support</Badge>
+            <Badge variant="secondary">Live Preview</Badge>
+          </div>
+          <div className="flex justify-center mt-6">
+            <Button 
+              asChild 
+              variant="outline"
+              size="lg"
+              className="bg-white/50 hover:bg-white/80 backdrop-blur-sm"
+            >
+              <a href="/editor">
+                <Edit3 className="w-5 h-5 mr-2" />
+                Markdown Editor & Preview
+              </a>
+            </Button>
           </div>
         </div>
 
