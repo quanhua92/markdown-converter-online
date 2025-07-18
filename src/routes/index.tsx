@@ -781,12 +781,12 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
                       onClick={() => setShowConverterPreview(!showConverterPreview)}
                       size="sm"
                       variant={showConverterPreview ? "default" : "outline"}
-                      className={`flex items-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
+                      className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
                     >
                       <Eye className="h-4 w-4" />
                       Preview
@@ -794,7 +794,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <Button
                       onClick={handlePrint}
                       size="sm"
-                      className="flex items-center gap-2 btn-elegant"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant"
                       disabled={!markdown.trim()}
                     >
                       <Printer className="h-4 w-4" />
@@ -803,7 +803,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <Button
                       onClick={clearMarkdown}
                       size="sm"
-                      className="flex items-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                       disabled={!markdown.trim()}
                     >
                       <X className="h-4 w-4" />
@@ -894,12 +894,12 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     onClick={() => setShowConverterPreview(!showConverterPreview)}
                     size="sm"
                     variant={showConverterPreview ? "default" : "outline"}
-                    className={`flex items-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
+                    className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
                   >
                     <Eye className="h-4 w-4" />
                     Preview
@@ -907,7 +907,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   <Button
                     onClick={handlePrint}
                     size="sm"
-                    className="flex items-center gap-2 btn-elegant"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant"
                     disabled={!markdown.trim()}
                   >
                     <Printer className="h-4 w-4" />
@@ -916,7 +916,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   <Button
                     onClick={clearMarkdown}
                     size="sm"
-                    className="flex items-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                     disabled={!markdown.trim()}
                   >
                     <X className="h-4 w-4" />
