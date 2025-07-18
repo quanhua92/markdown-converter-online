@@ -1213,16 +1213,35 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-gray-900 dark:to-indigo-950 py-4 sm:py-8 lg:py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
-          <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-              Markdown Converter
-            </h1>
-            <p className="text-sm sm:text-base lg:text-xl text-gray-600 dark:text-gray-300 mt-1">
-              Convert markdown to PowerPoint, HTML, Word, or PDF
-            </p>
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+                Markdown Converter
+              </h1>
+              <p className="text-sm sm:text-base lg:text-xl text-gray-600 dark:text-gray-300 mt-1">
+                Convert markdown to PowerPoint, HTML, Word, or PDF
+              </p>
+            </div>
+            <div className="flex items-center">
+              <Button
+                onClick={toggleTheme}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 px-3 py-2 btn-elegant"
+                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDarkMode ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-3 items-center">
+          
+          {/* Navigation Tabs */}
+          <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4">
             <Button
               onClick={() => setCurrentView('converter')}
               variant={currentView === 'converter' ? 'default' : 'outline'}
@@ -1249,19 +1268,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             >
               <BookOpen className="h-4 w-4" />
               Guides
-            </Button>
-            <Button
-              onClick={toggleTheme}
-              variant="outline"
-              size="default"
-              className="flex items-center gap-2 px-3 py-2 btn-elegant"
-              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {isDarkMode ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
             </Button>
           </div>
         </div>
