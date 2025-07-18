@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
 import { toast, Toaster } from 'sonner'
-import { Download, FileText, Presentation, File, Loader2, Edit3, Eye, Printer, Settings, Moon, Sun, ChevronDown, BookOpen, Code, Zap, Copy, X } from 'lucide-react'
+import { Download, FileText, Presentation, File, Loader2, Edit3, Eye, Printer, Settings, Moon, Sun, ChevronDown, BookOpen, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
@@ -507,14 +507,6 @@ Happy converting! 🎉`)
     }
   }
 
-  const copyToClipboard = async (text: string, label: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      toast.success(`${label} copied to clipboard!`)
-    } catch (error) {
-      toast.error('Failed to copy to clipboard')
-    }
-  }
 
   const templates = {
     presentation: `---
@@ -1566,9 +1558,9 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         {currentView === 'guides' && renderGuides()}
 
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Powered by Marp CLI and Pandoc • Built with React and Express • Git: be564d1 • {new Date().toISOString()}</p>
+          <p>Powered by Marp CLI and Pandoc • Built with React and Express • Git: 07acf8e • {new Date().toISOString()}</p>
           <div className="bg-purple-500 text-white p-4 mt-4 rounded font-mono text-lg">
-            🚀 BUILD INFO: Git commit be564d1 • Build time: {new Date().toISOString()}
+            🚀 BUILD INFO: Git commit 07acf8e • Build time: {new Date().toISOString()}
           </div>
         </div>
       </div>

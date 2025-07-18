@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
 import { toast, Toaster } from 'sonner'
-import { Download, FileText, Presentation, File, Loader2, X, BookOpen, Code, Zap, Copy, ChevronDown, Sun, Moon, Settings, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Download, FileText, Presentation, File, Loader2, X, BookOpen, ChevronDown, Sun, Moon, Settings, Code, Copy, Zap } from 'lucide-react'
 
 function App() {
   const [markdown, setMarkdown] = useState(`---

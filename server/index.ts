@@ -15,7 +15,7 @@ const app = express();
 const PORT = 3000;
 
 // Debug ALL requests at the very top
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   console.log('🔍 ALL REQUESTS:', req.method, req.originalUrl);
   next();
 });
@@ -288,14 +288,14 @@ async function setupStaticFiles() {
       console.log('Static files available:', files);
       
       // Debug middleware to log all requests
-      app.use('*', (req, res, next) => {
+      app.use('*', (req, _res, next) => {
         console.log('📥 Request:', req.method, req.originalUrl, req.path);
         next();
       });
       
       // Serve static files
       app.use(express.static(distPath, {
-        setHeaders: (res, path) => {
+        setHeaders: (_res, path) => {
           console.log('📁 Serving static file:', path);
         }
       }));
