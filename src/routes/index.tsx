@@ -107,6 +107,7 @@ Happy converting! 🎉`)
   const [selectedFormat, setSelectedFormat] = useState<string>('pptx')
   const [isConverting, setIsConverting] = useState(false)
   const [currentView, setCurrentView] = useState<'converter' | 'guides' | 'editor'>('converter')
+  const [showConverterPreview, setShowConverterPreview] = useState(false)
   const [downloadResult, setDownloadResult] = useState<{
     success: boolean;
     downloadUrl: string;
@@ -738,65 +739,183 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
   const renderConverter = () => (
     <>
-      <Card className="mb-8 card-elegant">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Markdown Input
-          </CardTitle>
-          <CardDescription>
-            Enter your markdown content below. For presentations, use <code>---</code> to separate slides.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2">
-                <Select onValueChange={applyTemplate}>
-                  <SelectTrigger className="w-40 h-9 input-elegant">
-                    <SelectValue placeholder="Load Template" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="presentation">
-                      <div className="flex items-center gap-2">
-                        <Presentation className="h-4 w-4" />
-                        Presentation
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="document">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        Document
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="article">
-                      <div className="flex items-center gap-2">
-                        <File className="h-4 w-4" />
-                        Article
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+      {showConverterPreview ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <Card className="card-elegant">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Markdown Input
+              </CardTitle>
+              <CardDescription>
+                Enter your markdown content below. For presentations, use <code>---</code> to separate slides.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2">
+                    <Select onValueChange={applyTemplate}>
+                      <SelectTrigger className="w-40 h-9 input-elegant">
+                        <SelectValue placeholder="Load Template" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="presentation">
+                          <div className="flex items-center gap-2">
+                            <Presentation className="h-4 w-4" />
+                            Presentation
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="document">
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            Document
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="article">
+                          <div className="flex items-center gap-2">
+                            <File className="h-4 w-4" />
+                            Article
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setShowConverterPreview(!showConverterPreview)}
+                      size="sm"
+                      variant={showConverterPreview ? "default" : "outline"}
+                      className={`flex items-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
+                    >
+                      <Eye className="h-4 w-4" />
+                      Preview
+                    </Button>
+                    <Button
+                      onClick={clearMarkdown}
+                      size="sm"
+                      className="flex items-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                      disabled={!markdown.trim()}
+                    >
+                      <X className="h-4 w-4" />
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+                <Textarea
+                  value={markdown}
+                  onChange={(e) => setMarkdown(e.target.value)}
+                  placeholder="Enter your markdown here..."
+                  className="min-h-[400px] font-mono text-sm input-elegant"
+                />
               </div>
-              <Button
-                onClick={clearMarkdown}
-                size="sm"
-                className="flex items-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                disabled={!markdown.trim()}
-              >
-                <X className="h-4 w-4" />
-                Clear
-              </Button>
+            </CardContent>
+          </Card>
+          
+          <Card className="card-elegant">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Preview
+                <Badge variant="secondary" className="ml-2">Live</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="min-h-[400px] overflow-auto prose prose-sm max-w-none">
+                <div className="markdown-preview">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                    components={{
+                      code(props: any) {
+                        const { children, className, ...rest } = props
+                        const match = /language-(\w+)/.exec(className || '')
+                        if (match && match[1] === 'mermaid') {
+                          return <MermaidDiagram chart={children as string} />
+                        }
+                        return <code {...rest} className={className}>{children}</code>
+                      }
+                    }}
+                  >
+                    {markdown}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <Card className="mb-8 card-elegant">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Markdown Input
+            </CardTitle>
+            <CardDescription>
+              Enter your markdown content below. For presentations, use <code>---</code> to separate slides.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  <Select onValueChange={applyTemplate}>
+                    <SelectTrigger className="w-40 h-9 input-elegant">
+                      <SelectValue placeholder="Load Template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="presentation">
+                        <div className="flex items-center gap-2">
+                          <Presentation className="h-4 w-4" />
+                          Presentation
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="document">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Document
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="article">
+                        <div className="flex items-center gap-2">
+                          <File className="h-4 w-4" />
+                          Article
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => setShowConverterPreview(!showConverterPreview)}
+                    size="sm"
+                    variant={showConverterPreview ? "default" : "outline"}
+                    className={`flex items-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
+                  >
+                    <Eye className="h-4 w-4" />
+                    Preview
+                  </Button>
+                  <Button
+                    onClick={clearMarkdown}
+                    size="sm"
+                    className="flex items-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                    disabled={!markdown.trim()}
+                  >
+                    <X className="h-4 w-4" />
+                    Clear
+                  </Button>
+                </div>
+              </div>
+              <Textarea
+                value={markdown}
+                onChange={(e) => setMarkdown(e.target.value)}
+                placeholder="Enter your markdown here..."
+                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm input-elegant"
+              />
             </div>
-            <Textarea
-              value={markdown}
-              onChange={(e) => setMarkdown(e.target.value)}
-              placeholder="Enter your markdown here..."
-              className="min-h-[200px] sm:min-h-[300px] font-mono text-sm input-elegant"
-            />
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="mb-8 card-elegant">
         <CardHeader>
