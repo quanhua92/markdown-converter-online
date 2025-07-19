@@ -14,6 +14,7 @@ export interface Workspace {
 
 interface WorkspaceSelectorProps {
   currentWorkspace: string
+  workspaces?: Workspace[]
   onWorkspaceChange: (workspaceId: string) => void
   onWorkspaceCreate: (name: string) => void
   onWorkspaceDelete: (workspaceId: string) => void
@@ -22,68 +23,20 @@ interface WorkspaceSelectorProps {
 
 export function WorkspaceSelector({
   currentWorkspace,
+  workspaces = [],
   onWorkspaceChange,
   onWorkspaceCreate,
   onWorkspaceDelete,
   onWorkspaceRename
 }: WorkspaceSelectorProps) {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [newWorkspaceName, setNewWorkspaceName] = useState('')
   const [renamingWorkspace, setRenamingWorkspace] = useState<string | null>(null)
 
-  // Load workspaces from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem('markdown-explorer-workspaces')
-    if (stored) {
-      try {
-        const parsedWorkspaces = JSON.parse(stored)
-        setWorkspaces(parsedWorkspaces)
-      } catch (error) {
-        console.error('Error loading workspaces:', error)
-        // Initialize with default workspace
-        const defaultWorkspace: Workspace = {
-          id: 'default',
-          name: 'Default Workspace',
-          createdAt: new Date().toISOString(),
-          lastModified: new Date().toISOString()
-        }
-        setWorkspaces([defaultWorkspace])
-        localStorage.setItem('markdown-explorer-workspaces', JSON.stringify([defaultWorkspace]))
-      }
-    } else {
-      // Initialize with default workspace
-      const defaultWorkspace: Workspace = {
-        id: 'default',
-        name: 'Default Workspace',
-        createdAt: new Date().toISOString(),
-        lastModified: new Date().toISOString()
-      }
-      setWorkspaces([defaultWorkspace])
-      localStorage.setItem('markdown-explorer-workspaces', JSON.stringify([defaultWorkspace]))
-    }
-  }, [])
-
-  // Save workspaces to localStorage whenever they change
-  useEffect(() => {
-    if (workspaces.length > 0) {
-      localStorage.setItem('markdown-explorer-workspaces', JSON.stringify(workspaces))
-    }
-  }, [workspaces])
-
   const handleCreateWorkspace = () => {
     if (newWorkspaceName.trim()) {
-      const newWorkspace: Workspace = {
-        id: `workspace_${Date.now()}`,
-        name: newWorkspaceName.trim(),
-        createdAt: new Date().toISOString(),
-        lastModified: new Date().toISOString()
-      }
-      
-      setWorkspaces(prev => [...prev, newWorkspace])
-      onWorkspaceCreate(newWorkspace.name)
-      onWorkspaceChange(newWorkspace.id)
+      onWorkspaceCreate(newWorkspaceName.trim())
       setNewWorkspaceName('')
       setIsCreateDialogOpen(false)
     }
@@ -91,26 +44,12 @@ export function WorkspaceSelector({
 
   const handleDeleteWorkspace = (workspaceId: string) => {
     if (workspaces.length > 1) {
-      setWorkspaces(prev => prev.filter(w => w.id !== workspaceId))
       onWorkspaceDelete(workspaceId)
-      
-      // If deleting current workspace, switch to the first remaining one
-      if (workspaceId === currentWorkspace) {
-        const remaining = workspaces.filter(w => w.id !== workspaceId)
-        if (remaining.length > 0) {
-          onWorkspaceChange(remaining[0].id)
-        }
-      }
     }
   }
 
   const handleRenameWorkspace = () => {
     if (renamingWorkspace && newWorkspaceName.trim()) {
-      setWorkspaces(prev => prev.map(w => 
-        w.id === renamingWorkspace 
-          ? { ...w, name: newWorkspaceName.trim(), lastModified: new Date().toISOString() }
-          : w
-      ))
       onWorkspaceRename(renamingWorkspace, newWorkspaceName.trim())
       setNewWorkspaceName('')
       setRenamingWorkspace(null)

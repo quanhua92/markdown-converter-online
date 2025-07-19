@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { FileSystemItem } from './FileTree'
 
 export interface WorkspaceData {
@@ -191,9 +191,20 @@ export function useWorkspaceManager() {
     )
   }, [])
 
+  const workspaceList = useMemo(() => {
+    const workspaces = getAllWorkspaces()
+    return workspaces.map(w => ({
+      id: w.id,
+      name: w.name,
+      createdAt: w.createdAt,
+      lastModified: w.lastModified
+    }))
+  }, [getAllWorkspaces])
+
   return {
     currentWorkspaceId,
     workspaceData,
+    workspaces: workspaceList,
     switchWorkspace,
     createWorkspace,
     deleteWorkspace,

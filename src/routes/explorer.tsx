@@ -36,6 +36,7 @@ function Explorer() {
     isLoaded,
     // Workspace management
     currentWorkspaceId,
+    workspaces,
     switchWorkspace,
     createWorkspace,
     deleteWorkspace,
@@ -172,6 +173,7 @@ function Explorer() {
           onToggleFolder={toggleFolder}
           onInitializeTemplate={initializeFromTemplate}
           currentWorkspaceId={currentWorkspaceId}
+          workspaces={workspaces}
           onWorkspaceChange={switchWorkspace}
           onWorkspaceCreate={createWorkspace}
           onWorkspaceDelete={deleteWorkspace}

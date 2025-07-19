@@ -153,6 +153,7 @@ export function useFileSystem() {
   const {
     currentWorkspaceId,
     workspaceData,
+    workspaces,
     switchWorkspace,
     createWorkspace,
     deleteWorkspace,
@@ -329,6 +330,7 @@ export function useFileSystem() {
     isLoaded,
     // Workspace management
     currentWorkspaceId,
+    workspaces,
     switchWorkspace,
     createWorkspace,
     deleteWorkspace,

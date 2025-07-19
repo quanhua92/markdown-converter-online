@@ -29,6 +29,7 @@ interface FileTreeProps {
   showTemplateOptions?: boolean
   // Workspace management props
   currentWorkspaceId?: string
+  workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
   onWorkspaceChange?: (workspaceId: string) => void
   onWorkspaceCreate?: (name: string) => void
   onWorkspaceDelete?: (workspaceId: string) => void
@@ -253,6 +254,7 @@ export function FileTree({
   onInitializeTemplate,
   showTemplateOptions = true,
   currentWorkspaceId,
+  workspaces,
   onWorkspaceChange,
   onWorkspaceCreate,
   onWorkspaceDelete,
@@ -276,14 +278,15 @@ export function FileTree({
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
-        {/* Workspace Selector - Temporarily disabled for debugging */}
-        {false && currentWorkspaceId && (
+        {/* Workspace Selector - Temporarily disabled to fix React error #185 */}
+        {false && currentWorkspaceId && workspaces && onWorkspaceChange && onWorkspaceCreate && onWorkspaceDelete && onWorkspaceRename && (
           <WorkspaceSelector
             currentWorkspace={currentWorkspaceId}
-            onWorkspaceChange={onWorkspaceChange!}
-            onWorkspaceCreate={onWorkspaceCreate!}
-            onWorkspaceDelete={onWorkspaceDelete!}
-            onWorkspaceRename={onWorkspaceRename!}
+            workspaces={workspaces}
+            onWorkspaceChange={onWorkspaceChange}
+            onWorkspaceCreate={onWorkspaceCreate}
+            onWorkspaceDelete={onWorkspaceDelete}
+            onWorkspaceRename={onWorkspaceRename}
           />
         )}
         
