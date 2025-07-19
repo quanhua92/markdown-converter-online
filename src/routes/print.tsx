@@ -175,15 +175,66 @@ function PrintPage() {
             overflow-x: auto !important;
             max-width: 100% !important;
             margin: 1em 0 !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: thin !important;
+            border: 1px solid #ddd !important;
+            border-radius: 4px !important;
+          }
+          .table-container::-webkit-scrollbar {
+            height: 8px !important;
+          }
+          .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1 !important;
+            border-radius: 4px !important;
+          }
+          .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1 !important;
+            border-radius: 4px !important;
+          }
+          .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8 !important;
+          }
+          /* Mobile table responsiveness */
+          @media (max-width: 768px) {
+            .table-container {
+              font-size: 14px !important;
+              position: relative !important;
+            }
+            .table-container::after {
+              content: "👈 Scroll to see more" !important;
+              position: absolute !important;
+              top: 10px !important;
+              right: 10px !important;
+              background: rgba(0,0,0,0.7) !important;
+              color: white !important;
+              padding: 4px 8px !important;
+              border-radius: 4px !important;
+              font-size: 12px !important;
+              pointer-events: none !important;
+              z-index: 10 !important;
+            }
+            table {
+              min-width: 600px !important;
+            }
+            th, td {
+              padding: 6px 8px !important;
+              font-size: 13px !important;
+            }
           }
           table {
             page-break-inside: avoid !important;
             min-width: 100% !important;
             white-space: nowrap !important;
+            background: white !important;
           }
           th, td {
             white-space: nowrap !important;
             padding: 8px 12px !important;
+            border: 1px solid #ddd !important;
+          }
+          th {
+            background: #f5f5f5 !important;
+            font-weight: bold !important;
           }
           /* KaTeX math rendering for print */
           .katex {
