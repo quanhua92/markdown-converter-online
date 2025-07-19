@@ -85,6 +85,69 @@ All test screenshots are saved in `tests/screenshots/` directory:
 - Mermaid diagrams render correctly in both preview and print
 - Consistent heading styles between preview and print modes
 
+#### Workspace Management
+- **Multiple Workspaces**: Users can create and switch between isolated file systems
+- **Workspace Persistence**: Each workspace is stored separately in localStorage
+- **Workspace Selector**: Dropdown in Files panel header for switching workspaces
+- **Workspace Operations**: Create, rename, delete workspaces via dialog interfaces
+- **Auto-save**: Current workspace and selected file are automatically saved
+- **Isolation**: Each workspace maintains its own files, folders, and current file state
+
+##### Workspace Storage Structure
+```
+localStorage:
+├── markdown-explorer-current-workspace: "workspace_id"
+├── markdown-explorer-workspace-default: { WorkspaceData }
+├── markdown-explorer-workspace-{id}: { WorkspaceData }
+└── ...
+
+WorkspaceData:
+{
+  id: string,
+  name: string,
+  files: FileSystemItem[],
+  currentFilePath?: string,
+  createdAt: string,
+  lastModified: string
+}
+
+FileSystemItem:
+{
+  id: string,
+  name: string,
+  type: 'file' | 'folder',
+  path: string,
+  content?: string,
+  children?: FileSystemItem[],
+  isExpanded?: boolean
+}
+```
+
+##### Workspace Implementation Components
+- **useWorkspaceManager.tsx**: Core hook managing workspace state and localStorage operations
+- **WorkspaceSelector.tsx**: UI component with dropdown, create/rename/delete dialogs
+- **useFileSystem.tsx**: Integration layer connecting workspace management to file operations
+- **FileTree.tsx**: Contains workspace selector in header (currently disabled for debugging)
+
+##### Storage Keys
+- `markdown-explorer-current-workspace`: Stores active workspace ID
+- `markdown-explorer-workspace-{id}`: Stores individual workspace data
+- `markdown-explorer-workspaces`: Legacy key for workspace list (deprecated)
+
+##### Default Workspace
+- **ID**: `default`
+- **Name**: "Default Workspace"
+- **Creation**: Automatically created if no workspaces exist
+- **Protection**: Cannot be deleted (minimum one workspace required)
+- **Initialization**: Contains Welcome.md and sample files on first use
+
+##### Workspace Switching Flow
+1. User selects workspace from dropdown
+2. Current workspace data is saved to localStorage
+3. New workspace data is loaded from localStorage
+4. UI updates to show new workspace files
+5. Current workspace ID is updated in localStorage
+
 ### Common Commands
 
 #### Git Workflow

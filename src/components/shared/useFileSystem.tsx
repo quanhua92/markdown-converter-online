@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { FileSystemItem } from './FileTree'
+import { useWorkspaceManager } from './useWorkspaceManager'
 
 const STORAGE_KEY = 'markdown-explorer-files'
 
@@ -149,30 +150,50 @@ function addItemToTree(items: FileSystemItem[], parentPath: string, newItem: Fil
 }
 
 export function useFileSystem() {
+  const {
+    currentWorkspaceId,
+    workspaceData,
+    switchWorkspace,
+    createWorkspace,
+    deleteWorkspace,
+    renameWorkspace,
+    updateWorkspaceFiles,
+    getAllWorkspaces
+  } = useWorkspaceManager()
+
   const [files, setFiles] = useState<FileSystemItem[]>([])
   const [currentFile, setCurrentFile] = useState<FileSystemItem | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Initialize files
+  // Initialize files from workspace data
   useEffect(() => {
-    const initialFiles = getInitialFiles()
-    setFiles(initialFiles)
-    
-    // Set the first file as current
-    const firstFile = findItemByPath(initialFiles, '/Welcome.md')
-    if (firstFile) {
-      setCurrentFile(firstFile)
+    if (workspaceData) {
+      setFiles(workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles())
+      
+      // Set current file from workspace or find default
+      if (workspaceData.currentFilePath) {
+        const savedCurrentFile = findItemByPath(workspaceData.files, workspaceData.currentFilePath)
+        if (savedCurrentFile) {
+          setCurrentFile(savedCurrentFile)
+        }
+      } else {
+        // Set the first file as current
+        const firstFile = findItemByPath(workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles(), '/Welcome.md')
+        if (firstFile) {
+          setCurrentFile(firstFile)
+        }
+      }
+      
+      setIsLoaded(true)
     }
-    
-    setIsLoaded(true)
-  }, [])
+  }, [workspaceData])
 
-  // Save files whenever they change
+  // Save files to workspace whenever they change
   useEffect(() => {
-    if (isLoaded) {
-      saveFiles(files)
+    if (isLoaded && workspaceData) {
+      updateWorkspaceFiles(files, currentFile?.path)
     }
-  }, [files, isLoaded])
+  }, [files, currentFile, isLoaded, workspaceData, updateWorkspaceFiles])
 
   const selectFile = useCallback((item: FileSystemItem) => {
     if (item.type === 'file') {
@@ -305,6 +326,13 @@ export function useFileSystem() {
     clearAll,
     initializeFromTemplate,
     appendTemplateItems,
-    isLoaded
+    isLoaded,
+    // Workspace management
+    currentWorkspaceId,
+    switchWorkspace,
+    createWorkspace,
+    deleteWorkspace,
+    renameWorkspace,
+    getAllWorkspaces
   }
 }

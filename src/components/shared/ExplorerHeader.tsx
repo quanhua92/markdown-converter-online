@@ -109,12 +109,10 @@ export function ExplorerHeader({
           </Button>
         </div>
 
-        {/* Second line: File info and desktop actions */}
+        {/* Second line: Save status and desktop actions */}
         {currentFile && (
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-2 mb-2 lg:mb-0">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Editing:</span>
-              <Badge variant="secondary">{currentFile.name}</Badge>
               {saveStatus === 'saving' && (
                 <span className="text-xs text-yellow-600">Saving...</span>
               )}

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Plus, Trash2, Edit3, Sparkles } from 'lucide-react'
 import { TemplateSelector } from './TemplateSelector'
+import { WorkspaceSelector } from './WorkspaceSelector'
 
 export interface FileSystemItem {
   id: string
@@ -26,6 +27,12 @@ interface FileTreeProps {
   onToggleFolder: (item: FileSystemItem) => void
   onInitializeTemplate?: (items: FileSystemItem[]) => void
   showTemplateOptions?: boolean
+  // Workspace management props
+  currentWorkspaceId?: string
+  onWorkspaceChange?: (workspaceId: string) => void
+  onWorkspaceCreate?: (name: string) => void
+  onWorkspaceDelete?: (workspaceId: string) => void
+  onWorkspaceRename?: (workspaceId: string, newName: string) => void
 }
 
 interface FileTreeItemProps {
@@ -244,7 +251,12 @@ export function FileTree({
   onRenameItem,
   onToggleFolder,
   onInitializeTemplate,
-  showTemplateOptions = true
+  showTemplateOptions = true,
+  currentWorkspaceId,
+  onWorkspaceChange,
+  onWorkspaceCreate,
+  onWorkspaceDelete,
+  onWorkspaceRename
 }: FileTreeProps) {
   const [isCreating, setIsCreating] = useState<'file' | 'folder' | null>(null)
   const [newName, setNewName] = useState('')
@@ -264,10 +276,21 @@ export function FileTree({
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
+        {/* Workspace Selector - Temporarily disabled for debugging */}
+        {false && currentWorkspaceId && (
+          <WorkspaceSelector
+            currentWorkspace={currentWorkspaceId}
+            onWorkspaceChange={onWorkspaceChange!}
+            onWorkspaceCreate={onWorkspaceCreate!}
+            onWorkspaceDelete={onWorkspaceDelete!}
+            onWorkspaceRename={onWorkspaceRename!}
+          />
+        )}
+        
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
             <Folder className="w-5 h-5" />
-            File Explorer
+            Files
           </span>
           <div className="flex gap-1">
             <Button

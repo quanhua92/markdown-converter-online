@@ -33,7 +33,14 @@ function Explorer() {
     toggleFolder,
     clearAll,
     initializeFromTemplate,
-    isLoaded
+    isLoaded,
+    // Workspace management
+    currentWorkspaceId,
+    switchWorkspace,
+    createWorkspace,
+    deleteWorkspace,
+    renameWorkspace,
+    getAllWorkspaces
   } = useFileSystem()
 
   const [isFileTreeCollapsed, setIsFileTreeCollapsed] = useState(false)
@@ -164,6 +171,11 @@ function Explorer() {
           onRenameItem={renameItem}
           onToggleFolder={toggleFolder}
           onInitializeTemplate={initializeFromTemplate}
+          currentWorkspaceId={currentWorkspaceId}
+          onWorkspaceChange={switchWorkspace}
+          onWorkspaceCreate={createWorkspace}
+          onWorkspaceDelete={deleteWorkspace}
+          onWorkspaceRename={renameWorkspace}
         />
 
         {/* Editor/Preview Area */}
