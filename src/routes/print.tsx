@@ -1,78 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
-import rehypeHighlight from 'rehype-highlight'
-import rehypeKatex from 'rehype-katex'
-import rehypeRaw from 'rehype-raw'
-import rehypeSlug from 'rehype-slug'
-import mermaid from 'mermaid'
+import { useEffect, useState } from 'react'
 import { Moon, Sun, Printer, X } from 'lucide-react'
+import { MarkdownRenderer, useTheme } from '@/components/shared'
 
 export const Route = createFileRoute('/print')({
   component: PrintPage,
 })
 
-interface MermaidProps {
-  chart: string
-}
-
-function MermaidDiagram({ chart }: MermaidProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [uniqueId] = useState(() => `mermaid-diagram-${Math.random().toString(36).substr(2, 9)}`)
-
-  useEffect(() => {
-    if (ref.current) {
-      // Always use light theme for print to match print CSS that forces white background
-      mermaid.initialize({
-        startOnLoad: true,
-        theme: 'default',
-        securityLevel: 'loose',
-      })
-      
-      mermaid.render(uniqueId, chart)
-        .then((result) => {
-          if (ref.current) {
-            ref.current.innerHTML = result.svg
-          }
-        })
-        .catch((err) => {
-          console.error('Mermaid rendering error:', err)
-          setError('Failed to render diagram')
-        })
-    }
-  }, [chart, uniqueId])
-
-  if (error) {
-    return (
-      <div style={{ color: 'red', border: '1px solid red', padding: '10px', margin: '10px 0' }}>
-        Error rendering diagram: {error}
-      </div>
-    )
-  }
-
-  return <div ref={ref} className="mermaid-diagram" />
-}
 
 function PrintPage() {
   const [markdown, setMarkdown] = useState('')
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
-
-  // Initialize theme from localStorage or system preference
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme')
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    
-    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
-      setIsDarkMode(true)
-      document.documentElement.classList.add('dark')
-    } else {
-      setIsDarkMode(false)
-      document.documentElement.classList.remove('dark')
-    }
-  }, [])
+  const { isDarkMode, toggleTheme } = useTheme()
 
   useEffect(() => {
     // Get markdown content from localStorage (fallback to URL parameters)
@@ -90,36 +28,7 @@ function PrintPage() {
     }
   }, [])
 
-  const toggleTheme = () => {
-    const newTheme = !isDarkMode
-    setIsDarkMode(newTheme)
-    
-    if (newTheme) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }
 
-  const customComponents = {
-    code(props: any) {
-      const { children, className, ...rest } = props
-      const match = /language-(\w+)/.exec(className || '')
-      if (match && match[1] === 'mermaid') {
-        return <MermaidDiagram chart={children as string} />
-      }
-      return <code {...rest} className={className}>{children}</code>
-    },
-    table(props: any) {
-      return (
-        <div className="table-container">
-          <table {...props} />
-        </div>
-      )
-    }
-  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -300,15 +209,11 @@ function PrintPage() {
         </div>
 
         {/* Content */}
-        <div className="print-content prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1 overflow-x-auto w-full">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
-            rehypePlugins={[rehypeSlug, rehypeHighlight, [rehypeKatex, { strict: false }], rehypeRaw]}
-            components={customComponents}
-          >
-            {markdown}
-          </ReactMarkdown>
-        </div>
+        <MarkdownRenderer
+          content={markdown}
+          forPrint={true}
+          className="print-content prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1 overflow-x-auto w-full"
+        />
 
         {/* Footer with GitHub link */}
         <div className="no-print mt-8 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-4">
