@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import mermaid from 'mermaid'
+import { Moon, Sun, Printer, X } from 'lucide-react'
 
 export const Route = createFileRoute('/print')({
   component: PrintPage,
@@ -55,6 +56,21 @@ function MermaidDiagram({ chart }: MermaidProps) {
 
 function PrintPage() {
   const [markdown, setMarkdown] = useState('')
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
+
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme')
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    
+    if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+      setIsDarkMode(true)
+      document.documentElement.classList.add('dark')
+    } else {
+      setIsDarkMode(false)
+      document.documentElement.classList.remove('dark')
+    }
+  }, [])
 
   useEffect(() => {
     // Get markdown content from localStorage (fallback to URL parameters)
@@ -72,6 +88,19 @@ function PrintPage() {
     }
   }, [])
 
+  const toggleTheme = () => {
+    const newTheme = !isDarkMode
+    setIsDarkMode(newTheme)
+    
+    if (newTheme) {
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    }
+  }
+
   const customComponents = {
     code(props: any) {
       const { children, className, ...rest } = props
@@ -84,160 +113,103 @@ function PrintPage() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      {/* Print-only CSS - minimal and focused */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           @page {
             size: A4;
             margin: 2cm;
           }
-          .print-container {
+          .no-print {
+            display: none !important;
+          }
+          body, .print-content {
             font-family: 'Times New Roman', serif !important;
             font-size: 12pt !important;
             line-height: 1.6 !important;
             color: #000 !important;
-            max-width: none !important;
-          }
-          .no-print {
-            display: none !important;
+            background: white !important;
           }
           h1, h2, h3, h4, h5, h6 {
             page-break-after: avoid !important;
             color: #000 !important;
           }
           p {
-            margin-bottom: 1em !important;
             orphans: 3 !important;
             widows: 3 !important;
             color: #000 !important;
           }
-          pre {
+          pre, code {
             background: #f5f5f5 !important;
-            padding: 1em !important;
-            border-radius: 4px !important;
-            overflow-wrap: break-word !important;
-            white-space: pre-wrap !important;
-            page-break-inside: avoid !important;
-            font-family: 'Courier New', monospace !important;
-            font-size: 10pt !important;
-          }
-          code {
-            background: #f5f5f5 !important;
-            padding: 0.2em 0.4em !important;
-            border-radius: 3px !important;
-            font-family: 'Courier New', monospace !important;
-            font-size: 10pt !important;
-          }
-          table {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            margin: 1em 0 !important;
-            page-break-inside: avoid !important;
-          }
-          th, td {
+            color: #000 !important;
             border: 1px solid #ddd !important;
-            padding: 8px !important;
-            text-align: left !important;
           }
-          th {
-            background-color: #f2f2f2 !important;
-            font-weight: bold !important;
-          }
-          blockquote {
-            border-left: 4px solid #ddd !important;
-            padding-left: 1em !important;
-            margin: 1em 0 !important;
-            font-style: italic !important;
+          pre {
+            page-break-inside: avoid !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 10pt !important;
           }
           .mermaid-diagram {
-            text-align: center !important;
-            margin: 2em 0 !important;
             page-break-inside: avoid !important;
           }
-          .mermaid-diagram svg {
-            max-width: 100% !important;
-            height: auto !important;
-          }
-          ul, ol {
-            margin: 1em 0 !important;
-            padding-left: 2em !important;
-          }
-          li {
-            margin-bottom: 0.5em !important;
-          }
-          strong {
-            font-weight: bold !important;
-          }
-          em {
-            font-style: italic !important;
-          }
-        }
-        @media screen {
-          .print-container {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-          }
-          .print-controls {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            text-align: center;
-          }
-          .print-button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 0.5rem;
-          }
-          .print-button:hover {
-            background: #0056b3;
-          }
-          .close-button {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-          }
-          .close-button:hover {
-            background: #545b62;
+          table {
+            page-break-inside: avoid !important;
           }
         }
       `}} />
       
-      <div className="print-container">
-        <div className="print-controls no-print">
-          <div style={{marginBottom: '1rem', textAlign: 'center'}}>
-            <h2 style={{margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#333'}}>📄 Print Preview</h2>
-            <p style={{margin: '0', fontSize: '0.9rem', color: '#666'}}>Read-only view optimized for printing</p>
+      <div className="max-w-4xl mx-auto p-8">
+        {/* Controls - only visible on screen */}
+        <div className="no-print bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-8 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              📄 Print Preview
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Read-only view optimized for printing
+            </p>
           </div>
-          <button 
-            className="print-button" 
-            onClick={() => window.print()}
-          >
-            🖨️ Print Document
-          </button>
-          <button 
-            className="close-button" 
-            onClick={() => window.close()}
-          >
-            ✕ Close
-          </button>
+          
+          <div className="flex flex-wrap justify-center gap-3">
+            <button 
+              onClick={() => window.print()}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+            >
+              <Printer className="w-4 h-4" />
+              Print Document
+            </button>
+            
+            <button 
+              onClick={toggleTheme}
+              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+            >
+              {isDarkMode ? (
+                <>
+                  <Sun className="w-4 h-4" />
+                  Light
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4" />
+                  Dark
+                </>
+              )}
+            </button>
+            
+            <button 
+              onClick={() => window.close()}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
+            >
+              <X className="w-4 h-4" />
+              Close
+            </button>
+          </div>
         </div>
 
-        <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1" style={{userSelect: 'text', pointerEvents: 'auto'}}>
+        {/* Content */}
+        <div className="print-content prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeHighlight, rehypeRaw]}
@@ -247,6 +219,6 @@ function PrintPage() {
           </ReactMarkdown>
         </div>
       </div>
-    </>
+    </div>
   )
 }
