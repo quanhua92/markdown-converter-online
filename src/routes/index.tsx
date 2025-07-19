@@ -15,7 +15,6 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import mermaid from 'mermaid'
-import 'highlight.js/styles/github.css'
 
 export const Route = createFileRoute('/')({
   component: Index,
