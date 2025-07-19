@@ -2014,7 +2014,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-gray-900 dark:to-purple-900 py-4 sm:py-8 lg:py-12 px-4">
+    <div className="min-h-screen bg-blue-50 dark:bg-gray-900 py-4 sm:py-8 lg:py-12 px-4">
       
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}

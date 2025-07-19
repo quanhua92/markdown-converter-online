@@ -39,7 +39,7 @@
   --color-ring: #3b82f6;
   
   /* Dark theme colors - auto-applied when .dark class is present */
-  --color-dark-background: #0f172a;
+  --color-dark-background: #111827;
   --color-dark-foreground: #f8fafc;
   --color-dark-card: #1e293b;
   --color-dark-card-foreground: #f8fafc;
