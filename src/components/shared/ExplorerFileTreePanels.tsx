@@ -15,6 +15,13 @@ interface ExplorerFileTreePanelsProps {
   onRenameItem: (path: string, newName: string) => void
   onToggleFolder: (path: string) => void
   onInitializeTemplate: (templateKey: string) => void
+  // Workspace management props
+  currentWorkspaceId?: string
+  currentWorkspaceName?: string
+  workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
+  onWorkspaceJoin?: (workspaceId: string) => void
+  onWorkspaceLeave?: () => void
+  onWorkspaceCreate?: (name: string) => void
 }
 
 export function ExplorerFileTreePanels({
@@ -28,7 +35,13 @@ export function ExplorerFileTreePanels({
   onDeleteItem,
   onRenameItem,
   onToggleFolder,
-  onInitializeTemplate
+  onInitializeTemplate,
+  currentWorkspaceId,
+  currentWorkspaceName,
+  workspaces,
+  onWorkspaceJoin,
+  onWorkspaceLeave,
+  onWorkspaceCreate
 }: ExplorerFileTreePanelsProps) {
   return (
     <Collapsible
@@ -64,6 +77,12 @@ export function ExplorerFileTreePanels({
               onToggleFolder={onToggleFolder}
               onInitializeTemplate={onInitializeTemplate}
               showTemplateOptions={files.length === 0}
+              currentWorkspaceId={currentWorkspaceId}
+              currentWorkspaceName={currentWorkspaceName}
+              workspaces={workspaces}
+              onWorkspaceJoin={onWorkspaceJoin}
+              onWorkspaceLeave={onWorkspaceLeave}
+              onWorkspaceCreate={onWorkspaceCreate}
             />
           </div>
         </CollapsibleContent>

@@ -15,7 +15,7 @@ This guide covers the architecture, development, and deployment details of the M
 │  │ • UI Components │  │ • Theme State   │  │ • Copy Utils  │ │
 │  │ • State Mgmt    │  │ • Local Storage │  │ • Examples    │ │
 │  │ • Explorer      │  │ • Auto-Save     │  │ • Workspaces  │ │
-│  │ • File Tree     │  │ • Persistence   │  │ • Multi-File  │ │
+│  │ • File Tree     │  │ • Persistence   │  │ • Sign-In/Out │ │
 │  └─────────────────┘  └─────────────────┘  └─────────────── │
 └─────────────────────────────────────────────────────────────┘
                                │ HTTP/REST API
@@ -272,7 +272,8 @@ GET /api/download/:filename
 ### State Management
 - **React Hooks**: Local component state
 - **Context**: Theme management
-- **LocalStorage**: Preference persistence
+- **LocalStorage**: Preference persistence and workspace isolation
+- **Workspace Sessions**: Sign-in/sign-out workflow for multi-workspace management
 
 ### Component Structure
 ```typescript
@@ -304,6 +305,58 @@ App.tsx
 - **Breakpoints**: `sm:`, `md:`, `lg:` progressive enhancement
 - **Touch-friendly**: Adequate tap targets
 - **Accessibility**: ARIA labels and keyboard navigation
+
+### Workspace Management Architecture
+
+#### Sign-In/Sign-Out Model
+The workspace system uses an explicit session-based approach similar to user authentication:
+
+```typescript
+// Core Workspace Operations
+interface WorkspaceManager {
+  joinWorkspace(id: string): void      // Sign in to workspace
+  leaveWorkspace(): void               // Sign out (return to default)
+  createWorkspace(name: string): void  // Create and join new workspace
+}
+```
+
+#### Data Isolation Strategy
+```typescript
+// localStorage Structure
+{
+  "markdown-explorer-current-workspace": "workspace_id",
+  "markdown-explorer-workspace-default": WorkspaceData,
+  "markdown-explorer-workspace-{id}": WorkspaceData
+}
+
+interface WorkspaceData {
+  id: string
+  name: string
+  files: FileSystemItem[]
+  currentFilePath?: string
+  createdAt: string
+  lastModified: string
+}
+```
+
+#### UI Design Principles
+- **Current Session Display**: Shows active workspace with blue badge
+- **Explicit Actions**: "Leave" button for sign-out, "Join/Create" for sign-in
+- **Modal Workflows**: Separate dialogs for joining vs creating workspaces
+- **Session Boundaries**: Clear visual separation between workspace states
+- **No Accidental Switching**: Prevents unintended workspace changes
+
+#### State Management Flow
+1. **User leaves workspace** → Saves current state → Returns to default
+2. **User joins workspace** → Loads target workspace data → Updates UI
+3. **User creates workspace** → Saves current state → Creates new → Auto-joins
+4. **File operations** → Isolated to current workspace → Auto-saved per session
+
+#### Implementation Components
+- `useWorkspaceManager.tsx`: Core session and persistence logic
+- `WorkspaceSelector.tsx`: Sign-in/sign-out UI component
+- `useFileSystem.tsx`: Integration layer with file operations
+- `FileTree.tsx`: Workspace status display and controls
 
 ## Testing
 

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Plus, Trash2, Edit3, Sparkles } from 'lucide-react'
 import { TemplateSelector } from './TemplateSelector'
-
+import { WorkspaceSelector } from './WorkspaceSelector'
 export interface FileSystemItem {
   id: string
   name: string
@@ -14,6 +14,9 @@ export interface FileSystemItem {
   children?: FileSystemItem[]
   isExpanded?: boolean
 }
+
+// Explicit type export for better compatibility
+export type { FileSystemItem as FileSystemItemType }
 
 interface FileTreeProps {
   items: FileSystemItem[]
@@ -26,6 +29,13 @@ interface FileTreeProps {
   onToggleFolder: (item: FileSystemItem) => void
   onInitializeTemplate?: (items: FileSystemItem[]) => void
   showTemplateOptions?: boolean
+  // Workspace management props
+  currentWorkspaceId?: string
+  currentWorkspaceName?: string
+  workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
+  onWorkspaceJoin?: (workspaceId: string) => void
+  onWorkspaceLeave?: () => void
+  onWorkspaceCreate?: (name: string) => void
 }
 
 interface FileTreeItemProps {
@@ -244,7 +254,13 @@ export function FileTree({
   onRenameItem,
   onToggleFolder,
   onInitializeTemplate,
-  showTemplateOptions = true
+  showTemplateOptions = true,
+  currentWorkspaceId,
+  currentWorkspaceName,
+  workspaces,
+  onWorkspaceJoin,
+  onWorkspaceLeave,
+  onWorkspaceCreate
 }: FileTreeProps) {
   const [isCreating, setIsCreating] = useState<'file' | 'folder' | null>(null)
   const [newName, setNewName] = useState('')
@@ -264,10 +280,22 @@ export function FileTree({
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
+        {/* Workspace Selector */}
+        {currentWorkspaceId && workspaces && onWorkspaceJoin && onWorkspaceLeave && onWorkspaceCreate && (
+          <WorkspaceSelector
+            currentWorkspace={currentWorkspaceId}
+            currentWorkspaceName={currentWorkspaceName || 'Default Workspace'}
+            workspaces={workspaces}
+            onWorkspaceJoin={onWorkspaceJoin}
+            onWorkspaceLeave={onWorkspaceLeave}
+            onWorkspaceCreate={onWorkspaceCreate}
+          />
+        )}
+        
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
             <Folder className="w-5 h-5" />
-            File Explorer
+            Files
           </span>
           <div className="flex gap-1">
             <Button

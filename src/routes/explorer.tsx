@@ -33,7 +33,17 @@ function Explorer() {
     toggleFolder,
     clearAll,
     initializeFromTemplate,
-    isLoaded
+    isLoaded,
+    // Workspace management
+    currentWorkspaceId,
+    currentWorkspaceName,
+    workspaces,
+    joinWorkspace,
+    leaveWorkspace,
+    createWorkspace,
+    deleteWorkspace,
+    renameWorkspace,
+    getAllWorkspaces
   } = useFileSystem()
 
   const [isFileTreeCollapsed, setIsFileTreeCollapsed] = useState(false)
@@ -147,6 +157,12 @@ function Explorer() {
         onManualSave={handleManualSave}
         onExport={handleExport}
         onPrint={handlePrint}
+        currentWorkspaceId={currentWorkspaceId}
+        currentWorkspaceName={currentWorkspaceName}
+        workspaces={workspaces}
+        onWorkspaceJoin={joinWorkspace}
+        onWorkspaceLeave={leaveWorkspace}
+        onWorkspaceCreate={createWorkspace}
       />
 
       {/* Main Content */}
@@ -164,6 +180,12 @@ function Explorer() {
           onRenameItem={renameItem}
           onToggleFolder={toggleFolder}
           onInitializeTemplate={initializeFromTemplate}
+          currentWorkspaceId={currentWorkspaceId}
+          currentWorkspaceName={currentWorkspaceName}
+          workspaces={workspaces}
+          onWorkspaceJoin={joinWorkspace}
+          onWorkspaceLeave={leaveWorkspace}
+          onWorkspaceCreate={createWorkspace}
         />
 
         {/* Editor/Preview Area */}

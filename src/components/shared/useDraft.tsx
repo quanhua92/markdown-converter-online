@@ -53,7 +53,7 @@ export function useDraft() {
     if (markdown !== '') {
       saveDraft(markdown)
     }
-  }, [markdown, saveDraft])
+  }, [markdown])
 
   const clearDraft = () => {
     setMarkdown('')

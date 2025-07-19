@@ -61,6 +61,72 @@ node tests/test-e2e-explorer.cjs
 - File tree interaction testing
 - Cross-device compatibility confirmation
 
+#### Workspace Functionality Test (`test-workspace-functionality.cjs`)
+Tests the workspace sign-in/sign-out management system.
+
+**What it tests:**
+- Workspace selector UI rendering and visibility
+- Sign-in/sign-out workflow (join/leave workspace operations)
+- Workspace creation and automatic joining
+- Multi-workspace isolation and data persistence
+- Session management and localStorage structure
+- UI state changes between workspace sessions
+
+**Run the test:**
+```bash
+node tests/test-workspace-functionality.cjs
+```
+
+**Expected output:**
+- Screenshots: `tests/screenshots/workspace-selector.png`, `tests/screenshots/workspace-created.png`
+- Workspace session flow verification
+- Data isolation testing between workspaces
+- UI interaction confirmation for join/leave operations
+
+#### Workspace Sign-In/Sign-Out Test (`test-workspace-sign-in-out.cjs`)
+Tests the complete workspace session management workflow.
+
+**What it tests:**
+- Default workspace initial state and display
+- Workspace creation with "Create & Join" flow
+- Workspace leaving with "Leave" button (return to default)
+- Workspace joining with "Join Workspace" dialog
+- Data persistence and isolation between workspace sessions
+- localStorage structure and multi-workspace support
+- UI state consistency during sign-in/sign-out operations
+
+**Run the test:**
+```bash
+node tests/test-workspace-sign-in-out.cjs
+```
+
+**Expected output:**
+- Screenshots: `tests/screenshots/workspace-initial-state.png`, `workspace-create-dialog.png`, `workspace-new-joined.png`, etc.
+- Complete sign-in/sign-out workflow verification
+- localStorage data structure validation
+- Session isolation confirmation
+
+#### Workspace Debug Test (`debug-workspace.cjs`)
+Debugging tool for workspace system analysis and troubleshooting.
+
+**What it tests:**
+- localStorage workspace data structure and integrity
+- Workspace UI element detection and analysis
+- File tree existence and rendering status
+- Console error monitoring and reporting
+- Workspace state consistency verification
+
+**Run the test:**
+```bash
+node tests/debug-workspace.cjs
+```
+
+**Expected output:**
+- Screenshots: `tests/screenshots/workspace-debug.png`
+- Detailed localStorage content analysis
+- UI element inspection results
+- Error detection and diagnostic information
+
 #### Heading Styles Test (`test-heading-styles.cjs`)
 Tests markdown heading rendering in both preview and print modes.
 
@@ -114,6 +180,18 @@ node tests/test-readability.cjs
    
    # Test heading styles
    node tests/test-heading-styles.cjs
+   
+   # Test workspace functionality
+   node tests/test-workspace-functionality.cjs
+   
+   # Test workspace sign-in/sign-out flow
+   node tests/test-workspace-sign-in-out.cjs
+   
+   # Debug workspace system
+   node tests/debug-workspace.cjs
+   
+   # Test full explorer functionality
+   node tests/test-e2e-explorer.cjs
    ```
 
 4. **Run all tests:**

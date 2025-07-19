@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { FileSystemItem } from './FileTree'
+import { useWorkspaceManager } from './useWorkspaceManager'
 
 const STORAGE_KEY = 'markdown-explorer-files'
 
@@ -149,30 +150,88 @@ function addItemToTree(items: FileSystemItem[], parentPath: string, newItem: Fil
 }
 
 export function useFileSystem() {
+  const {
+    currentWorkspaceId,
+    workspaceData,
+    workspaces,
+    joinWorkspace,
+    leaveWorkspace,
+    createWorkspace,
+    deleteWorkspace,
+    renameWorkspace,
+    updateWorkspaceFiles,
+    getAllWorkspaces
+  } = useWorkspaceManager()
+
   const [files, setFiles] = useState<FileSystemItem[]>([])
   const [currentFile, setCurrentFile] = useState<FileSystemItem | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Initialize files
-  useEffect(() => {
-    const initialFiles = getInitialFiles()
-    setFiles(initialFiles)
-    
-    // Set the first file as current
-    const firstFile = findItemByPath(initialFiles, '/Welcome.md')
-    if (firstFile) {
-      setCurrentFile(firstFile)
-    }
-    
-    setIsLoaded(true)
-  }, [])
+  // Refs to hold current values for beforeunload handler
+  const filesRef = useRef<FileSystemItem[]>([])
+  const currentFileRef = useRef<FileSystemItem | null>(null)
+  const isLoadedRef = useRef(false)
+  const workspaceDataRef = useRef(workspaceData)
 
-  // Save files whenever they change
+  // Update refs when state changes
   useEffect(() => {
-    if (isLoaded) {
-      saveFiles(files)
+    filesRef.current = files
+  }, [files])
+
+  useEffect(() => {
+    currentFileRef.current = currentFile
+  }, [currentFile])
+
+  useEffect(() => {
+    isLoadedRef.current = isLoaded
+  }, [isLoaded])
+
+  useEffect(() => {
+    workspaceDataRef.current = workspaceData
+  }, [workspaceData])
+
+  // Initialize files from workspace data
+  useEffect(() => {
+    if (workspaceData) {
+      setFiles(workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles())
+      
+      // Set current file from workspace or find default
+      if (workspaceData.currentFilePath) {
+        const savedCurrentFile = findItemByPath(workspaceData.files, workspaceData.currentFilePath)
+        if (savedCurrentFile) {
+          setCurrentFile(savedCurrentFile)
+        }
+      } else {
+        // Set the first file as current
+        const firstFile = findItemByPath(workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles(), '/Welcome.md')
+        if (firstFile) {
+          setCurrentFile(firstFile)
+        }
+      }
+      
+      setIsLoaded(true)
     }
-  }, [files, isLoaded])
+  }, [workspaceData])
+
+  // Manual save function - only save on explicit user actions
+  const saveWorkspaceManually = useCallback(() => {
+    if (isLoadedRef.current && workspaceDataRef.current) {
+      updateWorkspaceFiles(filesRef.current, currentFileRef.current?.path)
+    }
+  }, [updateWorkspaceFiles])
+
+  // Save on page unload to prevent data loss
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Use refs to get current values without dependencies
+      if (isLoadedRef.current && workspaceDataRef.current) {
+        updateWorkspaceFiles(filesRef.current, currentFileRef.current?.path)
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [updateWorkspaceFiles]) // Only depend on updateWorkspaceFiles (stable)
 
   const selectFile = useCallback((item: FileSystemItem) => {
     if (item.type === 'file') {
@@ -292,6 +351,22 @@ export function useFileSystem() {
     setFiles(prevFiles => [...prevFiles, ...templateItems])
   }, [])
 
+  // Workspace functions without auto-save for debugging
+  const joinWorkspaceWithoutSave = useCallback((workspaceId: string) => {
+    // Removed auto-save to debug infinite loop
+    joinWorkspace(workspaceId)
+  }, [joinWorkspace])
+
+  const leaveWorkspaceWithoutSave = useCallback(() => {
+    // Removed auto-save to debug infinite loop
+    leaveWorkspace()
+  }, [leaveWorkspace])
+
+  const createWorkspaceWithoutSave = useCallback((name: string) => {
+    // Removed auto-save to debug infinite loop
+    return createWorkspace(name)
+  }, [createWorkspace])
+
   return {
     files,
     currentFile,
@@ -305,6 +380,18 @@ export function useFileSystem() {
     clearAll,
     initializeFromTemplate,
     appendTemplateItems,
-    isLoaded
+    isLoaded,
+    // Manual save function for explicit saves
+    saveWorkspace: saveWorkspaceManually,
+    // Workspace management with auto-save on switching
+    currentWorkspaceId,
+    currentWorkspaceName: workspaceData?.name || 'Default Workspace',
+    workspaces,
+    joinWorkspace: joinWorkspaceWithoutSave,
+    leaveWorkspace: leaveWorkspaceWithoutSave,
+    createWorkspace: createWorkspaceWithoutSave,
+    deleteWorkspace,
+    renameWorkspace,
+    getAllWorkspaces
   }
 }
