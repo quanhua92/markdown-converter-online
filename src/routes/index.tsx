@@ -1413,7 +1413,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 variant={currentView === 'converter' ? 'default' : 'outline'}
                 size="default"
                 className={`flex items-center gap-2 px-4 py-2 ${currentView === 'converter' ? 'btn-gradient' : 'btn-elegant'}`}
-                style={{backgroundColor: 'red', color: 'white', border: '3px solid black'}}
               >
                 <FileText className="h-4 w-4" />
                 Converter
@@ -1423,7 +1422,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 variant={currentView === 'editor' ? 'default' : 'outline'}
                 size="default"
                 className={`flex items-center gap-2 px-4 py-2 ${currentView === 'editor' ? 'btn-gradient' : 'btn-elegant'}`}
-                style={{backgroundColor: 'blue', color: 'white', border: '3px solid black'}}
               >
                 <Edit3 className="h-4 w-4" />
                 Editor
@@ -1433,7 +1431,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 variant={currentView === 'guides' ? 'default' : 'outline'}
                 size="default"
                 className={`flex items-center gap-2 px-4 py-2 ${currentView === 'guides' ? 'btn-gradient' : 'btn-elegant'}`}
-                style={{backgroundColor: 'green', color: 'white', border: '3px solid black'}}
               >
                 <BookOpen className="h-4 w-4" />
                 Guides
