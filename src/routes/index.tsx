@@ -2250,7 +2250,18 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         {currentView === 'guides' && renderGuides()}
 
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Powered by Marp CLI and Pandoc • Built with React and Express • Git: {gitCommit} • {new Date().toISOString()}</p>
+          <p>
+            Powered by Marp CLI and Pandoc • Built with React and Express • Git: {gitCommit} • {new Date().toISOString()}
+            <br />
+            <a 
+              href="https://github.com/quanhua92/markdown-converter-online" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline hover:no-underline transition-colors"
+            >
+              View on GitHub
+            </a>
+          </p>
         </div>
       </div>
       <Toaster position="top-right" />

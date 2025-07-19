@@ -226,6 +226,20 @@ function PrintPage() {
             {markdown}
           </ReactMarkdown>
         </div>
+
+        {/* Footer with GitHub link */}
+        <div className="no-print mt-8 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-4">
+          <p>
+            <a 
+              href="https://github.com/quanhua92/markdown-converter-online" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline hover:no-underline transition-colors"
+            >
+              View on GitHub
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   )
