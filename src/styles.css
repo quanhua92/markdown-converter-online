@@ -403,6 +403,14 @@ code {
   color: #24292f !important;
 }
 
+/* Remove border and background from code inside pre blocks */
+pre code {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
 /* Dark mode code blocks */
 .dark pre {
   background-color: #0d1117 !important;
@@ -414,6 +422,14 @@ code {
   background-color: #0d1117 !important;
   border: 1px solid #30363d !important;
   color: #e6edf3 !important;
+}
+
+/* Remove border and background from code inside pre blocks in dark mode */
+.dark pre code {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
 }
 
 /* Highlight.js syntax highlighting for light mode */
