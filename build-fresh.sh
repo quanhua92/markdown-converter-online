@@ -18,26 +18,17 @@ echo "📋 Using compose file: $COMPOSE_FILE"
 GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 echo "📝 Git commit: $GIT_COMMIT"
 
-# Stop existing containers
-echo "🛑 Stopping existing containers..."
-docker compose -f "$COMPOSE_FILE" down
-
 # Remove old images to force rebuild
 echo "🗑️  Removing old images..."
-docker compose -f "$COMPOSE_FILE" rm -f
 docker image prune -f
 
 # Build with git commit as build arg (forces cache invalidation)
 echo "🔨 Building with fresh cache..."
 GIT_COMMIT=$GIT_COMMIT docker compose -f "$COMPOSE_FILE" build --build-arg GIT_COMMIT=$GIT_COMMIT
 
-# Stop existing containers after build
-echo "🛑 Stopping containers after build..."
-docker compose -f "$COMPOSE_FILE" stop
-
-# Start the new containers
-echo "🏃 Starting fresh containers..."
-GIT_COMMIT=$GIT_COMMIT docker compose -f "$COMPOSE_FILE" up -d
+# Start/restart containers with new image
+echo "🔄 Starting containers with new image..."
+GIT_COMMIT=$GIT_COMMIT docker compose -f "$COMPOSE_FILE" up -d --force-recreate
 
 echo "✅ Fresh build complete!"
 echo "🔗 Git commit: $GIT_COMMIT"
