@@ -274,7 +274,10 @@ GET /api/download/:filename
 ```typescript
 App.tsx
 ├── Navigation (theme toggle, view switching)
-├── GuidesPage (markdown examples, API docs)
+├── GuidesPage (comprehensive documentation with 6 sections:
+│   │ Getting Started, Markdown Syntax, Mermaid Diagrams,
+│   │ LaTeX Math, Templates & Examples, Preview & Print Features,
+│   │ API Examples with copy-to-clipboard functionality)
 └── ConverterPage
     ├── MarkdownInput (templates, clear button)
     ├── FormatSelection (interactive cards)

@@ -531,7 +531,12 @@ const makeRequest = async (url, options, retries = 3) => {
 
 ## Support
 
-- **Built-in Documentation**: Visit `/` for interactive guides and examples
+- **Built-in Documentation**: Visit `/` and use the Guides tab for comprehensive documentation including:
+  - Complete markdown syntax guide with copy-to-clipboard examples
+  - Mermaid diagram examples (flowcharts, sequences, class diagrams, Gantt)
+  - LaTeX math expressions and KaTeX rendering
+  - API usage examples in curl, JavaScript, and Python
+  - Built-in templates and preview/print features guide
 - **Error Debugging**: Detailed error responses with stderr/stdout
 - **Health Monitoring**: Use `/api/health` for service status
 - **GitHub Issues**: Report bugs and request features

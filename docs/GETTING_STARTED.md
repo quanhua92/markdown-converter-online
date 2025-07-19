@@ -86,8 +86,8 @@ The application provides three built-in templates:
 
 #### Conversion Fails
 1. Check the error debug section (appears automatically)
-2. Verify markdown syntax using the Guides tab
-3. Try with a simpler template first
+2. Verify markdown syntax using the comprehensive Guides tab (includes syntax reference, Mermaid diagrams, and LaTeX math)
+3. Try with a simpler template first (use built-in templates from Guides tab)
 4. Check Docker container logs: `docker compose logs`
 
 #### Dark Mode Not Working
@@ -103,7 +103,14 @@ The application provides three built-in templates:
 
 ### Getting Help
 
-1. **Built-in Guides**: Use the Guides tab for markdown syntax and API examples
+1. **Built-in Guides**: Use the Guides tab for comprehensive documentation including:
+   - Getting Started & Quick Start guide
+   - Complete Markdown syntax reference with copy-to-clipboard examples
+   - Mermaid diagrams (flowcharts, sequences, class diagrams, Gantt charts)
+   - LaTeX math expressions with KaTeX rendering
+   - Built-in templates for presentations, documents, and articles
+   - Preview & Print features guide
+   - REST API examples in multiple languages
 2. **Error Details**: The app shows detailed error information for debugging
 3. **Docker Logs**: `docker compose logs -f` for real-time logging
 4. **Health Check**: Visit `http://localhost:3000/api/health`
@@ -112,6 +119,7 @@ The application provides three built-in templates:
 
 - **Explore API**: Check [API Reference](API_REFERENCE.md) for programmatic access
 - **Technical Details**: See [Technical Guide](TECHNICAL.md) for architecture
+- **Interactive Guides**: Access comprehensive documentation in the Guides tab
 - **LLM Integration**: Use the built-in prompts for ChatGPT/Claude conversion
 - **Customization**: Modify templates or add new conversion formats
 
