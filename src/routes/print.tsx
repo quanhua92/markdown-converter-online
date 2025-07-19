@@ -219,6 +219,10 @@ function PrintPage() {
       
       <div className="print-container">
         <div className="print-controls no-print">
+          <div style={{marginBottom: '1rem', textAlign: 'center'}}>
+            <h2 style={{margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#333'}}>📄 Print Preview</h2>
+            <p style={{margin: '0', fontSize: '0.9rem', color: '#666'}}>Read-only view optimized for printing</p>
+          </div>
           <button 
             className="print-button" 
             onClick={() => window.print()}
@@ -233,7 +237,7 @@ function PrintPage() {
           </button>
         </div>
 
-        <div className="prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
+        <div className="prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1" style={{userSelect: 'text', pointerEvents: 'auto'}}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeHighlight, rehypeRaw]}
