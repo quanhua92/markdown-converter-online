@@ -1746,11 +1746,33 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
         <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Eye className="w-5 h-5" />
-              Live Preview
-              <Badge variant="secondary" className="ml-2">Mermaid + Syntax</Badge>
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Eye className="w-5 h-5" />
+                Live Preview
+                <Badge variant="secondary" className="ml-2">Mermaid + Syntax</Badge>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Export MD
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrint}
+                  className="flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4" />
+                  Print/PDF
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className={!isDesktop && activeTab === 'edit' ? 'hidden' : ''}>
             <div className="min-h-[600px] overflow-auto prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
@@ -2104,44 +2126,20 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         {/* Editor settings for editor view */}
         {currentView === 'editor' && (
           <div className="mb-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex gap-2">
-                <Button
-                  variant={showSettings ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setShowSettings(!showSettings)}
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleExport}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Export MD
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrint}
-                >
-                  <Printer className="w-4 h-4 mr-2" />
-                  Print/PDF
-                </Button>
-              </div>
-            </div>
-
-            {showSettings && (
-              <Card className="shadow-lg mt-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="w-5 h-5" />
+            <Collapsible open={showSettings} onOpenChange={setShowSettings}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full flex items-center justify-between bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
                     Editor Settings
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showSettings ? 'rotate-180' : ''}`} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-4">
+
+                <Card className="shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
+                  <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-2 block">Theme</label>
@@ -2208,9 +2206,10 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                       </label>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         )}
 
