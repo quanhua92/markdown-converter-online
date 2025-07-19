@@ -132,6 +132,8 @@ function Index() {
   // Editor-specific state
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
   const [isDesktop, setIsDesktop] = useState(false)
+  const [showEditPanel, setShowEditPanel] = useState(true)
+  const [showPreviewPanel, setShowPreviewPanel] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [theme, setTheme] = useState('light')
   const [fontSize, setFontSize] = useState('14')
@@ -1719,8 +1721,16 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
       </Card>
 
       {/* Editor and Preview */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
+      <div className={`grid gap-6 mb-6 ${
+        isDesktop 
+          ? (showEditPanel && showPreviewPanel 
+              ? 'grid-cols-2' 
+              : 'grid-cols-1') 
+          : 'grid-cols-1'
+      }`}>
+        <Card className={`shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300 ${
+          isDesktop ? (!showEditPanel ? 'hidden' : '') : ''
+        }`}>
           <CardHeader className="pb-4">
             {/* Clean Title Section */}
             <CardTitle className="flex items-center gap-2 mb-4">
@@ -1741,9 +1751,15 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {/* Edit Button */}
               <Button
-                variant={activeTab === 'edit' ? "default" : "outline"}
+                variant={isDesktop ? (showEditPanel ? "default" : "outline") : (activeTab === 'edit' ? "default" : "outline")}
                 size="sm"
-                onClick={() => setActiveTab('edit')}
+                onClick={() => {
+                  if (isDesktop) {
+                    setShowEditPanel(!showEditPanel)
+                  } else {
+                    setActiveTab('edit')
+                  }
+                }}
                 className="flex items-center justify-center gap-2"
               >
                 <Edit3 className="w-4 h-4" />
@@ -1752,9 +1768,15 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               
               {/* Preview Button */}
               <Button
-                variant={activeTab === 'preview' ? "default" : "outline"}
+                variant={isDesktop ? (showPreviewPanel ? "default" : "outline") : (activeTab === 'preview' ? "default" : "outline")}
                 size="sm"
-                onClick={() => setActiveTab('preview')}
+                onClick={() => {
+                  if (isDesktop) {
+                    setShowPreviewPanel(!showPreviewPanel)
+                  } else {
+                    setActiveTab('preview')
+                  }
+                }}
                 className="flex items-center justify-center gap-2"
               >
                 <Eye className="w-4 h-4" />
@@ -1784,7 +1806,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               </Button>
             </div>
           </CardHeader>
-          <CardContent className={activeTab === 'preview' ? 'hidden' : ''}>
+          <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
             <Textarea
               value={markdown}
               onChange={(e) => setMarkdown(e.target.value)}
@@ -1795,7 +1817,9 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           </CardContent>
         </Card>
 
-        <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
+        <Card className={`shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300 ${
+          isDesktop ? (!showPreviewPanel ? 'hidden' : '') : ''
+        }`}>
           <CardHeader>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
@@ -1805,7 +1829,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               </div>
             </div>
           </CardHeader>
-          <CardContent className={activeTab === 'edit' ? 'hidden' : ''}>
+          <CardContent className={!isDesktop && activeTab === 'edit' ? 'hidden' : ''}>
             <div className="min-h-[600px] overflow-auto prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
               <div className="markdown-preview">
                 <ReactMarkdown
