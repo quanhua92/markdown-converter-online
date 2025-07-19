@@ -6,14 +6,30 @@ async function debugWorkspace() {
   const browser = await chromium.launch();
   const page = await browser.newPage();
   
+  // Track React errors specifically
+  let hasReactError = false;
+  let reactErrorDetails = null;
+  
   // Listen for console messages
   page.on('console', msg => {
-    console.log('🖥️  Console:', msg.type(), msg.text());
+    const text = msg.text();
+    console.log('🖥️  Console:', msg.type(), text);
+    
+    // Check for React error #185
+    if (text.includes('Minified React error #185') || text.includes('React error #185')) {
+      hasReactError = true;
+      reactErrorDetails = text;
+      console.log('🚨 REACT ERROR #185 DETECTED:', text);
+    }
   });
   
   // Listen for errors
   page.on('pageerror', error => {
     console.log('❌ Page error:', error.message);
+    if (error.message.includes('React error #185')) {
+      hasReactError = true;
+      reactErrorDetails = error.message;
+    }
   });
   
   try {
@@ -63,6 +79,15 @@ async function debugWorkspace() {
     console.log('📁 File tree check:', JSON.stringify(fileTreeExists, null, 2));
     
     await page.screenshot({ path: 'tests/screenshots/workspace-debug.png', fullPage: true });
+    
+    // Report React error status
+    if (hasReactError) {
+      console.log('🚨 CRITICAL: React error #185 is still occurring!');
+      console.log('📝 Error details:', reactErrorDetails);
+      console.log('❌ TEST FAILURE: Workspace functionality has React errors');
+    } else {
+      console.log('✅ No React errors detected - workspace functionality appears stable');
+    }
     
   } catch (error) {
     console.error('❌ Debug error:', error.message);

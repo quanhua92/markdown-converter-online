@@ -27,8 +27,63 @@ export function useWorkspaceManager() {
     // Ensure default workspace exists
     ensureDefaultWorkspace()
     
-    // Load the current workspace
-    loadWorkspace(workspaceId)
+    // Load the current workspace without dependency loop
+    const workspaceKey = `${WORKSPACE_DATA_PREFIX}${workspaceId}`
+    const stored = localStorage.getItem(workspaceKey)
+    
+    if (stored) {
+      try {
+        const data = JSON.parse(stored) as WorkspaceData
+        setWorkspaceData(data)
+        setCurrentWorkspaceId(workspaceId)
+        localStorage.setItem(CURRENT_WORKSPACE_KEY, workspaceId)
+      } catch (error) {
+        console.error('Error loading workspace:', error)
+        // Fallback to default workspace
+        if (workspaceId !== 'default') {
+          const defaultKey = `${WORKSPACE_DATA_PREFIX}default`
+          const defaultStored = localStorage.getItem(defaultKey)
+          if (defaultStored) {
+            try {
+              const defaultData = JSON.parse(defaultStored) as WorkspaceData
+              setWorkspaceData(defaultData)
+              setCurrentWorkspaceId('default')
+              localStorage.setItem(CURRENT_WORKSPACE_KEY, 'default')
+            } catch {
+              // Create new default if corrupted
+              const defaultWorkspace: WorkspaceData = {
+                id: 'default',
+                name: 'Default Workspace',
+                files: [],
+                createdAt: new Date().toISOString(),
+                lastModified: new Date().toISOString()
+              }
+              setWorkspaceData(defaultWorkspace)
+              setCurrentWorkspaceId('default')
+              localStorage.setItem(defaultKey, JSON.stringify(defaultWorkspace))
+              localStorage.setItem(CURRENT_WORKSPACE_KEY, 'default')
+            }
+          }
+        }
+      }
+    } else {
+      // Create new workspace if it doesn't exist
+      const newWorkspace: WorkspaceData = {
+        id: workspaceId,
+        name: workspaceId === 'default' ? 'Default Workspace' : `Workspace ${workspaceId}`,
+        files: [],
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString()
+      }
+      setWorkspaceData(newWorkspace)
+      setCurrentWorkspaceId(workspaceId)
+      const workspaceKey = `${WORKSPACE_DATA_PREFIX}${workspaceId}`
+      const updatedWorkspace = {
+        ...newWorkspace,
+        lastModified: new Date().toISOString()
+      }
+      localStorage.setItem(workspaceKey, JSON.stringify(updatedWorkspace))
+    }
   }, [])
 
   const ensureDefaultWorkspace = () => {
@@ -47,6 +102,16 @@ export function useWorkspaceManager() {
     }
   }
 
+  const saveWorkspace = useCallback((workspace: WorkspaceData) => {
+    const workspaceKey = `${WORKSPACE_DATA_PREFIX}${workspace.id}`
+    const updatedWorkspace = {
+      ...workspace,
+      lastModified: new Date().toISOString()
+    }
+    localStorage.setItem(workspaceKey, JSON.stringify(updatedWorkspace))
+    setWorkspaceData(updatedWorkspace)
+  }, [])
+
   const loadWorkspace = useCallback((workspaceId: string) => {
     const workspaceKey = `${WORKSPACE_DATA_PREFIX}${workspaceId}`
     const stored = localStorage.getItem(workspaceKey)
@@ -59,8 +124,10 @@ export function useWorkspaceManager() {
         localStorage.setItem(CURRENT_WORKSPACE_KEY, workspaceId)
       } catch (error) {
         console.error('Error loading workspace:', error)
-        // Fallback to default workspace
-        loadWorkspace('default')
+        // Fallback to default workspace - avoid infinite recursion
+        if (workspaceId !== 'default') {
+          loadWorkspace('default')
+        }
       }
     } else {
       // Create new workspace if it doesn't exist
@@ -75,17 +142,7 @@ export function useWorkspaceManager() {
       setCurrentWorkspaceId(workspaceId)
       saveWorkspace(newWorkspace)
     }
-  }, [])
-
-  const saveWorkspace = useCallback((workspace: WorkspaceData) => {
-    const workspaceKey = `${WORKSPACE_DATA_PREFIX}${workspace.id}`
-    const updatedWorkspace = {
-      ...workspace,
-      lastModified: new Date().toISOString()
-    }
-    localStorage.setItem(workspaceKey, JSON.stringify(updatedWorkspace))
-    setWorkspaceData(updatedWorkspace)
-  }, [])
+  }, [saveWorkspace])
 
   const joinWorkspace = useCallback((workspaceId: string) => {
     // Save current workspace before switching
@@ -93,9 +150,21 @@ export function useWorkspaceManager() {
       saveWorkspace(workspaceData)
     }
     
-    // Load new workspace
-    loadWorkspace(workspaceId)
-  }, [workspaceData, saveWorkspace, loadWorkspace])
+    // Load new workspace directly without dependency loop
+    const workspaceKey = `${WORKSPACE_DATA_PREFIX}${workspaceId}`
+    const stored = localStorage.getItem(workspaceKey)
+    
+    if (stored) {
+      try {
+        const data = JSON.parse(stored) as WorkspaceData
+        setWorkspaceData(data)
+        setCurrentWorkspaceId(workspaceId)
+        localStorage.setItem(CURRENT_WORKSPACE_KEY, workspaceId)
+      } catch (error) {
+        console.error('Error loading workspace:', error)
+      }
+    }
+  }, [workspaceData, saveWorkspace])
 
   const leaveWorkspace = useCallback(() => {
     // Save current workspace
@@ -103,9 +172,21 @@ export function useWorkspaceManager() {
       saveWorkspace(workspaceData)
     }
     
-    // Switch to default workspace
-    loadWorkspace('default')
-  }, [workspaceData, saveWorkspace, loadWorkspace])
+    // Switch to default workspace directly
+    const defaultKey = `${WORKSPACE_DATA_PREFIX}default`
+    const stored = localStorage.getItem(defaultKey)
+    
+    if (stored) {
+      try {
+        const data = JSON.parse(stored) as WorkspaceData
+        setWorkspaceData(data)
+        setCurrentWorkspaceId('default')
+        localStorage.setItem(CURRENT_WORKSPACE_KEY, 'default')
+      } catch (error) {
+        console.error('Error loading default workspace:', error)
+      }
+    }
+  }, [workspaceData, saveWorkspace])
 
   const createWorkspace = useCallback((name: string) => {
     // Save current workspace first
@@ -123,10 +204,18 @@ export function useWorkspaceManager() {
     }
     
     // Save and immediately join the new workspace
-    saveWorkspace(newWorkspace)
-    loadWorkspace(workspaceId)
+    const workspaceKey = `${WORKSPACE_DATA_PREFIX}${workspaceId}`
+    const updatedWorkspace = {
+      ...newWorkspace,
+      lastModified: new Date().toISOString()
+    }
+    localStorage.setItem(workspaceKey, JSON.stringify(updatedWorkspace))
+    setWorkspaceData(updatedWorkspace)
+    setCurrentWorkspaceId(workspaceId)
+    localStorage.setItem(CURRENT_WORKSPACE_KEY, workspaceId)
+    
     return workspaceId
-  }, [workspaceData, saveWorkspace, loadWorkspace])
+  }, [workspaceData, saveWorkspace])
 
   const deleteWorkspace = useCallback((workspaceId: string) => {
     if (workspaceId === 'default') {
@@ -139,9 +228,21 @@ export function useWorkspaceManager() {
     
     // If deleting current workspace, switch to default
     if (workspaceId === currentWorkspaceId) {
-      loadWorkspace('default')
+      const defaultKey = `${WORKSPACE_DATA_PREFIX}default`
+      const stored = localStorage.getItem(defaultKey)
+      
+      if (stored) {
+        try {
+          const data = JSON.parse(stored) as WorkspaceData
+          setWorkspaceData(data)
+          setCurrentWorkspaceId('default')
+          localStorage.setItem(CURRENT_WORKSPACE_KEY, 'default')
+        } catch (error) {
+          console.error('Error loading default workspace:', error)
+        }
+      }
     }
-  }, [currentWorkspaceId, loadWorkspace])
+  }, [currentWorkspaceId])
 
   const renameWorkspace = useCallback((workspaceId: string, newName: string) => {
     if (workspaceData && workspaceData.id === workspaceId) {

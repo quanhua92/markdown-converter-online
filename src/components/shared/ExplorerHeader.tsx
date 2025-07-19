@@ -11,6 +11,7 @@ import {
   Moon 
 } from 'lucide-react'
 import { FileTree, FileSystemItem } from './FileTree'
+import { useCallback, useMemo } from 'react'
 
 interface ExplorerHeaderProps {
   isDarkMode: boolean
@@ -30,6 +31,13 @@ interface ExplorerHeaderProps {
   onManualSave: () => void
   onExport: () => void
   onPrint: () => void
+  // Workspace management props
+  currentWorkspaceId?: string
+  currentWorkspaceName?: string
+  workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
+  onWorkspaceJoin?: (workspaceId: string) => void
+  onWorkspaceLeave?: () => void
+  onWorkspaceCreate?: (name: string) => void
 }
 
 export function ExplorerHeader({
@@ -49,8 +57,50 @@ export function ExplorerHeader({
   onInitializeTemplate,
   onManualSave,
   onExport,
-  onPrint
+  onPrint,
+  // Workspace management props
+  currentWorkspaceId,
+  currentWorkspaceName,
+  workspaces,
+  onWorkspaceJoin,
+  onWorkspaceLeave,
+  onWorkspaceCreate
 }: ExplorerHeaderProps) {
+  // Memoize handlers to prevent infinite re-renders in mobile sheet
+  const handleFileSelect = useCallback((item: FileSystemItem) => {
+    onFileSelect(item)
+    setIsMobileSheetOpen(false)
+  }, [onFileSelect, setIsMobileSheetOpen])
+
+  // Create stable wrapper functions that match FileTree's expected interface
+  const handleDeleteItem = useCallback((item: FileSystemItem) => {
+    onDeleteItem(item.path)
+  }, [onDeleteItem])
+
+  const handleRenameItem = useCallback((item: FileSystemItem, newName: string) => {
+    onRenameItem(item.path, newName)
+  }, [onRenameItem])
+
+  const handleToggleFolder = useCallback((item: FileSystemItem) => {
+    onToggleFolder(item.path)
+  }, [onToggleFolder])
+
+  // Memoize workspace props to prevent unnecessary re-renders
+  const memoizedWorkspaceProps = useMemo(() => {
+    // Only include workspace props if they are fully defined to prevent partial renders
+    if (currentWorkspaceId && currentWorkspaceName && workspaces && onWorkspaceJoin && onWorkspaceLeave && onWorkspaceCreate) {
+      return {
+        currentWorkspaceId,
+        currentWorkspaceName,
+        workspaces,
+        onWorkspaceJoin,
+        onWorkspaceLeave,
+        onWorkspaceCreate
+      }
+    }
+    return {}
+  }, [currentWorkspaceId, currentWorkspaceName, workspaces, onWorkspaceJoin, onWorkspaceLeave, onWorkspaceCreate])
+
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
       <div className="max-w-full mx-auto">
@@ -75,17 +125,15 @@ export function ExplorerHeader({
                   <FileTree
                     items={files}
                     selectedFile={currentFile?.path}
-                    onFileSelect={(item) => {
-                      onFileSelect(item)
-                      setIsMobileSheetOpen(false)
-                    }}
+                    onFileSelect={handleFileSelect}
                     onCreateFile={onCreateFile}
                     onCreateFolder={onCreateFolder}
-                    onDeleteItem={onDeleteItem}
-                    onRenameItem={onRenameItem}
-                    onToggleFolder={onToggleFolder}
+                    onDeleteItem={handleDeleteItem}
+                    onRenameItem={handleRenameItem}
+                    onToggleFolder={handleToggleFolder}
                     onInitializeTemplate={onInitializeTemplate}
                     showTemplateOptions={files.length === 0}
+                    {...memoizedWorkspaceProps}
                   />
                 </div>
               </SheetContent>

@@ -157,6 +157,12 @@ function Explorer() {
         onManualSave={handleManualSave}
         onExport={handleExport}
         onPrint={handlePrint}
+        currentWorkspaceId={currentWorkspaceId}
+        currentWorkspaceName={currentWorkspaceName}
+        workspaces={workspaces}
+        onWorkspaceJoin={joinWorkspace}
+        onWorkspaceLeave={leaveWorkspace}
+        onWorkspaceCreate={createWorkspace}
       />
 
       {/* Main Content */}
