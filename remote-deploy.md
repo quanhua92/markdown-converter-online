@@ -9,11 +9,14 @@ Docker caching can cause stale builds where new code changes aren't reflected in
 
 ### Option 1: Use the Build Script (Recommended)
 ```bash
+# Use default docker-compose.yml
+./build-fresh.sh
+
+# Use specific compose file (e.g., for proxy setup)
+./build-fresh.sh docker-compose.proxy.yml
+
 # Download and run the fresh build script
 curl -sSL https://raw.githubusercontent.com/[your-repo]/main/build-fresh.sh | bash
-
-# Or if you have the repo cloned:
-./build-fresh.sh
 ```
 
 ### Option 2: Manual Fresh Build
