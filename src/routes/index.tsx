@@ -999,10 +999,10 @@ classDiagram
         +refund() Boolean
     }
     
-    User ||--o{ Order : places
-    Order ||--o{ OrderItem : contains
-    Product ||--o{ OrderItem : referenced_by
-    Order ||--|| Payment : has
+    User --> Order
+    Order --> OrderItem
+    Product --> OrderItem
+    Order --> Payment
     
     class OrderStatus {
         <<enumeration>>
@@ -1129,14 +1129,14 @@ erDiagram
         date created_at
     }
     
-    CUSTOMER ||--o{ ORDER : places
-    ORDER ||--o{ ORDER_ITEM : contains
-    PRODUCT ||--o{ ORDER_ITEM : includes
-    PRODUCT }o--|| CATEGORY : belongs_to
-    CATEGORY ||--o{ CATEGORY : has_subcategory
-    ORDER ||--|| PAYMENT : has
-    CUSTOMER ||--o{ REVIEW : writes
-    PRODUCT ||--o{ REVIEW : receives
+    CUSTOMER ||--o{ ORDER : "places"
+    ORDER ||--o{ ORDER_ITEM : "contains"
+    PRODUCT ||--o{ ORDER_ITEM : "includes"
+    PRODUCT }o--|| CATEGORY : "belongs_to"
+    CATEGORY ||--o{ CATEGORY : "has_subcategory"
+    ORDER ||--|| PAYMENT : "has"
+    CUSTOMER ||--o{ REVIEW : "writes"
+    PRODUCT ||--o{ REVIEW : "receives"
 \`\`\`
 
 ### 6. Gantt Chart - Project Timeline
@@ -1172,52 +1172,36 @@ gantt
     Performance Optimization :perf, 2024-05-15, 2024-06-15
 \`\`\`
 
-### 7. Git Flow Diagram
+### 7. Flowchart - Development Workflow
 \`\`\`mermaid
-gitgraph
-    commit id: "Initial commit"
-    branch develop
-    checkout develop
-    commit id: "Setup project structure"
-    commit id: "Add basic configuration"
+flowchart TD
+    A[Start Development] --> B[Create Feature Branch]
+    B --> C[Implement Feature]
+    C --> D[Write Tests]
+    D --> E[Code Review]
+    E --> F{Review Approved?}
+    F -->|No| G[Address Feedback]
+    G --> C
+    F -->|Yes| H[Merge to Develop]
+    H --> I[Run Integration Tests]
+    I --> J{Tests Pass?}
+    J -->|No| K[Fix Issues]
+    K --> I
+    J -->|Yes| L[Deploy to Staging]
+    L --> M[User Acceptance Testing]
+    M --> N{UAT Pass?}
+    N -->|No| O[Fix Issues]
+    O --> L
+    N -->|Yes| P[Merge to Main]
+    P --> Q[Deploy to Production]
+    Q --> R[Monitor & Release]
+    R --> S[End]
     
-    branch feature/user-auth
-    checkout feature/user-auth
-    commit id: "Implement login"
-    commit id: "Add password validation"
-    commit id: "Add JWT tokens"
-    
-    checkout develop
-    merge feature/user-auth
-    commit id: "Merge user authentication"
-    
-    branch feature/payment
-    checkout feature/payment
-    commit id: "Add payment gateway"
-    commit id: "Implement refunds"
-    
-    checkout develop
-    branch feature/notifications
-    checkout feature/notifications
-    commit id: "Email notifications"
-    commit id: "SMS notifications"
-    
-    checkout develop
-    merge feature/notifications
-    commit id: "Merge notifications"
-    
-    checkout main
-    merge develop
-    commit id: "Release v1.0.0" tag: "v1.0.0"
-    
-    checkout develop
-    merge feature/payment
-    commit id: "Merge payment system"
-    commit id: "Fix integration issues"
-    
-    checkout main
-    merge develop
-    commit id: "Release v1.1.0" tag: "v1.1.0"
+    style A fill:#e1f5fe
+    style S fill:#e8f5e8
+    style F fill:#fff3e0
+    style J fill:#fff3e0
+    style N fill:#fff3e0
 \`\`\`
 
 ### 8. User Journey Map
