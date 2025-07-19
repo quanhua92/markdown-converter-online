@@ -20,15 +20,25 @@ const { chromium } = require('playwright');
   await page.click('button:has-text("Preview")');
   await page.waitForTimeout(2000);
   
-  // Take light mode screenshot
-  await page.screenshot({ path: 'light-mode-preview.png' });
-  console.log('📸 Light mode screenshot taken');
+  // Take full page screenshot in light mode
+  await page.screenshot({ path: 'light-mode-full.png', fullPage: true });
+  console.log('📸 Light mode full page screenshot taken');
+  
+  // Take viewport screenshot in light mode
+  await page.screenshot({ path: 'light-mode-viewport.png' });
+  console.log('📸 Light mode viewport screenshot taken');
   
   // Check basic dark mode functionality first
   const lightBodyBg = await page.evaluate(() => {
     return window.getComputedStyle(document.body).backgroundColor;
   });
   console.log('Body background in light mode:', lightBodyBg);
+  
+  // Check the overall page background
+  const lightPageBg = await page.evaluate(() => {
+    return window.getComputedStyle(document.documentElement).backgroundColor;
+  });
+  console.log('Page background in light mode:', lightPageBg);
   
   // Get light mode h1 color
   const lightH1Color = await page.locator('h1').first().evaluate(el => {
@@ -39,21 +49,31 @@ const { chromium } = require('playwright');
   // Toggle to dark mode
   const themeButton = await page.locator('button.btn-elegant').first();
   await themeButton.click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(2000); // Give more time for transitions
   
   // Check if dark mode classes are applied
   const hasDarkClass = await page.evaluate(() => document.documentElement.classList.contains('dark'));
   console.log('Dark class applied:', hasDarkClass);
   
-  // Take dark mode screenshot
-  await page.screenshot({ path: 'dark-mode-preview.png' });
-  console.log('📸 Dark mode screenshot taken');
+  // Take full page screenshot in dark mode
+  await page.screenshot({ path: 'dark-mode-full.png', fullPage: true });
+  console.log('📸 Dark mode full page screenshot taken');
+  
+  // Take viewport screenshot in dark mode
+  await page.screenshot({ path: 'dark-mode-viewport.png' });
+  console.log('📸 Dark mode viewport screenshot taken');
   
   // Check basic dark mode functionality
   const darkBodyBg = await page.evaluate(() => {
     return window.getComputedStyle(document.body).backgroundColor;
   });
   console.log('Body background in dark mode:', darkBodyBg);
+  
+  // Check the overall page background in dark mode
+  const darkPageBg = await page.evaluate(() => {
+    return window.getComputedStyle(document.documentElement).backgroundColor;
+  });
+  console.log('Page background in dark mode:', darkPageBg);
   
   // Check if prose content has dark styling
   const darkH1Color = await page.locator('h1').first().evaluate(el => {
@@ -65,20 +85,48 @@ const { chromium } = require('playwright');
   const proseClasses = await page.locator('.prose').first().getAttribute('class');
   console.log('Prose classes:', proseClasses);
   
+  // Check body element classes
+  const bodyClasses = await page.evaluate(() => document.body.className);
+  console.log('Body classes:', bodyClasses);
+  
+  // Check what CSS is actually applied to body
+  const bodyComputedStyles = await page.evaluate(() => {
+    const body = document.body;
+    const computed = window.getComputedStyle(body);
+    return {
+      backgroundColor: computed.backgroundColor,
+      color: computed.color,
+      transition: computed.transition
+    };
+  });
+  console.log('Body computed styles:', bodyComputedStyles);
+  
+  // Check if dark class is on document.documentElement
+  const htmlClasses = await page.evaluate(() => document.documentElement.className);
+  console.log('HTML element classes:', htmlClasses);
+  
   // Check if basic dark mode is working
   if (lightBodyBg !== darkBodyBg) {
-    console.log('✅ Basic dark mode is working - body background changes');
+    console.log('✅ Body background changes between modes');
   } else {
-    console.log('⚠️  Basic dark mode not working - body background same in both modes');
+    console.log('⚠️  Body background stays the same in both modes');
+    console.log('   This suggests Tailwind dark mode classes are not being applied to body');
   }
   
   // Compare colors
   if (lightH1Color !== darkH1Color) {
-    console.log('✅ SUCCESS: Dark mode styling is working - colors change between modes');
+    console.log('✅ SUCCESS: Heading colors change between modes');
   } else {
-    console.log('⚠️  ISSUE: Dark mode styling might not be working - colors same in both modes');
-    console.log('This could mean Tailwind dark mode classes are not being applied to prose elements');
+    console.log('⚠️  ISSUE: Heading colors stay the same in both modes');
   }
+  
+  // Visual inspection recommendation
+  console.log('');
+  console.log('🔍 Visual Inspection:');
+  console.log('   Compare these screenshots to verify dark mode is working:');
+  console.log('   - light-mode-full.png vs dark-mode-full.png');
+  console.log('   - light-mode-viewport.png vs dark-mode-viewport.png');
+  console.log('   The background should change from white to dark gray/black');
   
   // Toggle back to light mode
   await themeButton.click();
