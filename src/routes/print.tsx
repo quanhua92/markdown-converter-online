@@ -111,6 +111,13 @@ function PrintPage() {
         return <MermaidDiagram chart={children as string} />
       }
       return <code {...rest} className={className}>{children}</code>
+    },
+    table(props: any) {
+      return (
+        <div className="table-container">
+          <table {...props} />
+        </div>
+      )
     }
   }
 
@@ -164,8 +171,19 @@ function PrintPage() {
             width: auto !important;
             height: auto !important;
           }
+          .table-container {
+            overflow-x: auto !important;
+            max-width: 100% !important;
+            margin: 1em 0 !important;
+          }
           table {
             page-break-inside: avoid !important;
+            min-width: 100% !important;
+            white-space: nowrap !important;
+          }
+          th, td {
+            white-space: nowrap !important;
+            padding: 8px 12px !important;
           }
           /* KaTeX math rendering for print */
           .katex {
