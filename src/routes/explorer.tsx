@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { toast, Toaster } from 'sonner'
 import {
   useTheme,
@@ -48,26 +48,29 @@ function Explorer() {
     }
   }, [currentFile])
 
-  // Debounced save function
-  const debouncedSave = debounce((content: string) => {
-    if (currentFile) {
-      updateFileContent(currentFile.path, content)
-      setSaveStatus('saved')
-      setTimeout(() => setSaveStatus('idle'), 2000)
-    }
-  }, 500)
+  // Debounced save function - memoized to prevent recreation on every render
+  const debouncedSave = useCallback(
+    debounce((content: string) => {
+      if (currentFile) {
+        updateFileContent(currentFile.path, content)
+        setSaveStatus('saved')
+        setTimeout(() => setSaveStatus('idle'), 2000)
+      }
+    }, 500),
+    [currentFile, updateFileContent]
+  )
 
-  const handleMarkdownChange = (value: string) => {
+  const handleMarkdownChange = useCallback((value: string) => {
     setMarkdownContent(value)
     setSaveStatus('saving')
     debouncedSave(value)
-  }
+  }, [debouncedSave])
 
-  const handleFileSelect = (item: FileSystemItem) => {
+  const handleFileSelect = useCallback((item: FileSystemItem) => {
     selectFile(item)
-  }
+  }, [selectFile])
 
-  const handlePrint = () => {
+  const handlePrint = useCallback(() => {
     if (!currentFile || !markdownContent.trim()) {
       toast.error('No content to print')
       return
@@ -85,9 +88,9 @@ function Explorer() {
       console.error('Print error:', error)
       toast.error('Failed to prepare content for printing')
     }
-  }
+  }, [currentFile, markdownContent])
 
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     if (!currentFile || !markdownContent.trim()) {
       toast.error('No content to export')
       return
@@ -101,16 +104,16 @@ function Explorer() {
     a.click()
     URL.revokeObjectURL(url)
     toast.success('Markdown file exported successfully!')
-  }
+  }, [currentFile, markdownContent])
 
-  const handleManualSave = () => {
+  const handleManualSave = useCallback(() => {
     if (currentFile) {
       updateFileContent(currentFile.path, markdownContent)
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus('idle'), 2000)
       toast.success('File saved!')
     }
-  }
+  }, [currentFile, markdownContent, updateFileContent])
 
   if (!isLoaded) {
     return (
