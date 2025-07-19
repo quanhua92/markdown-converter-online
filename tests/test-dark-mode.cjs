@@ -16,9 +16,13 @@ const { chromium } = require('playwright');
   
   await page.waitForTimeout(1000);
   
-  // Enable preview
-  await page.click('button:has-text("Preview")');
-  await page.waitForTimeout(2000);
+  // Check if preview is visible (on desktop it's always visible, on mobile we need to click Preview tab)
+  const isDesktop = await page.evaluate(() => window.innerWidth >= 1024);
+  if (!isDesktop) {
+    // On mobile, click the Preview tab
+    await page.click('button:has-text("Preview")');
+    await page.waitForTimeout(2000);
+  }
   
   // Take full page screenshot in light mode
   await page.screenshot({ path: 'light-mode-full.png', fullPage: true });
@@ -46,8 +50,8 @@ const { chromium } = require('playwright');
   });
   console.log('H1 color in light mode:', lightH1Color);
   
-  // Toggle to dark mode
-  const themeButton = await page.locator('button.btn-elegant').first();
+  // Toggle to dark mode - look for the theme toggle button with title text
+  const themeButton = await page.locator('button[title*="Switch to"]').first();
   await themeButton.click();
   await page.waitForTimeout(2000); // Give more time for transitions
   
