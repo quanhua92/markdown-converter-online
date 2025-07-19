@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Edit3, BookOpen, Sun, Moon, FolderOpen } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 
@@ -51,19 +52,20 @@ export function HeaderSection({
       
       {/* Navigation Tabs */}
       <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4">
-        <Button
-          onClick={() => onViewChange('editor')}
-          variant={currentView === 'editor' ? 'default' : 'outline'}
-          size="default"
-          className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-            currentView === 'editor' 
-              ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' 
-              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'
-          }`}
-        >
-          <Edit3 className="h-4 w-4" />
-          Converter
-        </Button>
+        <Tabs value={currentView} onValueChange={onViewChange} className="w-auto">
+          <TabsList className="bg-white/90 dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700 shadow-lg backdrop-blur-sm">
+            <TabsTrigger value="editor" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+              <Edit3 className="h-4 w-4" />
+              Converter
+            </TabsTrigger>
+            <TabsTrigger value="guides" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white">
+              <BookOpen className="h-4 w-4" />
+              Guides
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        {/* Separate Explorer link */}
         <Link to="/explorer">
           <Button
             variant="outline"
@@ -74,19 +76,6 @@ export function HeaderSection({
             Explorer
           </Button>
         </Link>
-        <Button
-          onClick={() => onViewChange('guides')}
-          variant={currentView === 'guides' ? 'default' : 'outline'}
-          size="default"
-          className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-            currentView === 'guides' 
-              ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' 
-              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'
-          }`}
-        >
-          <BookOpen className="h-4 w-4" />
-          Guides
-        </Button>
       </div>
     </div>
   )

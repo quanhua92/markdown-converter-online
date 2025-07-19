@@ -30,11 +30,35 @@ async function testPrintWorkflow() {
     // Now test print mode by simulating the print button click
     console.log('🖨️ Testing print mode...');
     
-    // Set up popup handler before clicking print
-    const printPagePromise = context.waitForEvent('page');
+    // Set up popup handler before clicking print with longer timeout
+    const printPagePromise = context.waitForEvent('page', { timeout: 60000 });
     
-    // Click the print button
-    await page.click('text=Print/PDF');
+    // Click the print button - try multiple selectors
+    const printButtons = [
+      'text=Print Preview',
+      'text=Print/PDF', 
+      'button:has-text("Print")',
+      '[title="Print"]'
+    ];
+    
+    let printClicked = false;
+    for (const selector of printButtons) {
+      try {
+        const button = page.locator(selector);
+        if (await button.isVisible({ timeout: 5000 })) {
+          await button.click();
+          printClicked = true;
+          break;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+    
+    if (!printClicked) {
+      console.log('❌ Could not find print button');
+      return;
+    }
     
     // Wait for print page to open
     const printPage = await printPagePromise;

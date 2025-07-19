@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import {
   Download,
   FileText,
@@ -251,68 +252,61 @@ export function OutputFormatAndConversionSection({
 
       {/* Download Result UI */}
       {downloadResult && (
-        <Card className="mb-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-xl">
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="flex items-center gap-2 text-green-800 text-lg sm:text-xl">
-              <Download className="h-5 w-5" />
-              Conversion Complete!
-            </CardTitle>
-            <CardDescription className="text-green-700 text-sm sm:text-base">
-              Your {formatConfig[downloadResult.format as keyof typeof formatConfig].label} file is ready for download
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
-                  {(() => {
-                    const IconComponent = formatConfig[downloadResult.format as keyof typeof formatConfig].icon
-                    return IconComponent ? <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" /> : null
-                  })()}
+        <Alert className="mb-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-xl">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <AlertTitle className="text-green-800 text-lg">
+            Conversion Complete!
+          </AlertTitle>
+          <AlertDescription className="text-green-700">
+            <div className="space-y-4">
+              <p>Your {formatConfig[downloadResult.format as keyof typeof formatConfig].label} file is ready for download</p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg border gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+                    {(() => {
+                      const IconComponent = formatConfig[downloadResult.format as keyof typeof formatConfig].icon
+                      return IconComponent ? <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" /> : null
+                    })()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{downloadResult.filename}</p>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                      Generated {downloadResult.timestamp.toLocaleTimeString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">{downloadResult.filename}</p>
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    Generated {downloadResult.timestamp.toLocaleTimeString()}
-                  </p>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button
+                    onClick={onDownload}
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 flex-1 sm:flex-none h-10 px-6 hover:scale-105"
+                    size="default"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                  </Button>
+                  <Button
+                    onClick={onClearResult}
+                    size="default"
+                    className="h-10 px-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                  >
+                    ✕
+                  </Button>
                 </div>
-              </div>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <Button
-                  onClick={onDownload}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 flex-1 sm:flex-none h-10 px-6 hover:scale-105"
-                  size="default"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download
-                </Button>
-                <Button
-                  onClick={onClearResult}
-                  size="default"
-                  className="h-10 px-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                >
-                  ✕
-                </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Conversion Error Debug Section */}
       {conversionError && (
-        <Card className="mb-6 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700 shadow-xl">
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="flex items-center gap-2 text-red-800 text-lg sm:text-xl">
-              ✕
-              Conversion Failed
-            </CardTitle>
-            <CardDescription className="text-red-700 text-sm sm:text-base">
-              {conversionError.message}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+        <Alert variant="destructive" className="mb-6 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700 shadow-xl">
+          <AlertTitle className="text-red-800 text-lg">
+            ✕ Conversion Failed
+          </AlertTitle>
+          <AlertDescription className="text-red-700">
             <div className="space-y-4">
+              <p>{conversionError.message}</p>
               {conversionError.details && (
                 <div>
                   <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Error Details:</h4>
@@ -331,8 +325,8 @@ export function OutputFormatAndConversionSection({
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </AlertDescription>
+        </Alert>
       )}
     </>
   )

@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { toast, Toaster } from 'sonner'
 import { 
   ChevronLeft, 
@@ -293,25 +294,19 @@ function Explorer() {
             <>
               {/* Mobile Tab Buttons */}
               {!isDesktop && (
-                <div className="flex mb-4 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md mx-2 lg:mx-0">
-                  <Button
-                    variant={activeTab === 'edit' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab('edit')}
-                    className="flex-1 text-xs lg:text-sm"
-                  >
-                    <Edit3 className="w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant={activeTab === 'preview' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setActiveTab('preview')}
-                    className="flex-1 text-xs lg:text-sm"
-                  >
-                    <Eye className="w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2" />
-                    Preview
-                  </Button>
+                <div className="mb-4 mx-2 lg:mx-0">
+                  <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    <TabsList className="w-full bg-white dark:bg-gray-800 shadow-md">
+                      <TabsTrigger value="edit" className="flex-1 text-xs lg:text-sm">
+                        <Edit3 className="w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2" />
+                        Edit
+                      </TabsTrigger>
+                      <TabsTrigger value="preview" className="flex-1 text-xs lg:text-sm">
+                        <Eye className="w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2" />
+                        Preview
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
               )}
 

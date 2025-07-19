@@ -54,31 +54,50 @@ const { chromium } = require('playwright');
       }
     }
     
+    // Create a file to enable mobile tabs
+    const createFileBtn = page.locator('button:has-text("Create New File")');
+    if (await createFileBtn.isVisible()) {
+      await createFileBtn.click();
+      await page.waitForTimeout(1000);
+      console.log('📁 Created new file for testing');
+      
+      // Close the sheet by clicking the close button or outside
+      const closeButton = page.locator('[data-slot="sheet-close"]');
+      if (await closeButton.isVisible()) {
+        await closeButton.click();
+        await page.waitForTimeout(500);
+        console.log('📋 Closed mobile sheet after file creation');
+      }
+    }
+
     // Test mobile tab functionality
     console.log('📋 Testing mobile tab functionality...');
-    const editTab = page.locator('button:has-text("Edit")').first();
-    const previewTab = page.locator('button:has-text("Preview")').first();
+    const tabsList = page.locator('[data-slot="tabs-list"]');
+    const editTab = page.locator('[data-slot="tabs-trigger"][value="edit"]');
+    const previewTab = page.locator('[data-slot="tabs-trigger"][value="preview"]');
     
+    const tabsListVisible = await tabsList.isVisible();
     const editTabVisible = await editTab.isVisible();
     const previewTabVisible = await previewTab.isVisible();
     
+    console.log(`📋 Tabs container visible: ${tabsListVisible}`);
     console.log(`✏️  Edit tab visible: ${editTabVisible}`);
     console.log(`👁️  Preview tab visible: ${previewTabVisible}`);
     
     if (editTabVisible && previewTabVisible) {
       // Test tab switching
       await previewTab.click();
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
       
-      const previewActive = await previewTab.getAttribute('class');
-      console.log(`🎯 Preview tab activation working: ${previewActive?.includes('default') || false}`);
+      const previewState = await previewTab.getAttribute('data-state');
+      console.log(`🎯 Preview tab activation working: ${previewState === 'active'}`);
       
       // Switch back to edit
       await editTab.click();
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
       
-      const editActive = await editTab.getAttribute('class');
-      console.log(`✏️  Edit tab activation working: ${editActive?.includes('default') || false}`);
+      const editState = await editTab.getAttribute('data-state');
+      console.log(`✏️  Edit tab activation working: ${editState === 'active'}`);
     }
     
     // Take mobile screenshot
