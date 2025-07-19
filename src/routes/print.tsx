@@ -18,6 +18,7 @@ interface MermaidProps {
 function MermaidDiagram({ chart }: MermaidProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [error, setError] = useState<string | null>(null)
+  const [uniqueId] = useState(() => `mermaid-diagram-${Math.random().toString(36).substr(2, 9)}`)
 
   useEffect(() => {
     if (ref.current) {
@@ -29,7 +30,7 @@ function MermaidDiagram({ chart }: MermaidProps) {
         securityLevel: 'loose',
       })
       
-      mermaid.render('mermaid-diagram', chart)
+      mermaid.render(uniqueId, chart)
         .then((result) => {
           if (ref.current) {
             ref.current.innerHTML = result.svg
@@ -40,7 +41,7 @@ function MermaidDiagram({ chart }: MermaidProps) {
           setError('Failed to render diagram')
         })
     }
-  }, [chart])
+  }, [chart, uniqueId])
 
   if (error) {
     return (
