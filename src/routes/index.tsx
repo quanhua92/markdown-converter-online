@@ -137,11 +137,9 @@ function Index() {
   const [isDesktop, setIsDesktop] = useState(false)
   const [showEditPanel, setShowEditPanel] = useState(true)
   const [showPreviewPanel, setShowPreviewPanel] = useState(true)
-  const [showSettings, setShowSettings] = useState(false)
-  const [theme, setTheme] = useState('light')
-  const [fontSize, setFontSize] = useState('14')
-  const [showLineNumbers, setShowLineNumbers] = useState(true)
-  const [previewStyle, setPreviewStyle] = useState('github')
+
+  // Guides-specific state
+  const [activeSection, setActiveSection] = useState('getting-started')
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -1815,7 +1813,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               onChange={(e) => setMarkdown(e.target.value)}
               placeholder="Enter your markdown here..."
               className="min-h-[600px] font-mono resize-none"
-              style={{ fontSize: `${fontSize}px` }}
+              style={{ fontSize: '14px' }}
             />
           </CardContent>
         </Card>
@@ -2114,7 +2112,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
 
   const renderGuides = () => {
-    const [activeSection, setActiveSection] = useState('getting-started')
 
     const copyToClipboard = (text: string) => {
       navigator.clipboard.writeText(text)
@@ -2887,95 +2884,6 @@ def convert_to_pdf(markdown_content):
           </div>
         </div>
 
-        {/* Editor settings for editor view */}
-        {currentView === 'editor' && (
-          <div className="mb-6">
-            <Collapsible open={showSettings} onOpenChange={setShowSettings}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full flex items-center justify-between bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm">
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    Editor Settings
-                  </div>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${showSettings ? 'rotate-180' : ''}`} />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-4">
-
-                <Card className="shadow-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
-                  <CardContent className="pt-6">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Theme</label>
-                      <Select value={theme} onValueChange={setTheme}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="light">
-                            <div className="flex items-center gap-2">
-                              <Sun className="w-4 h-4" />
-                              Light
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="dark">
-                            <div className="flex items-center gap-2">
-                              <Moon className="w-4 h-4" />
-                              Dark
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Font Size</label>
-                      <Select value={fontSize} onValueChange={setFontSize}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="12">12px</SelectItem>
-                          <SelectItem value="14">14px</SelectItem>
-                          <SelectItem value="16">16px</SelectItem>
-                          <SelectItem value="18">18px</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Preview Style</label>
-                      <Select value={previewStyle} onValueChange={setPreviewStyle}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="github">GitHub</SelectItem>
-                          <SelectItem value="minimal">Minimal</SelectItem>
-                          <SelectItem value="academic">Academic</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="lineNumbers"
-                        checked={showLineNumbers}
-                        onChange={(e) => setShowLineNumbers(e.target.checked)}
-                        className="rounded"
-                      />
-                      <label htmlFor="lineNumbers" className="text-sm font-medium">
-                        Show line numbers
-                      </label>
-                    </div>
-                  </div>
-                  </CardContent>
-                </Card>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-        )}
 
         {/* Render content based on current view */}
         {currentView === 'editor' && renderEditor()}
