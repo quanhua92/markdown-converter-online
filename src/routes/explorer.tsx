@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { toast, Toaster } from 'sonner'
 import { 
   ChevronLeft, 
@@ -17,7 +18,8 @@ import {
   Sun, 
   FolderOpen,
   Save,
-  ChevronDown
+  ChevronDown,
+  Menu
 } from 'lucide-react'
 import {
   MarkdownRenderer,
@@ -53,6 +55,7 @@ function Explorer() {
   } = useFileSystem()
 
   const [isFileTreeCollapsed, setIsFileTreeCollapsed] = useState(false)
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
   const [markdownContent, setMarkdownContent] = useState('')
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
 
@@ -144,9 +147,24 @@ function Explorer() {
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
         <div className="max-w-full mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <FolderOpen className="w-6 h-6" />
-              Markdown Explorer
+            {/* Mobile menu button */}
+            <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="lg:hidden"
+                  title="Open file tree"
+                >
+                  <Menu className="w-5 h-5" />
+                </Button>
+              </SheetTrigger>
+            </Sheet>
+            
+            <h1 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <FolderOpen className="w-5 h-5 lg:w-6 lg:h-6" />
+              <span className="hidden sm:inline">Markdown Explorer</span>
+              <span className="sm:hidden">Explorer</span>
             </h1>
             {currentFile && (
               <div className="flex items-center gap-2">
@@ -162,13 +180,14 @@ function Explorer() {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 lg:gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleManualSave}
               disabled={!currentFile}
               title="Manual save"
+              className="hidden sm:flex"
             >
               <Save className="w-4 h-4" />
             </Button>
@@ -204,11 +223,35 @@ function Explorer() {
 
       {/* Main Content */}
       <div className="flex h-[calc(100vh-80px)]">
-        {/* File Tree Panel */}
+        {/* Mobile File Tree Sheet */}
+        <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
+          <SheetContent side="left" className="w-80 p-0 lg:hidden">
+            <div className="p-4 h-full">
+              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Files</h2>
+              <FileTree
+                items={files}
+                selectedFile={currentFile?.path}
+                onFileSelect={(item) => {
+                  handleFileSelect(item)
+                  setIsMobileSheetOpen(false)
+                }}
+                onCreateFile={createFile}
+                onCreateFolder={createFolder}
+                onDeleteItem={deleteItem}
+                onRenameItem={renameItem}
+                onToggleFolder={toggleFolder}
+                onInitializeTemplate={initializeFromTemplate}
+                showTemplateOptions={files.length === 0}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Desktop File Tree Panel */}
         <Collapsible
           open={!isFileTreeCollapsed}
           onOpenChange={setIsFileTreeCollapsed}
-          className="border-r border-gray-200 dark:border-gray-700"
+          className="hidden lg:block border-r border-gray-200 dark:border-gray-700"
         >
           <div className={`transition-all duration-300 ${isFileTreeCollapsed ? 'w-12' : 'w-80'}`}>
             <CollapsibleTrigger asChild>
@@ -245,28 +288,28 @@ function Explorer() {
         </Collapsible>
 
         {/* Editor/Preview Area */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-2 lg:p-4">
           {currentFile ? (
             <>
               {/* Mobile Tab Buttons */}
               {!isDesktop && (
-                <div className="flex mb-4 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md">
+                <div className="flex mb-4 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md mx-2 lg:mx-0">
                   <Button
                     variant={activeTab === 'edit' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setActiveTab('edit')}
-                    className="flex-1"
+                    className="flex-1 text-xs lg:text-sm"
                   >
-                    <Edit3 className="w-4 h-4 mr-2" />
+                    <Edit3 className="w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2" />
                     Edit
                   </Button>
                   <Button
                     variant={activeTab === 'preview' ? 'default' : 'ghost'}
                     size="sm"
                     onClick={() => setActiveTab('preview')}
-                    className="flex-1"
+                    className="flex-1 text-xs lg:text-sm"
                   >
-                    <Eye className="w-4 h-4 mr-2" />
+                    <Eye className="w-3 h-3 lg:w-4 lg:h-4 mr-1 lg:mr-2" />
                     Preview
                   </Button>
                 </div>
@@ -317,7 +360,7 @@ function Explorer() {
                       value={markdownContent}
                       onChange={(e) => handleMarkdownChange(e.target.value)}
                       placeholder="Start writing your markdown..."
-                      className="min-h-[600px] font-mono resize-none border-0 p-4 focus:ring-0"
+                      className="min-h-[400px] lg:min-h-[600px] font-mono resize-none border-0 p-2 lg:p-4 focus:ring-0 text-sm lg:text-base"
                       style={{ fontSize: '14px' }}
                       data-testid="markdown-editor"
                     />
@@ -340,7 +383,7 @@ function Explorer() {
                   <CardContent className={!isDesktop && activeTab === 'edit' ? 'hidden' : ''}>
                     <MarkdownRenderer
                       content={markdownContent}
-                      className="min-h-[600px] overflow-auto prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1"
+                      className="min-h-[400px] lg:min-h-[600px] overflow-auto prose prose-sm lg:prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-xl lg:prose-h1:text-3xl prose-h2:text-lg lg:prose-h2:text-2xl prose-h3:text-base lg:prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1"
                       data-testid="markdown-preview"
                     />
                   </CardContent>
