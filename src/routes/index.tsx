@@ -2023,6 +2023,19 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         )}
       </div>
 
+      {/* Print Button */}
+      <div className="text-center mb-6">
+        <Button 
+          onClick={handlePrint}
+          disabled={!markdown.trim()}
+          size="lg"
+          className="w-full sm:w-auto px-8 py-3 h-12 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 rounded-full font-semibold text-lg relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+        >
+          <Printer className="mr-2 h-4 w-4" />
+          Print Preview
+        </Button>
+      </div>
+
       {/* Download Result UI */}
       {downloadResult && (
         <Card className="mb-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-xl">
