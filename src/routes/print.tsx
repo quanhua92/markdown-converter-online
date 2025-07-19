@@ -151,6 +151,15 @@ function PrintPage() {
           }
           .mermaid-diagram {
             page-break-inside: avoid !important;
+            max-width: 100% !important;
+            max-height: 80vh !important;
+            overflow: hidden !important;
+          }
+          .mermaid-diagram svg {
+            max-width: 100% !important;
+            max-height: 80vh !important;
+            width: auto !important;
+            height: auto !important;
           }
           table {
             page-break-inside: avoid !important;
