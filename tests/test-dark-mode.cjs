@@ -96,10 +96,26 @@ const { chromium } = require('playwright');
     return {
       backgroundColor: computed.backgroundColor,
       color: computed.color,
-      transition: computed.transition
+      background: computed.background,
+      backgroundImage: computed.backgroundImage
     };
   });
   console.log('Body computed styles:', bodyComputedStyles);
+  
+  // Check main container elements that might be overriding
+  const mainContainerStyles = await page.evaluate(() => {
+    const container = document.querySelector('main') || document.querySelector('.min-h-screen') || document.querySelector('[class*="bg-"]');
+    if (container) {
+      const computed = window.getComputedStyle(container);
+      return {
+        element: container.tagName + ' ' + container.className,
+        backgroundColor: computed.backgroundColor,
+        background: computed.background
+      };
+    }
+    return null;
+  });
+  console.log('Main container styles:', mainContainerStyles);
   
   // Check if dark class is on document.documentElement
   const htmlClasses = await page.evaluate(() => document.documentElement.className);

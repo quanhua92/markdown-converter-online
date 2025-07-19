@@ -166,6 +166,15 @@ body {
   color: #f9fafb;
 }
 
+/* Main container background */
+.main-bg {
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #e0e7ff 100%);
+}
+
+.dark .main-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #111827 50%, #1e1b4b 100%);
+}
+
 code {
   font-family: 'JetBrains Mono', 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;

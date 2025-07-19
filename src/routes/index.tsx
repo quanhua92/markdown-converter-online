@@ -1191,7 +1191,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-gray-900 dark:to-indigo-950 py-4 sm:py-8 lg:py-12 px-4">
+    <div className="min-h-screen main-bg py-4 sm:py-8 lg:py-12 px-4">
       
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
