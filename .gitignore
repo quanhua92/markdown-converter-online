@@ -36,3 +36,7 @@ src/App-debug.tsx
 src/App-simple.tsx
 src/main-debug.tsx
 src/main-test.tsx
+
+# Test screenshots - only keep in tests/screenshots/
+*.png
+!tests/screenshots/*.png

@@ -35,7 +35,7 @@ node tests/test-dark-mode.cjs
 ```
 
 **Expected output:**
-- Screenshots: `light-mode-full.png`, `dark-mode-full.png`, etc.
+- Screenshots: `tests/screenshots/light-mode-full.png`, `tests/screenshots/dark-mode-full.png`, etc.
 - Console logs showing color values and test results
 - Visual confirmation that backgrounds change dramatically
 
@@ -53,9 +53,28 @@ node tests/test-heading-styles.cjs
 ```
 
 **Expected output:**
-- Screenshots: `preview-styling-test.png`, `print-styling-test.png`
+- Screenshots: `tests/screenshots/preview-styling-test.png`, `tests/screenshots/print-styling-test.png`
 - Console logs showing heading styles and test results
 - Confirmation that heading styles work correctly
+
+#### Readability Test (`test-readability.cjs`)
+Tests text readability and accessibility compliance in both light and dark modes.
+
+**What it tests:**
+- WCAG contrast ratio compliance
+- Text readability across different elements (headings, paragraphs, links, code)
+- Color contrast between text and background
+- Accessibility standards verification
+
+**Run the test:**
+```bash
+node tests/test-readability.cjs
+```
+
+**Expected output:**
+- Screenshots: `tests/screenshots/readability-light-mode.png`, `tests/screenshots/readability-dark-mode.png`
+- Console logs showing contrast ratios and WCAG compliance levels
+- Detailed accessibility analysis for both themes
 
 ### Running Tests
 
@@ -88,7 +107,7 @@ node tests/test-heading-styles.cjs
 ### Test Output
 
 Tests generate:
-- **Screenshots** in the root directory for visual verification
+- **Screenshots** in the `tests/screenshots/` directory for visual verification
 - **Console logs** with detailed test results
 - **Success/failure indicators** for each test case
 

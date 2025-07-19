@@ -159,7 +159,7 @@ function testReadability() {
   await testCurrentMode('Light');
   
   // Take screenshot in light mode
-  await page.screenshot({ path: 'readability-light-mode.png', fullPage: true });
+  await page.screenshot({ path: 'tests/screenshots/readability-light-mode.png', fullPage: true });
   console.log('📸 Light mode readability screenshot saved\n');
   
   // Switch to dark mode
@@ -172,7 +172,7 @@ function testReadability() {
   await testCurrentMode('Dark');
   
   // Take screenshot in dark mode
-  await page.screenshot({ path: 'readability-dark-mode.png', fullPage: true });
+  await page.screenshot({ path: 'tests/screenshots/readability-dark-mode.png', fullPage: true });
   console.log('📸 Dark mode readability screenshot saved\n');
   
   console.log('📋 SUMMARY & RECOMMENDATIONS');
@@ -184,8 +184,8 @@ function testReadability() {
   console.log('  • Below 3:1: Poor accessibility');
   console.log('');
   console.log('Check the screenshots for visual confirmation:');
-  console.log('  • readability-light-mode.png');
-  console.log('  • readability-dark-mode.png');
+  console.log('  • tests/screenshots/readability-light-mode.png');
+  console.log('  • tests/screenshots/readability-dark-mode.png');
   
   await browser.close();
   console.log('\n🎉 Readability test completed!');

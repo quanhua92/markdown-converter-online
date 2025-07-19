@@ -25,11 +25,11 @@ const { chromium } = require('playwright');
   }
   
   // Take full page screenshot in light mode
-  await page.screenshot({ path: 'light-mode-full.png', fullPage: true });
+  await page.screenshot({ path: 'tests/screenshots/light-mode-full.png', fullPage: true });
   console.log('📸 Light mode full page screenshot taken');
   
   // Take viewport screenshot in light mode
-  await page.screenshot({ path: 'light-mode-viewport.png' });
+  await page.screenshot({ path: 'tests/screenshots/light-mode-viewport.png' });
   console.log('📸 Light mode viewport screenshot taken');
   
   // Check basic dark mode functionality first
@@ -60,11 +60,11 @@ const { chromium } = require('playwright');
   console.log('Dark class applied:', hasDarkClass);
   
   // Take full page screenshot in dark mode
-  await page.screenshot({ path: 'dark-mode-full.png', fullPage: true });
+  await page.screenshot({ path: 'tests/screenshots/dark-mode-full.png', fullPage: true });
   console.log('📸 Dark mode full page screenshot taken');
   
   // Take viewport screenshot in dark mode
-  await page.screenshot({ path: 'dark-mode-viewport.png' });
+  await page.screenshot({ path: 'tests/screenshots/dark-mode-viewport.png' });
   console.log('📸 Dark mode viewport screenshot taken');
   
   // Check basic dark mode functionality
@@ -144,14 +144,14 @@ const { chromium } = require('playwright');
   console.log('');
   console.log('🔍 Visual Inspection:');
   console.log('   Compare these screenshots to verify dark mode is working:');
-  console.log('   - light-mode-full.png vs dark-mode-full.png');
-  console.log('   - light-mode-viewport.png vs dark-mode-viewport.png');
+  console.log('   - tests/screenshots/light-mode-full.png vs tests/screenshots/dark-mode-full.png');
+  console.log('   - tests/screenshots/light-mode-viewport.png vs tests/screenshots/dark-mode-viewport.png');
   console.log('   The background should change from white to dark gray/black');
   
   // Toggle back to light mode
   await themeButton.click();
   await page.waitForTimeout(1000);
-  await page.screenshot({ path: 'back-to-light-mode.png' });
+  await page.screenshot({ path: 'tests/screenshots/back-to-light-mode.png' });
   
   await browser.close();
   console.log('🎉 Dark mode test completed!');

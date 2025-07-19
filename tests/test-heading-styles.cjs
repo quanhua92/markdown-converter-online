@@ -38,9 +38,13 @@ function test() {
   
   await page.waitForTimeout(1000);
   
-  // Enable preview
-  await page.click('button:has-text("Preview")');
-  await page.waitForTimeout(2000);
+  // Check if preview is visible (on desktop it's always visible, on mobile we need to click Preview tab)
+  const isDesktop = await page.evaluate(() => window.innerWidth >= 1024);
+  if (!isDesktop) {
+    // On mobile, click the Preview tab
+    await page.click('button:has-text("Preview")');
+    await page.waitForTimeout(2000);
+  }
   
   // Test preview heading styles
   console.log('📊 Testing preview heading styles...');
@@ -89,7 +93,7 @@ function test() {
   console.log(`   H2 has border: ${h2HasBorder}`);
   console.log(`   Headings are bold: ${headingsAreBold}`);
   
-  await page.screenshot({ path: 'preview-styling-test.png' });
+  await page.screenshot({ path: 'tests/screenshots/preview-styling-test.png' });
   
   // Test print page
   console.log('🖨️  Testing print page heading styles...');
@@ -138,7 +142,7 @@ function test() {
   console.log(`   Print H2 has border: ${printH2HasBorder}`);
   console.log(`   Print headings are bold: ${printHeadingsAreBold}`);
   
-  await printPage.screenshot({ path: 'print-styling-test.png' });
+  await printPage.screenshot({ path: 'tests/screenshots/print-styling-test.png' });
   
   // Summary
   const previewWorking = h1HasBorder && h2HasBorder && headingsAreBold;

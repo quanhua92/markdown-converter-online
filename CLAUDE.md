@@ -47,12 +47,24 @@ node tests/test-dark-mode.cjs
 
 # Test heading styles
 node tests/test-heading-styles.cjs
+
+# Test text readability and accessibility
+node tests/test-readability.cjs
 ```
 
 #### What to test after changes:
 1. **UI Changes**: Run dark mode test to verify light/dark themes work
-2. **Markdown Rendering**: Run heading styles test for preview/print consistency
-3. **New Features**: Add new Playwright tests in `tests/` directory
+2. **Markdown Rendering**: Run heading styles test for preview/print consistency  
+3. **Accessibility**: Run readability test to ensure WCAG compliance
+4. **New Features**: Add new Playwright tests in `tests/` directory
+
+#### Test Screenshots
+All test screenshots are saved in `tests/screenshots/` directory:
+- Light/dark mode comparisons
+- Readability verification images
+- Component styling verification
+
+**IMPORTANT**: Always create new test files in `tests/` directory, not in root!
 
 ### Key Technical Details
 
