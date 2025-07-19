@@ -1734,6 +1734,17 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             </div>
           </CardHeader>
           <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
+            <div className="flex gap-2 mb-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export MD and settings
+              </Button>
+            </div>
             <Textarea
               value={markdown}
               onChange={(e) => setMarkdown(e.target.value)}
@@ -1753,15 +1764,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 <Badge variant="secondary" className="ml-2">Mermaid + Syntax</Badge>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleExport}
-                  className="flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Export MD
-                </Button>
                 <Button
                   variant="outline"
                   size="sm"
