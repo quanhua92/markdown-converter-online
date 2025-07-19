@@ -404,20 +404,20 @@ function Index() {
 
 ---
 
-## 🎯 Table of Contents
-1. [Text Formatting](#️-text-formatting)
-2. [Headers & Structure](#-headers--structure)
-3. [Lists & Organization](#-lists--organization)
-4. [Code & Syntax](#-code--syntax)
-5. [Links & Media](#-links--media)
-6. [Tables & Data](#-tables--data)
-7. [Blockquotes & Callouts](#-blockquotes--callouts)
-8. [Mermaid Diagrams](#-mermaid-diagrams)
-9. [Advanced Features](#-advanced-features)
+## Table of Contents
+1. [Text Formatting](#text-formatting)
+2. [Headers & Structure](#headers--structure)
+3. [Lists & Organization](#lists--organization)
+4. [Code & Syntax](#code--syntax)
+5. [Links & Media](#links--media)
+6. [Tables & Data](#tables--data)
+7. [Blockquotes & Callouts](#blockquotes--callouts)
+8. [Mermaid Diagrams](#mermaid-diagrams)
+9. [Advanced Features](#advanced-features)
 
 ---
 
-## ✍️ Text Formatting
+## Text Formatting
 
 ### Basic Emphasis
 - **Bold text** using \`**text**\` or \`__text__\`
@@ -438,7 +438,7 @@ Use backslashes to escape special characters: \\* \\_ \\# \\[ \\]
 
 ---
 
-## 📖 Headers & Structure
+## Headers & Structure
 
 # Header Level 1 (H1)
 ## Header Level 2 (H2)
@@ -456,7 +456,7 @@ Header 2
 
 ---
 
-## 📝 Lists & Organization
+## Lists & Organization
 
 ### Unordered Lists
 - Primary item
@@ -497,7 +497,7 @@ Header 2
 
 ---
 
-## 💻 Code & Syntax
+## Code & Syntax
 
 ### Inline Code
 Use \`console.log()\` for JavaScript logging, or \`print()\` for Python output.
@@ -773,7 +773,7 @@ You can use it for:
 
 ---
 
-## 🔗 Links & Media
+## Links & Media
 
 ### Basic Links
 - [GitHub](https://github.com)
@@ -786,8 +786,8 @@ You can use it for:
 - Email: support@github.com
 
 ### Internal Links (Anchors)
-- [Go to Text Formatting section](#️-text-formatting)
-- [Jump to Mermaid Diagrams](#-mermaid-diagrams)
+- [Go to Text Formatting section](#text-formatting)
+- [Jump to Mermaid Diagrams](#mermaid-diagrams)
 
 ### Images
 ![Sample image](https://picsum.photos/200/300 "Sample Image")
@@ -803,7 +803,7 @@ This is a [reference link][1] and this is [another one][link-reference].
 
 ---
 
-## 📊 Tables & Data
+## Tables & Data
 
 ### Basic Table
 | Column 1 | Column 2 | Column 3 |
@@ -834,7 +834,7 @@ This is a [reference link][1] and this is [another one][link-reference].
 
 ---
 
-## 💬 Blockquotes & Callouts
+## Blockquotes & Callouts
 
 ### Simple Blockquote
 > This is a simple blockquote.
@@ -881,7 +881,7 @@ This is a [reference link][1] and this is [another one][link-reference].
 
 ---
 
-## 🎨 Mermaid Diagrams
+## Mermaid Diagrams
 
 ### 1. Flowchart - System Architecture
 \`\`\`mermaid
@@ -1389,7 +1389,7 @@ mindmap
 
 ---
 
-## 🚀 Advanced Features
+## Advanced Features
 
 ### HTML in Markdown
 You can use <mark>HTML tags</mark> in markdown for <sup>advanced</sup> formatting.
