@@ -16,6 +16,7 @@ import remarkMath from 'remark-math'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
+import rehypeSlug from 'rehype-slug'
 import mermaid from 'mermaid'
 
 export const Route = createFileRoute('/')({
@@ -1837,7 +1838,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               <div className="markdown-preview">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
-                  rehypePlugins={[rehypeHighlight, [rehypeKatex, { strict: false }], rehypeRaw]}
+                  rehypePlugins={[rehypeSlug, rehypeHighlight, [rehypeKatex, { strict: false }], rehypeRaw]}
                   components={customComponents}
                 >
                   {markdown}
