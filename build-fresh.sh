@@ -18,9 +18,6 @@ echo "📋 Using compose file: $COMPOSE_FILE"
 GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 echo "📝 Git commit: $GIT_COMMIT"
 
-# Remove old images to force rebuild
-echo "🗑️  Removing old images..."
-docker image prune -f
 
 # Build with git commit as build arg (forces cache invalidation)
 echo "🔨 Building with fresh cache..."
