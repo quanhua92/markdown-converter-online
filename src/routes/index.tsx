@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -20,6 +20,18 @@ import 'highlight.js/styles/github.css'
 export const Route = createFileRoute('/')({
   component: Index,
 })
+
+// Debounce utility function
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
 
 interface MermaidProps {
   chart: string
@@ -63,51 +75,8 @@ function Index() {
   // Git commit hash - prevent optimization
   const gitCommit = ['1', '5', '1', '0', 'd', 'f', 'c'].join('')
   
-  const [markdown, setMarkdown] = useState(`---
-theme: default
-paginate: true
----
-
-# My Presentation
-Welcome to my markdown converter!
-
----
-
-## Features
-- Convert markdown to PowerPoint
-- Convert markdown to HTML
-- Convert markdown to Word
-- Convert markdown to PDF
-- Live preview with Mermaid diagrams
-- Advanced conversion options
-
----
-
-## Example Code
-
-\`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
-}
-\`\`\`
-
----
-
-## Example Mermaid Diagram
-
-\`\`\`mermaid
-graph TD
-    A[Start] --> B{Decision}
-    B -->|Yes| C[Action 1]
-    B -->|No| D[Action 2]
-    C --> E[End]
-    D --> E
-\`\`\`
-
----
-
-## Thank You!
-Happy converting! 🎉`)
+  const [markdown, setMarkdown] = useState('')
+  const [draftSaveStatus, setDraftSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   
   const [selectedFormat, setSelectedFormat] = useState<string>('pptx')
   const [isConverting, setIsConverting] = useState(false)
@@ -191,6 +160,54 @@ Happy converting! 🎉`)
     window.addEventListener('resize', checkDesktop)
     return () => window.removeEventListener('resize', checkDesktop)
   }, [])
+
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem('markdownDraft')
+      if (savedDraft && savedDraft.trim()) {
+        setMarkdown(savedDraft)
+        setDraftSaveStatus('saved')
+      }
+    } catch (error) {
+      console.warn('Failed to load draft from localStorage:', error)
+      setDraftSaveStatus('error')
+    }
+  }, [])
+
+  // Debounced draft save
+  const saveDraft = useCallback(
+    debounce((content: string) => {
+      try {
+        setDraftSaveStatus('saving')
+        if (content.trim()) {
+          localStorage.setItem('markdownDraft', content)
+        } else {
+          localStorage.removeItem('markdownDraft')
+        }
+        setDraftSaveStatus('saved')
+        
+        // Clear saved status after 2 seconds
+        setTimeout(() => {
+          setDraftSaveStatus('idle')
+        }, 2000)
+      } catch (error) {
+        console.error('Failed to save draft:', error)
+        setDraftSaveStatus('error')
+        setTimeout(() => {
+          setDraftSaveStatus('idle')
+        }, 3000)
+      }
+    }, 1000),
+    []
+  )
+
+  // Save draft when markdown changes
+  useEffect(() => {
+    if (markdown !== '') {
+      saveDraft(markdown)
+    }
+  }, [markdown, saveDraft])
 
   const toggleTheme = () => {
     const newTheme = !isDarkMode
@@ -331,12 +348,29 @@ Happy converting! 🎉`)
 
   const clearMarkdown = () => {
     setMarkdown('')
+    // Clear draft from localStorage
+    try {
+      localStorage.removeItem('markdownDraft')
+      setDraftSaveStatus('idle')
+    } catch (error) {
+      console.warn('Failed to clear draft from localStorage:', error)
+    }
   }
 
   const handlePrint = () => {
-    // Create a new route/page for print view instead of manual HTML construction
-    const printUrl = `/print?content=${encodeURIComponent(markdown)}`
-    window.open(printUrl, '_blank')
+    try {
+      // Store content in localStorage using the same key as draft
+      localStorage.setItem('markdownDraft', markdown)
+      const printUrl = `/print`
+      const newWindow = window.open(printUrl, '_blank')
+      
+      if (!newWindow) {
+        toast.error('Failed to open print window. Please check your popup blocker settings.')
+      }
+    } catch (error) {
+      console.error('Print error:', error)
+      toast.error('Failed to prepare content for printing')
+    }
   }
 
   const handleExport = () => {
@@ -1683,6 +1717,15 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               <CardTitle className="flex items-center gap-2">
                 <Edit3 className="w-5 h-5" />
                 Markdown Editor
+                {draftSaveStatus === 'saving' && (
+                  <span className="text-xs text-gray-500 ml-2">Saving...</span>
+                )}
+                {draftSaveStatus === 'saved' && (
+                  <span className="text-xs text-green-600 ml-2">✓ Saved</span>
+                )}
+                {draftSaveStatus === 'error' && (
+                  <span className="text-xs text-red-500 ml-2">⚠ Save failed</span>
+                )}
               </CardTitle>
               {!isDesktop && (
                 <div className="flex gap-1">

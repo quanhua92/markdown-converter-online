@@ -57,11 +57,18 @@ function PrintPage() {
   const [markdown, setMarkdown] = useState('')
 
   useEffect(() => {
-    // Get markdown content from URL parameters
-    const urlParams = new URLSearchParams(window.location.search)
-    const content = urlParams.get('content')
-    if (content) {
-      setMarkdown(decodeURIComponent(content))
+    // Get markdown content from localStorage (fallback to URL parameters)
+    const storedContent = localStorage.getItem('markdownDraft')
+    if (storedContent) {
+      setMarkdown(storedContent)
+      // Don't clear the draft - keep it for the editor
+    } else {
+      // Fallback to URL parameters for backward compatibility
+      const urlParams = new URLSearchParams(window.location.search)
+      const content = urlParams.get('content')
+      if (content) {
+        setMarkdown(decodeURIComponent(content))
+      }
     }
   }, [])
 
