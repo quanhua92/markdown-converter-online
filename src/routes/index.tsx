@@ -1739,13 +1739,12 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             
             {/* Action Buttons Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {/* Edit Button - Always visible but disabled on desktop */}
+              {/* Edit Button */}
               <Button
-                variant={(!isDesktop && activeTab === 'edit') ? "default" : "outline"}
+                variant={activeTab === 'edit' ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveTab('edit')}
-                className={`flex items-center justify-center gap-2 ${isDesktop ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={isDesktop}
+                className="flex items-center justify-center gap-2"
               >
                 <Edit3 className="w-4 h-4" />
                 <span className="text-xs sm:text-sm">Edit</span>
@@ -1753,7 +1752,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               
               {/* Preview Button */}
               <Button
-                variant={(!isDesktop && activeTab === 'preview') ? "default" : "outline"}
+                variant={activeTab === 'preview' ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveTab('preview')}
                 className="flex items-center justify-center gap-2"
@@ -1785,7 +1784,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               </Button>
             </div>
           </CardHeader>
-          <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
+          <CardContent className={activeTab === 'preview' ? 'hidden' : ''}>
             <Textarea
               value={markdown}
               onChange={(e) => setMarkdown(e.target.value)}
@@ -1806,7 +1805,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               </div>
             </div>
           </CardHeader>
-          <CardContent className={!isDesktop && activeTab === 'edit' ? 'hidden' : ''}>
+          <CardContent className={activeTab === 'edit' ? 'hidden' : ''}>
             <div className="min-h-[600px] overflow-auto prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
               <div className="markdown-preview">
                 <ReactMarkdown
