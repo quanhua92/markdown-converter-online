@@ -1,0 +1,14 @@
+
+> markdown-converter-online@ client:dev /Volumes/data/workspace/markdown-converter-online
+> vite --host 0.0.0.0
+
+🔧 Vite config - Git commit hash: ae6cee3
+🔧 Vite config - Define value: "ae6cee3"
+Generated route tree in 56ms
+
+  VITE v6.3.5  ready in 308 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.1.13:5173/
+  ➜  Network: http://100.121.116.69:5173/
+ ELIFECYCLE  Command failed with exit code 143.
