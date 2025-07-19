@@ -518,7 +518,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
   // Render different views based on currentView
   const renderEditor = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card className="shadow-lg">
+      <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2">
@@ -558,7 +558,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         </CardContent>
       </Card>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Eye className="w-5 h-5" />
@@ -587,7 +587,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
     <>
       {showConverterPreview ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="shadow-xl">
+          <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
@@ -667,7 +667,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             </CardContent>
           </Card>
           
-          <Card className="shadow-xl">
+          <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="h-5 w-5" />
@@ -700,7 +700,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           </Card>
         </div>
       ) : (
-        <Card className="mb-8 shadow-xl">
+        <Card className="mb-8 shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
@@ -781,7 +781,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         </Card>
       )}
 
-      <Card className="mb-8 shadow-xl">
+      <Card className="mb-8 shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <IconComponent className="h-5 w-5" />
@@ -800,8 +800,8 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               return (
                 <Card 
                   key={format}
-                  className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 shadow-xl ${
-                    isSelected ? 'ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30' : ''
+                  className={`cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 shadow-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border ${
+                    isSelected ? 'ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 scale-105 shadow-2xl' : 'border-gray-200/50 dark:border-gray-700/50 hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
                   }`}
                   onClick={() => setSelectedFormat(format)}
                 >
@@ -1039,8 +1039,8 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           <Button 
             onClick={handleConvert}
             disabled={isConverting || !markdown.trim()}
-            size="default"
-            className="w-full sm:w-auto px-6 py-2 h-10 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105"
+            size="lg"
+            className="w-full sm:w-auto px-8 py-3 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 rounded-full font-semibold text-lg relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity"
           >
             {isConverting ? (
               <>
@@ -1057,8 +1057,8 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         ) : (
           <Button 
             onClick={clearResult}
-            size="default"
-            className="w-full sm:w-auto px-6 py-2 h-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:scale-105"
+            size="lg"
+            className="w-full sm:w-auto px-8 py-3 h-12 bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 backdrop-blur-lg hover:scale-105 rounded-full font-semibold text-lg"
           >
             <FileText className="mr-2 h-4 w-4" />
             Convert Another File
@@ -1193,18 +1193,18 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 dark:from-slate-900 dark:to-blue-900 py-4 sm:py-8 lg:py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-gray-900 dark:to-purple-900 py-4 sm:py-8 lg:py-12 px-4">
       
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-center sm:text-left">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
                 Markdown Converter
               </h1>
-              <p className="text-sm sm:text-base lg:text-xl text-gray-600 dark:text-gray-300 mt-1">
-                Convert markdown to PowerPoint, HTML, Word, or PDF
+              <p className="text-base sm:text-lg lg:text-xl text-gray-700 dark:text-gray-300 mt-2 font-medium">
+                ✨ Convert markdown to PowerPoint, HTML, Word, or PDF
               </p>
             </div>
             <div className="flex items-center">
@@ -1212,13 +1212,19 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 onClick={toggleTheme}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm rounded-md"
+                className="flex items-center gap-2 px-4 py-2 bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-md rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30"
                 title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               >
                 {isDarkMode ? (
-                  <Sun className="h-4 w-4" />
+                  <>
+                    <Sun className="h-4 w-4" />
+                    <span className="hidden sm:inline">Light</span>
+                  </>
                 ) : (
-                  <Moon className="h-4 w-4" />
+                  <>
+                    <Moon className="h-4 w-4" />
+                    <span className="hidden sm:inline">Dark</span>
+                  </>
                 )}
               </Button>
             </div>
