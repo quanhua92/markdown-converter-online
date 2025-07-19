@@ -405,15 +405,15 @@ function Index() {
 ---
 
 ## 🎯 Table of Contents
-1. [Text Formatting](#text-formatting)
-2. [Headers & Structure](#headers--structure)
-3. [Lists & Organization](#lists--organization)
-4. [Code & Syntax](#code--syntax)
-5. [Links & Media](#links--media)
-6. [Tables & Data](#tables--data)
-7. [Blockquotes & Callouts](#blockquotes--callouts)
-8. [Mermaid Diagrams](#mermaid-diagrams)
-9. [Advanced Features](#advanced-features)
+1. [Text Formatting](#️-text-formatting)
+2. [Headers & Structure](#-headers--structure)
+3. [Lists & Organization](#-lists--organization)
+4. [Code & Syntax](#-code--syntax)
+5. [Links & Media](#-links--media)
+6. [Tables & Data](#-tables--data)
+7. [Blockquotes & Callouts](#-blockquotes--callouts)
+8. [Mermaid Diagrams](#-mermaid-diagrams)
+9. [Advanced Features](#-advanced-features)
 
 ---
 
@@ -786,8 +786,8 @@ You can use it for:
 - Email: support@github.com
 
 ### Internal Links (Anchors)
-- [Go to Text Formatting section](#text-formatting)
-- [Jump to Mermaid Diagrams](#mermaid-diagrams)
+- [Go to Text Formatting section](#️-text-formatting)
+- [Jump to Mermaid Diagrams](#-mermaid-diagrams)
 
 ### Images
 ![Sample image](https://picsum.photos/200/300 "Sample Image")
