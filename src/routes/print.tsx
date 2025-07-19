@@ -21,9 +21,11 @@ function MermaidDiagram({ chart }: MermaidProps) {
 
   useEffect(() => {
     if (ref.current) {
+      // Detect dark mode for Mermaid theme
+      const isDark = document.documentElement.classList.contains('dark')
       mermaid.initialize({
         startOnLoad: true,
-        theme: 'default',
+        theme: isDark ? 'dark' : 'default',
         securityLevel: 'loose',
       })
       

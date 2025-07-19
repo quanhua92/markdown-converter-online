@@ -31,9 +31,11 @@ function MermaidDiagram({ chart }: MermaidProps) {
 
   useEffect(() => {
     if (ref.current) {
+      // Detect dark mode for Mermaid theme
+      const isDark = document.documentElement.classList.contains('dark')
       mermaid.initialize({
         startOnLoad: true,
-        theme: 'default',
+        theme: isDark ? 'dark' : 'default',
         securityLevel: 'loose',
       })
       
@@ -585,7 +587,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
     <>
       {showConverterPreview ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="card-elegant">
+          <Card className="shadow-xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
@@ -600,7 +602,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                   <div className="flex gap-2">
                     <Select onValueChange={applyTemplate}>
-                      <SelectTrigger className="w-40 h-9 input-elegant">
+                      <SelectTrigger className="w-40 h-9 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                         <SelectValue placeholder="Load Template" />
                       </SelectTrigger>
                       <SelectContent>
@@ -630,7 +632,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                       onClick={() => setShowConverterPreview(!showConverterPreview)}
                       size="sm"
                       variant={showConverterPreview ? "default" : "outline"}
-                      className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
+                      className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
                     >
                       <Eye className="h-4 w-4" />
                       Preview
@@ -638,7 +640,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <Button
                       onClick={handlePrint}
                       size="sm"
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm"
                       disabled={!markdown.trim()}
                     >
                       <Printer className="h-4 w-4" />
@@ -647,7 +649,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <Button
                       onClick={clearMarkdown}
                       size="sm"
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                       disabled={!markdown.trim()}
                     >
                       <X className="h-4 w-4" />
@@ -659,13 +661,13 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   value={markdown}
                   onChange={(e) => setMarkdown(e.target.value)}
                   placeholder="Enter your markdown here..."
-                  className="min-h-[400px] font-mono text-sm input-elegant"
+                  className="min-h-[400px] font-mono text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm"
                 />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="card-elegant">
+          <Card className="shadow-xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="h-5 w-5" />
@@ -698,7 +700,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           </Card>
         </div>
       ) : (
-        <Card className="mb-8 card-elegant">
+        <Card className="mb-8 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
@@ -713,7 +715,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <div className="flex gap-2">
                   <Select onValueChange={applyTemplate}>
-                    <SelectTrigger className="w-40 h-9 input-elegant">
+                    <SelectTrigger className="w-40 h-9 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                       <SelectValue placeholder="Load Template" />
                     </SelectTrigger>
                     <SelectContent>
@@ -743,7 +745,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     onClick={() => setShowConverterPreview(!showConverterPreview)}
                     size="sm"
                     variant={showConverterPreview ? "default" : "outline"}
-                    className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'btn-gradient' : 'btn-elegant'}`}
+                    className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
                   >
                     <Eye className="h-4 w-4" />
                     Preview
@@ -751,7 +753,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   <Button
                     onClick={handlePrint}
                     size="sm"
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm"
                     disabled={!markdown.trim()}
                   >
                     <Printer className="h-4 w-4" />
@@ -760,7 +762,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   <Button
                     onClick={clearMarkdown}
                     size="sm"
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                     disabled={!markdown.trim()}
                   >
                     <X className="h-4 w-4" />
@@ -772,14 +774,14 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
                 placeholder="Enter your markdown here..."
-                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm input-elegant"
+                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm"
               />
             </div>
           </CardContent>
         </Card>
       )}
 
-      <Card className="mb-8 card-elegant">
+      <Card className="mb-8 shadow-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <IconComponent className="h-5 w-5" />
@@ -798,7 +800,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               return (
                 <Card 
                   key={format}
-                  className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 card-elegant ${
+                  className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 shadow-xl ${
                     isSelected ? 'ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30' : ''
                   }`}
                   onClick={() => setSelectedFormat(format)}
@@ -821,7 +823,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           </div>
 
           <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger className="w-full input-elegant">
+            <SelectTrigger className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
               <SelectValue placeholder="Select output format" />
             </SelectTrigger>
             <SelectContent>
@@ -839,7 +841,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           {/* Advanced Options */}
           <Collapsible open={showAdvancedOptions} onOpenChange={setShowAdvancedOptions}>
             <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full flex items-center justify-between mt-4 btn-elegant">
+              <Button variant="ghost" className="w-full flex items-center justify-between mt-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm">
                 <div className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Advanced Options
@@ -855,7 +857,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <div>
                       <Label htmlFor="theme">Theme</Label>
                       <Select value={conversionOptions.theme} onValueChange={(value) => setConversionOptions({...conversionOptions, theme: value})}>
-                        <SelectTrigger className="input-elegant">
+                        <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -868,7 +870,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <div>
                       <Label htmlFor="imageScale">Image Scale</Label>
                       <Select value={conversionOptions.imageScale?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, imageScale: parseInt(value)})}>
-                        <SelectTrigger className="input-elegant">
+                        <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -882,7 +884,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <div>
                       <Label htmlFor="browser">Browser</Label>
                       <Select value={conversionOptions.browser} onValueChange={(value) => setConversionOptions({...conversionOptions, browser: value})}>
-                        <SelectTrigger className="input-elegant">
+                        <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -896,7 +898,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                     <div>
                       <Label htmlFor="browserTimeout">Browser Timeout</Label>
                       <Select value={conversionOptions.browserTimeout?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, browserTimeout: parseInt(value)})}>
-                        <SelectTrigger className="input-elegant">
+                        <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -918,7 +920,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                         <div>
                           <Label htmlFor="margin">Page Margins</Label>
                           <Select value={conversionOptions.margin} onValueChange={(value) => setConversionOptions({...conversionOptions, margin: value})}>
-                            <SelectTrigger className="input-elegant">
+                            <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -932,7 +934,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                         <div>
                           <Label htmlFor="fontSize">Font Size</Label>
                           <Select value={conversionOptions.fontSize} onValueChange={(value) => setConversionOptions({...conversionOptions, fontSize: value})}>
-                            <SelectTrigger className="input-elegant">
+                            <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -947,7 +949,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                         <div>
                           <Label htmlFor="paperSize">Paper Size</Label>
                           <Select value={conversionOptions.paperSize} onValueChange={(value) => setConversionOptions({...conversionOptions, paperSize: value})}>
-                            <SelectTrigger className="input-elegant">
+                            <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -994,7 +996,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                       <div className="ml-6">
                         <Label htmlFor="tocDepth">TOC Depth</Label>
                         <Select value={conversionOptions.tocDepth?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, tocDepth: parseInt(value)})}>
-                          <SelectTrigger className="input-elegant w-32">
+                          <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm w-32">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -1038,7 +1040,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             onClick={handleConvert}
             disabled={isConverting || !markdown.trim()}
             size="default"
-            className="w-full sm:w-auto px-6 py-2 h-10 btn-gradient hover:scale-105"
+            className="w-full sm:w-auto px-6 py-2 h-10 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105"
           >
             {isConverting ? (
               <>
@@ -1056,7 +1058,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           <Button 
             onClick={clearResult}
             size="default"
-            className="w-full sm:w-auto px-6 py-2 h-10 btn-elegant hover:scale-105"
+            className="w-full sm:w-auto px-6 py-2 h-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:scale-105"
           >
             <FileText className="mr-2 h-4 w-4" />
             Convert Another File
@@ -1066,7 +1068,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
       {/* Download Result UI */}
       {downloadResult && (
-        <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 card-elegant">
+        <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-xl">
           <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="flex items-center gap-2 text-green-800 text-lg sm:text-xl">
               <Download className="h-5 w-5" />
@@ -1095,7 +1097,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   onClick={handleDownload}
-                  className="btn-gradient flex-1 sm:flex-none h-10 px-6 hover:scale-105"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 flex-1 sm:flex-none h-10 px-6 hover:scale-105"
                   size="default"
                 >
                   <Download className="mr-2 h-4 w-4" />
@@ -1104,7 +1106,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 <Button
                   onClick={clearResult}
                   size="default"
-                  className="h-10 px-3 btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                  className="h-10 px-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -1120,7 +1122,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
       {/* Conversion Error Debug Section */}
       {conversionError && (
-        <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700 card-elegant">
+        <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700 shadow-xl">
           <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="flex items-center gap-2 text-red-800 text-lg sm:text-xl">
               <X className="h-5 w-5" />
@@ -1161,7 +1163,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   <Button
                     onClick={() => setConversionError(null)}
                     size="sm"
-                    className="btn-elegant hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                    className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
                   >
                     <X className="mr-2 h-4 w-4" />
                     Dismiss
@@ -1169,7 +1171,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   <Button
                     onClick={() => setShowAdvancedOptions(true)}
                     size="sm"
-                    className="btn-elegant"
+                    className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm"
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     Check Options
@@ -1191,7 +1193,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
   )
 
   return (
-    <div className="min-h-screen main-bg py-4 sm:py-8 lg:py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 dark:from-slate-900 dark:to-blue-900 py-4 sm:py-8 lg:py-12 px-4">
       
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
@@ -1210,7 +1212,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 onClick={toggleTheme}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2 px-3 py-2 btn-elegant"
+                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm rounded-md"
                 title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               >
                 {isDarkMode ? (
@@ -1228,7 +1230,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 onClick={() => setCurrentView('converter')}
                 variant={currentView === 'converter' ? 'default' : 'outline'}
                 size="default"
-                className={`flex items-center gap-2 px-4 py-2 ${currentView === 'converter' ? 'btn-gradient' : 'btn-elegant'}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md ${currentView === 'converter' ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
               >
                 <FileText className="h-4 w-4" />
                 Converter
@@ -1237,7 +1239,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 onClick={() => setCurrentView('editor')}
                 variant={currentView === 'editor' ? 'default' : 'outline'}
                 size="default"
-                className={`flex items-center gap-2 px-4 py-2 ${currentView === 'editor' ? 'btn-gradient' : 'btn-elegant'}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md ${currentView === 'editor' ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
               >
                 <Edit3 className="h-4 w-4" />
                 Editor
@@ -1246,7 +1248,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 onClick={() => setCurrentView('guides')}
                 variant={currentView === 'guides' ? 'default' : 'outline'}
                 size="default"
-                className={`flex items-center gap-2 px-4 py-2 ${currentView === 'guides' ? 'btn-gradient' : 'btn-elegant'}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md ${currentView === 'guides' ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
               >
                 <BookOpen className="h-4 w-4" />
                 Guides
@@ -1287,7 +1289,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             </div>
 
             {showSettings && (
-              <Card className="shadow-lg mt-4">
+              <Card className="shadow-lg mt-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Settings className="w-5 h-5" />
