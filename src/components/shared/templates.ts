@@ -601,10 +601,10 @@ classDiagram
         +refund() Boolean
     }
     
-    User ||--o{ Order : places
-    Order ||--o{ OrderItem : contains
-    Product ||--o{ OrderItem : referenced_by
-    Order ||--|| Payment : has
+    User --> Order
+    Order --> OrderItem
+    Product --> OrderItem
+    Order --> Payment
     
     class OrderStatus {
         <<enumeration>>
@@ -776,7 +776,7 @@ gantt
 
 ### 7. Git Flow Diagram
 \`\`\`mermaid
-gitgraph
+gitGraph
     commit id: "Initial commit"
     branch develop
     checkout develop
