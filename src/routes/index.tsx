@@ -40,6 +40,7 @@ interface MermaidProps {
 function MermaidDiagram({ chart }: MermaidProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [error, setError] = useState<string | null>(null)
+  const [uniqueId] = useState(() => `mermaid-diagram-${Math.random().toString(36).substr(2, 9)}`)
 
   useEffect(() => {
     if (ref.current) {
@@ -51,7 +52,7 @@ function MermaidDiagram({ chart }: MermaidProps) {
         securityLevel: 'loose',
       })
       
-      mermaid.render('mermaid-diagram', chart)
+      mermaid.render(uniqueId, chart)
         .then((result) => {
           if (ref.current) {
             ref.current.innerHTML = result.svg
@@ -62,7 +63,7 @@ function MermaidDiagram({ chart }: MermaidProps) {
           setError('Failed to render diagram')
         })
     }
-  }, [chart])
+  }, [chart, uniqueId])
 
   if (error) {
     return <div className="text-red-500 p-4 border border-red-200 rounded">{error}</div>
@@ -1742,7 +1743,16 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 className="flex items-center gap-2"
               >
                 <Download className="w-4 h-4" />
-                Export MD and settings
+                Export .md
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrint}
+                className="flex items-center gap-2"
+              >
+                <Printer className="w-4 h-4" />
+                Print/PDF
               </Button>
             </div>
             <Textarea
@@ -1762,17 +1772,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 <Eye className="w-5 h-5" />
                 Live Preview
                 <Badge variant="secondary" className="ml-2">Mermaid + Syntax</Badge>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrint}
-                  className="flex items-center gap-2"
-                >
-                  <Printer className="w-4 h-4" />
-                  Print/PDF
-                </Button>
               </div>
             </div>
           </CardHeader>
