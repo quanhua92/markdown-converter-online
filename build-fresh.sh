@@ -31,6 +31,10 @@ docker image prune -f
 echo "🔨 Building with fresh cache..."
 GIT_COMMIT=$GIT_COMMIT docker compose -f "$COMPOSE_FILE" build --build-arg GIT_COMMIT=$GIT_COMMIT
 
+# Stop existing containers after build
+echo "🛑 Stopping containers after build..."
+docker compose -f "$COMPOSE_FILE" stop
+
 # Start the new containers
 echo "🏃 Starting fresh containers..."
 GIT_COMMIT=$GIT_COMMIT docker compose -f "$COMPOSE_FILE" up -d
