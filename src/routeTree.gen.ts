@@ -9,12 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexSimpleRouteImport } from './routes/index-simple'
+import { Route as PrintRouteImport } from './routes/print'
 import { Route as IndexRouteImport } from './routes/index'
 
-const IndexSimpleRoute = IndexSimpleRouteImport.update({
-  id: '/index-simple',
-  path: '/index-simple',
+const PrintRoute = PrintRouteImport.update({
+  id: '/print',
+  path: '/print',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,37 +25,37 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/index-simple': typeof IndexSimpleRoute
+  '/print': typeof PrintRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/index-simple': typeof IndexSimpleRoute
+  '/print': typeof PrintRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/index-simple': typeof IndexSimpleRoute
+  '/print': typeof PrintRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/index-simple'
+  fullPaths: '/' | '/print'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/index-simple'
-  id: '__root__' | '/' | '/index-simple'
+  to: '/' | '/print'
+  id: '__root__' | '/' | '/print'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  IndexSimpleRoute: typeof IndexSimpleRoute
+  PrintRoute: typeof PrintRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/index-simple': {
-      id: '/index-simple'
-      path: '/index-simple'
-      fullPath: '/index-simple'
-      preLoaderRoute: typeof IndexSimpleRouteImport
+    '/print': {
+      id: '/print'
+      path: '/print'
+      fullPath: '/print'
+      preLoaderRoute: typeof PrintRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,7 +70,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  IndexSimpleRoute: IndexSimpleRoute,
+  PrintRoute: PrintRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,4 +1,17 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+  }
+}
 
 @theme {
   --color-*: initial;
@@ -82,6 +95,41 @@
   --color-rose-50: #fff1f2;
   --color-rose-900: #881337;
   
+  /* Prose-specific colors for dark mode */
+  --color-prose-body: #374151;
+  --color-prose-headings: #111827;
+  --color-prose-lead: #4b5563;
+  --color-prose-links: #3b82f6;
+  --color-prose-bold: #111827;
+  --color-prose-counters: #6b7280;
+  --color-prose-bullets: #d1d5db;
+  --color-prose-hr: #e5e7eb;
+  --color-prose-quotes: #111827;
+  --color-prose-quote-borders: #e5e7eb;
+  --color-prose-captions: #6b7280;
+  --color-prose-code: #111827;
+  --color-prose-pre-code: #e5e7eb;
+  --color-prose-pre-bg: #1f2937;
+  --color-prose-th-borders: #d1d5db;
+  --color-prose-td-borders: #e5e7eb;
+  
+  --color-prose-invert-body: #d1d5db;
+  --color-prose-invert-headings: #ffffff;
+  --color-prose-invert-lead: #9ca3af;
+  --color-prose-invert-links: #60a5fa;
+  --color-prose-invert-bold: #ffffff;
+  --color-prose-invert-counters: #9ca3af;
+  --color-prose-invert-bullets: #4b5563;
+  --color-prose-invert-hr: #374151;
+  --color-prose-invert-quotes: #f3f4f6;
+  --color-prose-invert-quote-borders: #374151;
+  --color-prose-invert-captions: #9ca3af;
+  --color-prose-invert-code: #ffffff;
+  --color-prose-invert-pre-code: #d1d5db;
+  --color-prose-invert-pre-bg: #0f172a;
+  --color-prose-invert-th-borders: #4b5563;
+  --color-prose-invert-td-borders: #374151;
+  
   --radius: 0.75rem;
 }
 
@@ -102,13 +150,12 @@
 }
 
 body {
-  @apply m-0;
+  @apply m-0 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply bg-background text-foreground;
 }
 
 code {
@@ -138,6 +185,7 @@ code {
   @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300;
   box-shadow: var(--shadow-soft);
 }
+
 
 /* Smooth transitions */
 * {
