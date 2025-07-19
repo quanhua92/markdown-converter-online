@@ -3,6 +3,12 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import { resolve } from 'node:path'
+import { execSync } from 'child_process'
+
+const gitCommitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim()
+
+console.log('🔧 Vite config - Git commit hash:', gitCommitHash)
+console.log('🔧 Vite config - Define value:', JSON.stringify(gitCommitHash))
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -28,5 +34,8 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  define: {
+    __GIT_COMMIT_HASH__: JSON.stringify(gitCommitHash)
   }
 })

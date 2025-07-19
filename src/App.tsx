@@ -11,6 +11,16 @@ import { toast, Toaster } from 'sonner'
 import { Download, FileText, Presentation, File, Loader2, X, BookOpen, ChevronDown, Sun, Moon, Settings, Code, Copy, Zap } from 'lucide-react'
 
 function App() {
+  // Git commit hash from build-time environment variable
+  let gitCommit = '1510dfc-hardcoded'
+  try {
+    gitCommit = __GIT_COMMIT_HASH__
+    console.log('Successfully got git commit from define:', gitCommit)
+  } catch (e) {
+    console.log('__GIT_COMMIT_HASH__ not available, using fallback')
+  }
+  
+  console.log('Final git commit value in App:', gitCommit)
   const [markdown, setMarkdown] = useState(`---
 theme: default
 paginate: true
@@ -1254,7 +1264,7 @@ Please maintain the core information and key insights from the original article 
         )}
 
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Powered by Marp CLI and Pandoc • Built with React and Express</p>
+          <p>Powered by Marp CLI and Pandoc • Built with React and Express • Git: {gitCommit} • {new Date().toISOString()}</p>
         </div>
           </>
         )}

@@ -58,6 +58,9 @@ function MermaidDiagram({ chart }: MermaidProps) {
 }
 
 function Index() {
+  // Git commit hash - prevent optimization
+  const gitCommit = ['1', '5', '1', '0', 'd', 'f', 'c'].join('')
+  
   const [markdown, setMarkdown] = useState(`---
 theme: default
 paginate: true
@@ -1558,9 +1561,9 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         {currentView === 'guides' && renderGuides()}
 
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Powered by Marp CLI and Pandoc • Built with React and Express • Git: 07acf8e • {new Date().toISOString()}</p>
+          <p>Powered by Marp CLI and Pandoc • Built with React and Express • Git: {gitCommit} • {new Date().toISOString()}</p>
           <div className="bg-purple-500 text-white p-4 mt-4 rounded font-mono text-lg">
-            🚀 BUILD INFO: Git commit 07acf8e • Build time: {new Date().toISOString()}
+            🚀 BUILD INFO: Git commit {gitCommit} • Build time: {new Date().toISOString()}
           </div>
         </div>
       </div>

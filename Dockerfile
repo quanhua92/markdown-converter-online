@@ -10,12 +10,19 @@ WORKDIR /usr/src/app
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --no-frozen-lockfile
 
-# Copy source code and build client
+# Copy source code and build everything
 COPY . .
-RUN pnpm run client:build
 
-# Build server TypeScript
-RUN npx tsc --project server/tsconfig.json
+# Build client and server (must succeed or fail the build)
+RUN pnpm build
+
+# Verify critical files exist after build
+RUN test -f dist/index.html || (echo "ERROR: dist/index.html not found after build" && exit 1)
+RUN test -f server/dist/index.js || (echo "ERROR: server/dist/index.js not found after build" && exit 1)
+RUN ls -la dist/ && ls -la server/dist/
+
+# Skip verification for now - test if environment variable approach works
+RUN echo "Git commit hash injection via environment variable - skipping verification for now"
 
 # Production stage - minimal runtime dependencies
 FROM node:18-bullseye-slim AS production
