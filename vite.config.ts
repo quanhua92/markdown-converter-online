@@ -5,7 +5,14 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import { resolve } from 'node:path'
 import { execSync } from 'child_process'
 
-const gitCommitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim()
+// Try to get git commit hash, fallback to environment variable or 'dev'
+let gitCommitHash = 'dev'
+try {
+  gitCommitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim()
+} catch (error) {
+  // If git is not available (e.g., in Docker), use environment variable
+  gitCommitHash = process.env.GIT_COMMIT_HASH || process.env.GIT_COMMIT || 'unknown'
+}
 
 console.log('🔧 Vite config - Git commit hash:', gitCommitHash)
 console.log('🔧 Vite config - Define value:', JSON.stringify(gitCommitHash))

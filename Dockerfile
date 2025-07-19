@@ -10,11 +10,21 @@ WORKDIR /usr/src/app
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --no-frozen-lockfile
 
+# Add git commit info for cache invalidation
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT_HASH=${GIT_COMMIT}
+
 # Copy source code and build everything
 COPY . .
 
+# Verify we have the latest git commit (cache buster)
+RUN echo "Building with git commit: ${GIT_COMMIT}" && \
+    if [ "${GIT_COMMIT}" = "unknown" ]; then \
+        echo "Warning: Building without git commit info"; \
+    fi
+
 # Build client and server (must succeed or fail the build)
-RUN pnpm build
+RUN GIT_COMMIT_HASH=${GIT_COMMIT} pnpm build
 
 # Verify critical files exist after build
 RUN test -f dist/index.html || (echo "ERROR: dist/index.html not found after build" && exit 1)
