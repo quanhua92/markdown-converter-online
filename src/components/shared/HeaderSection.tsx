@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { Edit3, BookOpen, Sun, Moon } from 'lucide-react'
+import { Edit3, BookOpen, Sun, Moon, FolderOpen } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 
 interface HeaderSectionProps {
   isDarkMode: boolean
@@ -61,8 +62,18 @@ export function HeaderSection({
           }`}
         >
           <Edit3 className="h-4 w-4" />
-          Editor & Converter
+          Converter
         </Button>
+        <Link to="/explorer">
+          <Button
+            variant="outline"
+            size="default"
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-green-50 dark:hover:bg-green-900/30"
+          >
+            <FolderOpen className="h-4 w-4" />
+            Explorer
+          </Button>
+        </Link>
         <Button
           onClick={() => onViewChange('guides')}
           variant={currentView === 'guides' ? 'default' : 'outline'}
