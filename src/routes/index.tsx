@@ -111,7 +111,7 @@ Happy converting! 🎉`)
   
   const [selectedFormat, setSelectedFormat] = useState<string>('pptx')
   const [isConverting, setIsConverting] = useState(false)
-  const [currentView, setCurrentView] = useState<'converter' | 'guides' | 'editor'>('converter')
+  const [currentView, setCurrentView] = useState<'editor' | 'guides'>('editor')
   const [showConverterPreview, setShowConverterPreview] = useState(false)
   const [downloadResult, setDownloadResult] = useState<{
     success: boolean;
@@ -1613,283 +1613,136 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
   // Render different views based on currentView
   const renderEditor = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2">
-              <Edit3 className="w-5 h-5" />
-              Raw Markdown Editor
-            </CardTitle>
-            {!isDesktop && (
-              <div className="flex gap-1">
-                <Button
-                  variant={activeTab === 'edit' ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setActiveTab('edit')}
-                >
-                  <Edit3 className="w-4 h-4 mr-1" />
-                  Edit
-                </Button>
-                <Button
-                  variant={activeTab === 'preview' ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setActiveTab('preview')}
-                >
-                  <Eye className="w-4 h-4 mr-1" />
-                  Preview
-                </Button>
-              </div>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
-          <Textarea
-            value={markdown}
-            onChange={(e) => setMarkdown(e.target.value)}
-            placeholder="Enter your markdown here..."
-            className="min-h-[600px] font-mono resize-none"
-            style={{ fontSize: `${fontSize}px` }}
-          />
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
+    <>
+      {/* Template Selection */}
+      <Card className="mb-6 shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Eye className="w-5 h-5" />
-            Live Preview
-            <Badge variant="secondary" className="ml-2">Mermaid + Syntax</Badge>
+            <BookOpen className="h-5 w-5" />
+            Templates
           </CardTitle>
+          <CardDescription>
+            Start with a pre-built template or create your own markdown content.
+          </CardDescription>
         </CardHeader>
-        <CardContent className={!isDesktop && activeTab === 'edit' ? 'hidden' : ''}>
-          <div className="min-h-[600px] overflow-auto prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
-            <div className="markdown-preview">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight, rehypeRaw]}
-                components={customComponents}
+        <CardContent>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <Select onValueChange={applyTemplate}>
+              <SelectTrigger className="w-full sm:w-48 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
+                <SelectValue placeholder="Load Template" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="showcase">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    Ultimate Showcase
+                  </div>
+                </SelectItem>
+                <SelectItem value="presentation">
+                  <div className="flex items-center gap-2">
+                    <Presentation className="h-4 w-4" />
+                    Presentation
+                  </div>
+                </SelectItem>
+                <SelectItem value="document">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Document
+                  </div>
+                </SelectItem>
+                <SelectItem value="article">
+                  <div className="flex items-center gap-2">
+                    <File className="h-4 w-4" />
+                    Article
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <div className="flex gap-2">
+              <Button
+                onClick={clearMarkdown}
+                size="sm"
+                variant="outline"
+                className="flex items-center gap-2"
+                disabled={!markdown.trim()}
               >
-                {markdown}
-              </ReactMarkdown>
+                <X className="h-4 w-4" />
+                Clear
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
-    </div>
-  )
 
-  const renderConverter = () => (
-    <>
-      {showConverterPreview ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Markdown Input
-              </CardTitle>
-              <CardDescription>
-                Enter your markdown content below. For presentations, use <code>---</code> to separate slides.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                  <div className="flex gap-2">
-                    <Select onValueChange={applyTemplate}>
-                      <SelectTrigger className="w-40 h-9 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
-                        <SelectValue placeholder="Load Template" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="showcase">
-                          <div className="flex items-center gap-2">
-                            <BookOpen className="h-4 w-4" />
-                            Ultimate Showcase
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="presentation">
-                          <div className="flex items-center gap-2">
-                            <Presentation className="h-4 w-4" />
-                            Presentation
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="document">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4" />
-                            Document
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="article">
-                          <div className="flex items-center gap-2">
-                            <File className="h-4 w-4" />
-                            Article
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Button
-                      onClick={() => setShowConverterPreview(!showConverterPreview)}
-                      size="sm"
-                      variant={showConverterPreview ? "default" : "outline"}
-                      className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
-                    >
-                      <Eye className="h-4 w-4" />
-                      Preview
-                    </Button>
-                    <Button
-                      onClick={handlePrint}
-                      size="sm"
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm"
-                      disabled={!markdown.trim()}
-                    >
-                      <Printer className="h-4 w-4" />
-                      Print
-                    </Button>
-                    <Button
-                      onClick={clearMarkdown}
-                      size="sm"
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                      disabled={!markdown.trim()}
-                    >
-                      <X className="h-4 w-4" />
-                      Clear
-                    </Button>
-                  </div>
-                </div>
-                <Textarea
-                  value={markdown}
-                  onChange={(e) => setMarkdown(e.target.value)}
-                  placeholder="Enter your markdown here..."
-                  className="min-h-[400px] font-mono text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm"
-                />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Eye className="h-5 w-5" />
-                Preview
-                <Badge variant="secondary" className="ml-2">Live</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="min-h-[400px] overflow-auto prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
-                <div className="markdown-preview">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeHighlight, rehypeRaw]}
-                    components={{
-                      code(props: any) {
-                        const { children, className, ...rest } = props
-                        const match = /language-(\w+)/.exec(className || '')
-                        if (match && match[1] === 'mermaid') {
-                          return <MermaidDiagram chart={children as string} />
-                        }
-                        return <code {...rest} className={className}>{children}</code>
-                      }
-                    }}
-                  >
-                    {markdown}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      ) : (
-        <Card className="mb-8 shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
+      {/* Editor and Preview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Markdown Input
-            </CardTitle>
-            <CardDescription>
-              Enter your markdown content below. For presentations, use <code>---</code> to separate slides.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                <div className="flex gap-2">
-                  <Select onValueChange={applyTemplate}>
-                    <SelectTrigger className="w-40 h-9 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
-                      <SelectValue placeholder="Load Template" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="showcase">
-                        <div className="flex items-center gap-2">
-                          <BookOpen className="h-4 w-4" />
-                          Ultimate Showcase
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="presentation">
-                        <div className="flex items-center gap-2">
-                          <Presentation className="h-4 w-4" />
-                          Presentation
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="document">
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Document
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="article">
-                        <div className="flex items-center gap-2">
-                          <File className="h-4 w-4" />
-                          Article
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center gap-2">
+                <Edit3 className="w-5 h-5" />
+                Markdown Editor
+              </CardTitle>
+              {!isDesktop && (
+                <div className="flex gap-1">
                   <Button
-                    onClick={() => setShowConverterPreview(!showConverterPreview)}
+                    variant={activeTab === 'edit' ? "default" : "outline"}
                     size="sm"
-                    variant={showConverterPreview ? "default" : "outline"}
-                    className={`w-full sm:w-auto flex items-center justify-center gap-2 ${showConverterPreview ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
+                    onClick={() => setActiveTab('edit')}
                   >
-                    <Eye className="h-4 w-4" />
+                    <Edit3 className="w-4 h-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant={activeTab === 'preview' ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setActiveTab('preview')}
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
                     Preview
                   </Button>
-                  <Button
-                    onClick={handlePrint}
-                    size="sm"
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm"
-                    disabled={!markdown.trim()}
-                  >
-                    <Printer className="h-4 w-4" />
-                    Print
-                  </Button>
-                  <Button
-                    onClick={clearMarkdown}
-                    size="sm"
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                    disabled={!markdown.trim()}
-                  >
-                    <X className="h-4 w-4" />
-                    Clear
-                  </Button>
                 </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
+            <Textarea
+              value={markdown}
+              onChange={(e) => setMarkdown(e.target.value)}
+              placeholder="Enter your markdown here..."
+              className="min-h-[600px] font-mono resize-none"
+              style={{ fontSize: `${fontSize}px` }}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5" />
+              Live Preview
+              <Badge variant="secondary" className="ml-2">Mermaid + Syntax</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className={!isDesktop && activeTab === 'edit' ? 'hidden' : ''}>
+            <div className="min-h-[600px] overflow-auto prose prose-lg prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
+              <div className="markdown-preview">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                  components={customComponents}
+                >
+                  {markdown}
+                </ReactMarkdown>
               </div>
-              <Textarea
-                value={markdown}
-                onChange={(e) => setMarkdown(e.target.value)}
-                placeholder="Enter your markdown here..."
-                className="min-h-[200px] sm:min-h-[300px] font-mono text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm"
-              />
             </div>
           </CardContent>
         </Card>
-      )}
+      </div>
 
-      <Card className="mb-8 shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
+      {/* Output Format Selection */}
+      <Card className="mb-6 shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <IconComponent className="h-5 w-5" />
@@ -1930,22 +1783,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             })}
           </div>
 
-          <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-            <SelectTrigger className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
-              <SelectValue placeholder="Select output format" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(formatConfig).map(([format, config]) => (
-                <SelectItem key={format} value={format}>
-                  <div className="flex items-center gap-2">
-                    <config.icon className="h-4 w-4" />
-                    {config.label}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
           {/* Advanced Options */}
           <Collapsible open={showAdvancedOptions} onOpenChange={setShowAdvancedOptions}>
             <CollapsibleTrigger asChild>
@@ -1989,34 +1826,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor="browser">Browser</Label>
-                      <Select value={conversionOptions.browser} onValueChange={(value) => setConversionOptions({...conversionOptions, browser: value})}>
-                        <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="auto">Auto</SelectItem>
-                          <SelectItem value="chrome">Chrome</SelectItem>
-                          <SelectItem value="firefox">Firefox</SelectItem>
-                          <SelectItem value="edge">Edge</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="browserTimeout">Browser Timeout</Label>
-                      <Select value={conversionOptions.browserTimeout?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, browserTimeout: parseInt(value)})}>
-                        <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="30000">30 seconds</SelectItem>
-                          <SelectItem value="60000">60 seconds</SelectItem>
-                          <SelectItem value="90000">90 seconds</SelectItem>
-                          <SelectItem value="120000">120 seconds</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
                   </div>
                 </div>
               ) : (
@@ -2054,40 +1863,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                             </SelectContent>
                           </Select>
                         </div>
-                        <div>
-                          <Label htmlFor="paperSize">Paper Size</Label>
-                          <Select value={conversionOptions.paperSize} onValueChange={(value) => setConversionOptions({...conversionOptions, paperSize: value})}>
-                            <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="a4paper">A4</SelectItem>
-                              <SelectItem value="letterpaper">Letter</SelectItem>
-                              <SelectItem value="a3paper">A3</SelectItem>
-                              <SelectItem value="a5paper">A5</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </>
-                    )}
-                    {selectedFormat === 'html' && (
-                      <>
-                        <div className="flex items-center space-x-2">
-                          <Switch 
-                            id="selfContained" 
-                            checked={conversionOptions.selfContained} 
-                            onCheckedChange={(checked) => setConversionOptions({...conversionOptions, selfContained: checked})}
-                          />
-                          <Label htmlFor="selfContained">Self-contained HTML</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Switch 
-                            id="sectionDivs" 
-                            checked={conversionOptions.sectionDivs} 
-                            onCheckedChange={(checked) => setConversionOptions({...conversionOptions, sectionDivs: checked})}
-                          />
-                          <Label htmlFor="sectionDivs">Section divs</Label>
-                        </div>
                       </>
                     )}
                   </div>
@@ -2100,40 +1875,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                       />
                       <Label htmlFor="toc">Table of Contents</Label>
                     </div>
-                    {conversionOptions.toc && (
-                      <div className="ml-6">
-                        <Label htmlFor="tocDepth">TOC Depth</Label>
-                        <Select value={conversionOptions.tocDepth?.toString()} onValueChange={(value) => setConversionOptions({...conversionOptions, tocDepth: parseInt(value)})}>
-                          <SelectTrigger className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 shadow-sm w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">1 level</SelectItem>
-                            <SelectItem value="2">2 levels</SelectItem>
-                            <SelectItem value="3">3 levels</SelectItem>
-                            <SelectItem value="4">4 levels</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                    {selectedFormat === 'pdf' && (
-                      <div className="flex items-center space-x-2">
-                        <Switch 
-                          id="colorLinks" 
-                          checked={conversionOptions.colorLinks} 
-                          onCheckedChange={(checked) => setConversionOptions({...conversionOptions, colorLinks: checked})}
-                        />
-                        <Label htmlFor="colorLinks">Colored Links</Label>
-                      </div>
-                    )}
-                    <div className="flex items-center space-x-2">
-                      <Switch 
-                        id="citeproc" 
-                        checked={conversionOptions.citeproc} 
-                        onCheckedChange={(checked) => setConversionOptions({...conversionOptions, citeproc: checked})}
-                      />
-                      <Label htmlFor="citeproc">Citation Processing</Label>
-                    </div>
                   </div>
                 </div>
               )}
@@ -2142,7 +1883,8 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         </CardContent>
       </Card>
 
-      <div className="text-center">
+      {/* Convert Button */}
+      <div className="text-center mb-6">
         {!downloadResult ? (
           <Button 
             onClick={handleConvert}
@@ -2176,7 +1918,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
       {/* Download Result UI */}
       {downloadResult && (
-        <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-xl">
+        <Card className="mb-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 shadow-xl">
           <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="flex items-center gap-2 text-green-800 text-lg sm:text-xl">
               <Download className="h-5 w-5" />
@@ -2220,17 +1962,13 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 </Button>
               </div>
             </div>
-            
-            <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-green-700 dark:text-green-300">
-              <p>💡 <strong>Tip:</strong> Your file will be automatically cleaned up from the server after 1 hour for security.</p>
-            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Conversion Error Debug Section */}
       {conversionError && (
-        <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700 shadow-xl">
+        <Card className="mb-6 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-700 shadow-xl">
           <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="flex items-center gap-2 text-red-800 text-lg sm:text-xl">
               <X className="h-5 w-5" />
@@ -2250,41 +1988,15 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                   </pre>
                 </div>
               )}
-              {conversionError.stderr && (
-                <div>
-                  <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Standard Error:</h4>
-                  <pre className="bg-red-100 dark:bg-red-900/20 p-3 rounded text-sm overflow-x-auto text-red-700 dark:text-red-300">
-                    {conversionError.stderr}
-                  </pre>
-                </div>
-              )}
-              {conversionError.stdout && (
-                <div>
-                  <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">Standard Output:</h4>
-                  <pre className="bg-red-100 dark:bg-red-900/20 p-3 rounded text-sm overflow-x-auto text-red-700 dark:text-red-300">
-                    {conversionError.stdout}
-                  </pre>
-                </div>
-              )}
               <div className="flex justify-end">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => setConversionError(null)}
-                    size="sm"
-                    className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Dismiss
-                  </Button>
-                  <Button
-                    onClick={() => setShowAdvancedOptions(true)}
-                    size="sm"
-                    className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Check Options
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => setConversionError(null)}
+                  size="sm"
+                  className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Dismiss
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -2292,6 +2004,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
       )}
     </>
   )
+
 
   const renderGuides = () => (
     <div className="text-center p-8">
@@ -2341,22 +2054,13 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           {/* Navigation Tabs */}
           <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4">
               <Button
-                onClick={() => setCurrentView('converter')}
-                variant={currentView === 'converter' ? 'default' : 'outline'}
-                size="default"
-                className={`flex items-center gap-2 px-4 py-2 rounded-md ${currentView === 'converter' ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
-              >
-                <FileText className="h-4 w-4" />
-                Converter
-              </Button>
-              <Button
                 onClick={() => setCurrentView('editor')}
                 variant={currentView === 'editor' ? 'default' : 'outline'}
                 size="default"
                 className={`flex items-center gap-2 px-4 py-2 rounded-md ${currentView === 'editor' ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 backdrop-blur-sm'}`}
               >
                 <Edit3 className="h-4 w-4" />
-                Editor
+                Editor & Converter
               </Button>
               <Button
                 onClick={() => setCurrentView('guides')}
@@ -2484,7 +2188,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
         )}
 
         {/* Render content based on current view */}
-        {currentView === 'converter' && renderConverter()}
         {currentView === 'editor' && renderEditor()}
         {currentView === 'guides' && renderGuides()}
 
