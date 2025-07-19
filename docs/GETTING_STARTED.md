@@ -45,8 +45,11 @@ This configuration:
 
 ## Basic Usage
 
-### Converting Markdown
+### Two Main Modes
 
+The application offers two distinct interfaces:
+
+#### 1. Converter Mode (Quick Conversion)
 1. **Navigate to the Converter tab**
 2. **Enter your markdown content** or use a template:
    - Click "Load Template" dropdown
@@ -55,24 +58,45 @@ This configuration:
 4. **Click "Convert"** 
 5. **Download your file** when conversion completes
 
+#### 2. Explorer Mode (File Management & Workspace)
+1. **Click the Explorer button** in the navigation
+2. **Choose a template** or start fresh:
+   - **Project Notes**: Organized documentation structure
+   - **Knowledge Base**: Personal knowledge management system  
+   - **Blog/Website**: Content structure for blogs and websites
+3. **Use the file tree** to navigate and organize your content
+4. **Edit multiple files** with auto-save functionality
+5. **Export individual files** or use the print function
+
 ### Using Templates
 
-The application provides three built-in templates:
+#### Converter Templates (For Quick Conversion)
+The Converter provides three built-in templates:
 
-#### Presentation Template
-- Optimized for PowerPoint conversion with Marp
-- Includes slide separators (`---`)
-- Contains sample content structure
+- **Presentation Template**: Optimized for PowerPoint conversion with Marp
+- **Document Template**: Comprehensive markdown showcase for PDF/Word
+- **Article Template**: Blog-style content for all output formats
 
-#### Document Template 
-- Comprehensive markdown showcase
-- Headers, lists, code blocks, tables
-- Perfect for PDF and Word conversion
+#### Explorer Templates (For Workspace Management)
+The Explorer offers structured workspace templates:
 
-#### Article Template
-- Blog-style content with metadata
-- Advanced formatting examples
-- Suitable for all output formats
+- **Project Notes**: Complete project documentation structure with README, docs/, and notes/ folders
+- **Knowledge Base**: Personal knowledge management with organized learning, references, and daily notes
+- **Blog/Website**: Content structure with posts, drafts, and about pages for content creators
+
+### Explorer Features
+
+#### File Management
+- **Create/Delete/Rename**: Files and folders with right-click context menu
+- **File Tree Navigation**: Collapsible folder structure like VS Code
+- **Auto-Save**: Content automatically saved to browser localStorage
+- **Multi-File Editing**: Switch between files while preserving content
+
+#### Workspace Organization  
+- **Folder Structure**: Organize content hierarchically
+- **File Persistence**: Data saved across browser sessions
+- **Mobile Responsive**: Touch-friendly interface with edit/preview tabs
+- **Export Options**: Individual file export and print functionality
 
 ### Dark/Light Mode
 

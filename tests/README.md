@@ -39,6 +39,28 @@ node tests/test-dark-mode.cjs
 - Console logs showing color values and test results
 - Visual confirmation that backgrounds change dramatically
 
+#### Explorer E2E Test (`test-e2e-explorer.cjs`)
+Comprehensive test for the new Markdown Explorer functionality.
+
+**What it tests:**
+- Template initialization (Project Notes, Knowledge Base, Blog/Website)
+- File tree navigation and toggle functionality
+- Multi-file editing workflow with auto-save
+- Mobile responsive design with edit/preview tabs
+- Data persistence across browser sessions
+- Dark/light mode in Explorer interface
+
+**Run the test:**
+```bash
+node tests/test-e2e-explorer.cjs
+```
+
+**Expected output:**
+- Screenshots: `tests/screenshots/explorer-desktop-*.png`, `tests/screenshots/explorer-mobile-*.png`
+- Template initialization verification
+- File tree interaction testing
+- Cross-device compatibility confirmation
+
 #### Heading Styles Test (`test-heading-styles.cjs`)
 Tests markdown heading rendering in both preview and print modes.
 

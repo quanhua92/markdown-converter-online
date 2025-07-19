@@ -14,6 +14,8 @@ This guide covers the architecture, development, and deployment details of the M
 │  │                 │  │  Mode Toggle    │  │   & Guides    │ │
 │  │ • UI Components │  │ • Theme State   │  │ • Copy Utils  │ │
 │  │ • State Mgmt    │  │ • Local Storage │  │ • Examples    │ │
+│  │ • Explorer      │  │ • Auto-Save     │  │ • Workspaces  │ │
+│  │ • File Tree     │  │ • Persistence   │  │ • Multi-File  │ │
 │  └─────────────────┘  └─────────────────┘  └─────────────── │
 └─────────────────────────────────────────────────────────────┘
                                │ HTTP/REST API
@@ -47,9 +49,11 @@ This guide covers the architecture, development, and deployment details of the M
 - **TypeScript**: Type safety and developer experience
 - **Tailwind CSS 4**: Utility-first styling with dark mode
 - **Vite**: Fast build tool and dev server
-- **Radix UI**: Accessible component primitives
+- **Radix UI**: Accessible component primitives (Dialog, Collapsible, etc.)
 - **Sonner**: Toast notifications
 - **Lucide React**: Icon library
+- **TanStack Router**: File-based routing with type safety
+- **localStorage API**: Client-side file system persistence
 
 #### Backend
 - **Node.js 18**: LTS runtime environment

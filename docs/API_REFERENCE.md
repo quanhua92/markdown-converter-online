@@ -1,14 +1,28 @@
 # API Reference
 
-Complete reference for the Markdown Converter Online REST API.
+Complete reference for the Markdown Converter Online REST API and application routes.
 
 ## Base URL
 
 ```
-http://localhost:3000/api
+http://localhost:3000
 ```
 
 For production deployments, replace `localhost:3000` with your domain.
+
+## Application Routes
+
+### Main Application Routes
+
+- **`/`** - Homepage with Converter, Explorer navigation, and Guides
+- **`/explorer`** - File management workspace with template initialization
+- **`/print`** - Print-optimized view for markdown content
+
+### API Base URL
+
+```
+http://localhost:3000/api
+```
 
 ## Authentication
 
