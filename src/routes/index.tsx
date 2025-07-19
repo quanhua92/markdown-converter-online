@@ -1749,7 +1749,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 disabled={isDesktop}
               >
                 <Edit3 className="w-4 h-4" />
-                <span className="hidden sm:inline">Edit</span>
+                <span className="text-xs sm:text-sm">Edit</span>
               </Button>
               
               {/* Preview Button */}
@@ -1760,7 +1760,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 className="flex items-center justify-center gap-2"
               >
                 <Eye className="w-4 h-4" />
-                <span className="hidden sm:inline">Preview</span>
+                <span className="text-xs sm:text-sm">Preview</span>
               </Button>
               
               {/* Export Button */}
@@ -1771,7 +1771,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 className="flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export</span>
+                <span className="text-xs sm:text-sm">Export</span>
               </Button>
               
               {/* Print Button */}
@@ -1782,7 +1782,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 className="flex items-center justify-center gap-2"
               >
                 <Printer className="w-4 h-4" />
-                <span className="hidden sm:inline">Print</span>
+                <span className="text-xs sm:text-sm">Print</span>
               </Button>
             </div>
           </CardHeader>
