@@ -431,7 +431,7 @@ function Index() {
 ### Advanced Text Features
 > **💡 Pro Tip:** You can combine multiple formatting styles!
 
-Here's a sentence with **bold**, *italic*, \`code\`, and [links](https://example.com) all together.
+Here's a sentence with **bold**, *italic*, \`code\`, and [links](https://github.com) all together.
 
 ### Escape Characters
 Use backslashes to escape special characters: \\* \\_ \\# \\[ \\]
@@ -776,30 +776,30 @@ You can use it for:
 ## 🔗 Links & Media
 
 ### Basic Links
-- [Simple link](https://example.com)
-- [Link with title](https://example.com "This is a title")
+- [GitHub](https://github.com)
+- [Stack Overflow](https://stackoverflow.com "Developer Q&A Community")
 - [Reference link][1]
 - [Another reference link][link-reference]
 
 ### URL Links
-- Direct URL: https://www.example.com
-- Email: contact@example.com
+- Direct URL: https://www.github.com
+- Email: support@github.com
 
 ### Internal Links (Anchors)
 - [Go to Text Formatting section](#text-formatting)
 - [Jump to Mermaid Diagrams](#mermaid-diagrams)
 
 ### Images
-![Alt text for image](https://via.placeholder.com/400x200?text=Sample+Image "Image title")
+![Sample image](https://picsum.photos/200/300 "Sample Image")
 
 ### Images with Links
-[![Clickable image](https://via.placeholder.com/200x100?text=Click+Me)](https://example.com)
+[![Clickable image](https://picsum.photos/200/300)](https://github.com)
 
 ### Reference-style Links
 This is a [reference link][1] and this is [another one][link-reference].
 
-[1]: https://example.com
-[link-reference]: https://example.com "Reference link with title"
+[1]: https://github.com
+[link-reference]: https://stackoverflow.com "Developer Q&A Community"
 
 ---
 
@@ -1546,7 +1546,7 @@ function hello() {
 \`\`\`
 
 ## Links and Images
-[Visit our website](https://example.com)
+[Visit GitHub](https://github.com)
 
 ## Tables
 | Feature | Description | Status |
@@ -1836,8 +1836,8 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             <div className="min-h-[600px] overflow-auto prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
               <div className="markdown-preview">
                 <ReactMarkdown
-                  remarkPlugins={[remarkGfm, remarkMath]}
-                  rehypePlugins={[rehypeHighlight, rehypeKatex, rehypeRaw]}
+                  remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
+                  rehypePlugins={[rehypeHighlight, [rehypeKatex, { strict: false }], rehypeRaw]}
                   components={customComponents}
                 >
                   {markdown}
@@ -2242,9 +2242,9 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
               <div>
                 <h4 className="font-semibold mb-2">Links and Images</h4>
-                <CodeBlock onCopy={() => copyToClipboard('[Link text](https://example.com)\n![Image alt text](https://example.com/image.png)')}>
-{`[Link text](https://example.com)
-![Image alt text](https://example.com/image.png)`}
+                <CodeBlock onCopy={() => copyToClipboard('[GitHub](https://github.com)\n![Sample Image](https://picsum.photos/200/300)')}>
+{`[GitHub](https://github.com)
+![Sample Image](https://picsum.photos/200/300)`}
                 </CodeBlock>
               </div>
 
