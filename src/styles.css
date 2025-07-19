@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@import "katex/dist/katex.min.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -536,4 +537,31 @@ pre code {
 
 .dark .hljs-strong {
   font-weight: bold !important;
+}
+
+/* KaTeX math rendering styles */
+.katex {
+  font-size: 1.1em !important;
+  color: inherit !important;
+}
+
+.katex-display {
+  margin: 1em 0 !important;
+  text-align: center !important;
+}
+
+/* Ensure KaTeX math works in dark mode */
+.dark .katex {
+  color: #e6edf3 !important;
+}
+
+/* Math inline and block styles */
+.math-inline {
+  display: inline !important;
+}
+
+.math-display {
+  display: block !important;
+  text-align: center !important;
+  margin: 1em 0 !important;
 }

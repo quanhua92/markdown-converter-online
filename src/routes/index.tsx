@@ -17,7 +17,6 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import mermaid from 'mermaid'
-import 'katex/dist/katex.min.css'
 
 export const Route = createFileRoute('/')({
   component: Index,
