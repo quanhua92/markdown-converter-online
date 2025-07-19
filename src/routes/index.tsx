@@ -565,7 +565,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           </CardTitle>
         </CardHeader>
         <CardContent className={!isDesktop && activeTab === 'edit' ? 'hidden' : ''}>
-          <div className="min-h-[600px] overflow-auto prose prose-sm max-w-none">
+          <div className="min-h-[600px] overflow-auto prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
             <div className="markdown-preview">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -674,7 +674,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="min-h-[400px] overflow-auto prose prose-sm max-w-none">
+              <div className="min-h-[400px] overflow-auto prose prose-lg prose-slate max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
                 <div className="markdown-preview">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
