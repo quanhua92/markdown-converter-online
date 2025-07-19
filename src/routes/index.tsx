@@ -1343,37 +1343,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-gray-900 dark:to-indigo-950 py-4 sm:py-8 lg:py-12 px-4">
-      {/* GIANT IMPOSSIBLE TO MISS BANNER */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: '#ff0000',
-        color: '#ffffff',
-        fontSize: '48px',
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: '20px',
-        zIndex: 9999,
-        border: '10px solid #000000'
-      }}>
-        🔥 NEW BUILD: be564d1 🔥
-      </div>
-      
-      {/* BIG DEBUG VIEW */}
-      <div className="bg-red-100 border-4 border-red-500 p-8 mb-8 text-black text-xl font-mono" style={{marginTop: '150px'}}>
-        <h1 className="text-3xl font-bold mb-4">🔍 DEBUG INFO</h1>
-        <div className="space-y-2">
-          <p><strong>Current View:</strong> {currentView}</p>
-          <p><strong>Selected Format:</strong> {selectedFormat}</p>
-          <p><strong>Show Converter Preview:</strong> {showConverterPreview ? 'YES' : 'NO'}</p>
-          <p><strong>Markdown Length:</strong> {markdown.length} chars</p>
-          <p><strong>Is Converting:</strong> {isConverting ? 'YES' : 'NO'}</p>
-          <p><strong>Window Width:</strong> {typeof window !== 'undefined' ? window.innerWidth : 'unknown'}</p>
-          <p><strong>Component Mounted:</strong> YES</p>
-        </div>
-      </div>
       
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
@@ -1405,9 +1374,7 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
           </div>
           
           {/* Navigation Tabs */}
-          <div className="bg-yellow-200 border-2 border-yellow-600 p-4 mb-4">
-            <p className="text-black font-bold mb-2">🔍 NAV BUTTONS DEBUG:</p>
-            <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-4">
               <Button
                 onClick={() => setCurrentView('converter')}
                 variant={currentView === 'converter' ? 'default' : 'outline'}
@@ -1435,7 +1402,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
                 <BookOpen className="h-4 w-4" />
                 Guides
               </Button>
-            </div>
           </div>
         </div>
 
