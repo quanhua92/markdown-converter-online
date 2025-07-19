@@ -22,11 +22,10 @@ function MermaidDiagram({ chart }: MermaidProps) {
 
   useEffect(() => {
     if (ref.current) {
-      // Detect dark mode for Mermaid theme
-      const isDark = document.documentElement.classList.contains('dark')
+      // Always use light theme for print to match print CSS that forces white background
       mermaid.initialize({
         startOnLoad: true,
-        theme: isDark ? 'dark' : 'default',
+        theme: 'default',
         securityLevel: 'loose',
       })
       
