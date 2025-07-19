@@ -12,9 +12,12 @@ import { toast, Toaster } from 'sonner'
 import { Download, FileText, Presentation, File, Loader2, Edit3, Eye, Printer, Settings, Moon, Sun, ChevronDown, BookOpen, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
 import rehypeHighlight from 'rehype-highlight'
+import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import mermaid from 'mermaid'
+import 'katex/dist/katex.min.css'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -1833,8 +1836,8 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
             <div className="min-h-[600px] overflow-auto prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 prose-h2:border-gray-200 prose-h1:pb-2 prose-h2:pb-1">
               <div className="markdown-preview">
                 <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                  remarkPlugins={[remarkGfm, remarkMath]}
+                  rehypePlugins={[rehypeHighlight, rehypeKatex, rehypeRaw]}
                   components={customComponents}
                 >
                   {markdown}
