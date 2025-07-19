@@ -1,17 +1,19 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color-scheme: light;
-  }
-}
+/* @media (prefers-color-scheme: dark) { */
+/*   :root { */
+/*     color-scheme: dark; */
+/*   } */
+/* } */
+/**/
+/* @media (prefers-color-scheme: light) { */
+/*   :root { */
+/*     color-scheme: light; */
+/*   } */
+/* } */
 
 @theme {
   --color-*: initial;
