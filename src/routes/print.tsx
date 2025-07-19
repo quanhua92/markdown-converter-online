@@ -7,7 +7,6 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import mermaid from 'mermaid'
-import 'katex/dist/katex.min.css'
 import { Moon, Sun, Printer, X } from 'lucide-react'
 
 export const Route = createFileRoute('/print')({
@@ -167,6 +166,15 @@ function PrintPage() {
           table {
             page-break-inside: avoid !important;
           }
+          /* KaTeX math rendering for print */
+          .katex {
+            font-size: 1.1em !important;
+            color: #000 !important;
+          }
+          .katex-display {
+            margin: 1em 0 !important;
+            text-align: center !important;
+          }
         }
       `}} />
       
@@ -222,8 +230,8 @@ function PrintPage() {
         {/* Content */}
         <div className="print-content prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeHighlight, rehypeKatex, rehypeRaw]}
+            remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
+            rehypePlugins={[rehypeHighlight, [rehypeKatex, { strict: false }], rehypeRaw]}
             components={customComponents}
           >
             {markdown}
