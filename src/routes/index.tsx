@@ -2220,9 +2220,6 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
 
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
           <p>Powered by Marp CLI and Pandoc • Built with React and Express • Git: {gitCommit} • {new Date().toISOString()}</p>
-          <div className="bg-purple-500 text-white p-4 mt-4 rounded font-mono text-lg">
-            🚀 BUILD INFO: Git commit {gitCommit} • Build time: {new Date().toISOString()}
-          </div>
         </div>
       </div>
       <Toaster position="top-right" />
