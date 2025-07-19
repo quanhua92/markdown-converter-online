@@ -331,6 +331,7 @@ export function useFileSystem() {
     isLoaded,
     // Workspace management
     currentWorkspaceId,
+    currentWorkspaceName: workspaceData?.name || 'Default Workspace',
     workspaces,
     joinWorkspace,
     leaveWorkspace,

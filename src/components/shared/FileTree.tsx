@@ -29,6 +29,7 @@ interface FileTreeProps {
   showTemplateOptions?: boolean
   // Workspace management props
   currentWorkspaceId?: string
+  currentWorkspaceName?: string
   workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
   onWorkspaceJoin?: (workspaceId: string) => void
   onWorkspaceLeave?: () => void
@@ -253,6 +254,7 @@ export function FileTree({
   onInitializeTemplate,
   showTemplateOptions = true,
   currentWorkspaceId,
+  currentWorkspaceName,
   workspaces,
   onWorkspaceJoin,
   onWorkspaceLeave,
@@ -280,7 +282,7 @@ export function FileTree({
         {currentWorkspaceId && workspaces && onWorkspaceJoin && onWorkspaceLeave && onWorkspaceCreate && (
           <WorkspaceSelector
             currentWorkspace={currentWorkspaceId}
-            currentWorkspaceName={workspaces.find(w => w.id === currentWorkspaceId)?.name || 'Unknown'}
+            currentWorkspaceName={currentWorkspaceName || 'Default Workspace'}
             workspaces={workspaces}
             onWorkspaceJoin={onWorkspaceJoin}
             onWorkspaceLeave={onWorkspaceLeave}

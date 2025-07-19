@@ -17,6 +17,7 @@ interface ExplorerFileTreePanelsProps {
   onInitializeTemplate: (templateKey: string) => void
   // Workspace management props
   currentWorkspaceId?: string
+  currentWorkspaceName?: string
   workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
   onWorkspaceJoin?: (workspaceId: string) => void
   onWorkspaceLeave?: () => void
@@ -36,6 +37,7 @@ export function ExplorerFileTreePanels({
   onToggleFolder,
   onInitializeTemplate,
   currentWorkspaceId,
+  currentWorkspaceName,
   workspaces,
   onWorkspaceJoin,
   onWorkspaceLeave,
@@ -76,6 +78,7 @@ export function ExplorerFileTreePanels({
               onInitializeTemplate={onInitializeTemplate}
               showTemplateOptions={files.length === 0}
               currentWorkspaceId={currentWorkspaceId}
+              currentWorkspaceName={currentWorkspaceName}
               workspaces={workspaces}
               onWorkspaceJoin={onWorkspaceJoin}
               onWorkspaceLeave={onWorkspaceLeave}

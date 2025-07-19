@@ -36,6 +36,7 @@ function Explorer() {
     isLoaded,
     // Workspace management
     currentWorkspaceId,
+    currentWorkspaceName,
     workspaces,
     joinWorkspace,
     leaveWorkspace,
@@ -174,6 +175,7 @@ function Explorer() {
           onToggleFolder={toggleFolder}
           onInitializeTemplate={initializeFromTemplate}
           currentWorkspaceId={currentWorkspaceId}
+          currentWorkspaceName={currentWorkspaceName}
           workspaces={workspaces}
           onWorkspaceJoin={joinWorkspace}
           onWorkspaceLeave={leaveWorkspace}
