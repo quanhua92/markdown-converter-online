@@ -447,10 +447,10 @@ Happy converting! 🎉`)
               // Render markdown content
               const content = \`${markdown.replace(/\`/g, '\\`').replace(/\$/g, '\\$')}\`;
               
-              // Simple markdown to HTML conversion
+              // Enhanced markdown to HTML conversion
               function markdownToHtml(md) {
                 return md
-                  .replace(/\`\`\`mermaid\\n([\\s\\S]*?)\`\`\`/g, '<div class="mermaid">$1</div>')
+                  .replace(/\`\`\`mermaid\\n([\\s\\S]*?)\`\`\`/g, '<div class="mermaid-diagram"><div class="mermaid">$1</div></div>')
                   .replace(/\`\`\`(\\w+)?\\n([\\s\\S]*?)\`\`\`/g, '<pre><code class="language-$1">$2</code></pre>')
                   .replace(/\`([^\`]+)\`/g, '<code>$1</code>')
                   .replace(/^### (.*$)/gm, '<h3>$1</h3>')
@@ -470,16 +470,93 @@ Happy converting! 🎉`)
                   .replace(/<p>(<h[1-6]>.*<\\/h[1-6]>)<\\/p>/g, '$1')
                   .replace(/<p>(<ul>.*<\\/ul>)<\\/p>/g, '$1')
                   .replace(/<p>(<blockquote>.*<\\/blockquote>)<\\/p>/g, '$1')
-                  .replace(/<p>(<div class="mermaid">.*<\\/div>)<\\/p>/g, '$1')
+                  .replace(/<p>(<div class="mermaid-diagram">.*<\\/div>)<\\/p>/g, '$1')
                   .replace(/<p>(<pre>.*<\\/pre>)<\\/p>/g, '$1');
               }
               
+              // Set initial content
               document.getElementById('print-content').innerHTML = markdownToHtml(content);
               
-              // Auto-print after mermaid diagrams are rendered
-              setTimeout(() => {
-                window.print();
-              }, 1000);
+              // Wait for Mermaid diagrams to render before printing
+              function waitForMermaidAndPrint() {
+                const mermaidElements = document.querySelectorAll('.mermaid');
+                if (mermaidElements.length === 0) {
+                  // No Mermaid diagrams, print immediately
+                  window.print();
+                  return;
+                }
+                
+                // Initialize Mermaid with proper settings
+                mermaid.initialize({ 
+                  startOnLoad: false,
+                  theme: 'default',
+                  securityLevel: 'loose',
+                  themeVariables: {
+                    fontFamily: 'arial',
+                    fontSize: '14px'
+                  }
+                });
+                
+                let renderedCount = 0;
+                const totalMermaid = mermaidElements.length;
+                
+                // Render each Mermaid diagram
+                mermaidElements.forEach((element, index) => {
+                  const diagramText = element.textContent;
+                  if (diagramText && diagramText.trim()) {
+                    try {
+                      mermaid.render(\`mermaid-print-\${index}\`, diagramText)
+                        .then((result) => {
+                          element.innerHTML = result.svg;
+                          renderedCount++;
+                          
+                          // When all diagrams are rendered, print
+                          if (renderedCount === totalMermaid) {
+                            setTimeout(() => {
+                              window.print();
+                            }, 500); // Small delay to ensure rendering is complete
+                          }
+                        })
+                        .catch((error) => {
+                          console.error('Mermaid rendering error:', error);
+                          element.innerHTML = \`<div style="color: red; border: 1px solid red; padding: 10px; margin: 10px 0;">Error rendering diagram: \${error.message}</div>\`;
+                          renderedCount++;
+                          
+                          if (renderedCount === totalMermaid) {
+                            setTimeout(() => {
+                              window.print();
+                            }, 500);
+                          }
+                        });
+                    } catch (error) {
+                      console.error('Mermaid syntax error:', error);
+                      element.innerHTML = \`<div style="color: red; border: 1px solid red; padding: 10px; margin: 10px 0;">Invalid diagram syntax</div>\`;
+                      renderedCount++;
+                      
+                      if (renderedCount === totalMermaid) {
+                        setTimeout(() => {
+                          window.print();
+                        }, 500);
+                      }
+                    }
+                  } else {
+                    // Empty diagram, skip
+                    renderedCount++;
+                    if (renderedCount === totalMermaid) {
+                      setTimeout(() => {
+                        window.print();
+                      }, 500);
+                    }
+                  }
+                });
+              }
+              
+              // Wait for DOM to be ready, then render Mermaid and print
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', waitForMermaidAndPrint);
+              } else {
+                waitForMermaidAndPrint();
+              }
             </script>
           </body>
         </html>
