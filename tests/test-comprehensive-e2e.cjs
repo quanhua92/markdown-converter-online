@@ -137,7 +137,7 @@ graph TD
     console.log('✅ Mobile: Page loaded successfully');
     
     // Test 2: Edit tab is active by default on mobile
-    const editTab = await mobilePage.locator('button:has-text("Edit")');
+    const editTab = await mobilePage.locator('button:has-text("Edit")').nth(1); // Get the second button (actual tab)
     const editTabActive = await editTab.getAttribute('class');
     if (editTabActive && editTabActive.includes('bg-blue')) {
       console.log('✅ Mobile: Edit tab active by default');
@@ -152,7 +152,7 @@ graph TD
     await mobilePage.screenshot({ path: 'tests/screenshots/mobile-edit-mode.png' });
     
     // Test 4: Switch to Preview tab
-    const previewTab = await mobilePage.locator('button:has-text("Preview")');
+    const previewTab = await mobilePage.locator('button:has-text("Preview")').first(); // Get the first "Preview" button (actual tab)
     await previewTab.click();
     await mobilePage.waitForTimeout(2000);
     
