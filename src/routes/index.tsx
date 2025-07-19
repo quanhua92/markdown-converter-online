@@ -1722,64 +1722,71 @@ Markdown strikes the perfect balance between simplicity and functionality. Wheth
       {/* Editor and Preview */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="shadow-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-3xl transition-all duration-300">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="flex items-center gap-2">
-                <Edit3 className="w-5 h-5" />
-                Markdown Editor
-                {draftSaveStatus === 'saving' && (
-                  <span className="text-xs text-gray-500 ml-2">Saving...</span>
-                )}
-                {draftSaveStatus === 'saved' && (
-                  <span className="text-xs text-green-600 ml-2">✓ Saved</span>
-                )}
-                {draftSaveStatus === 'error' && (
-                  <span className="text-xs text-red-500 ml-2">⚠ Save failed</span>
-                )}
-              </CardTitle>
-              {!isDesktop && (
-                <div className="flex gap-1">
-                  <Button
-                    variant={activeTab === 'edit' ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setActiveTab('edit')}
-                  >
-                    <Edit3 className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant={activeTab === 'preview' ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setActiveTab('preview')}
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    Preview
-                  </Button>
-                </div>
+          <CardHeader className="pb-4">
+            {/* Clean Title Section */}
+            <CardTitle className="flex items-center gap-2 mb-4">
+              <Edit3 className="w-5 h-5" />
+              Markdown Editor
+              {draftSaveStatus === 'saving' && (
+                <span className="text-xs text-gray-500 ml-2">Saving...</span>
               )}
-            </div>
-          </CardHeader>
-          <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
-            <div className="flex gap-2 mb-4">
+              {draftSaveStatus === 'saved' && (
+                <span className="text-xs text-green-600 ml-2">✓ Saved</span>
+              )}
+              {draftSaveStatus === 'error' && (
+                <span className="text-xs text-red-500 ml-2">⚠ Save failed</span>
+              )}
+            </CardTitle>
+            
+            {/* Action Buttons Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {/* Edit Button - Always visible but disabled on desktop */}
+              <Button
+                variant={(!isDesktop && activeTab === 'edit') ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveTab('edit')}
+                className={`flex items-center justify-center gap-2 ${isDesktop ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isDesktop}
+              >
+                <Edit3 className="w-4 h-4" />
+                <span className="hidden sm:inline">Edit</span>
+              </Button>
+              
+              {/* Preview Button */}
+              <Button
+                variant={(!isDesktop && activeTab === 'preview') ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveTab('preview')}
+                className="flex items-center justify-center gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                <span className="hidden sm:inline">Preview</span>
+              </Button>
+              
+              {/* Export Button */}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExport}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />
-                Export .md
+                <span className="hidden sm:inline">Export</span>
               </Button>
+              
+              {/* Print Button */}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handlePrint}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2"
               >
                 <Printer className="w-4 h-4" />
-                Print/PDF
+                <span className="hidden sm:inline">Print</span>
               </Button>
             </div>
+          </CardHeader>
+          <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
             <Textarea
               value={markdown}
               onChange={(e) => setMarkdown(e.target.value)}
