@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, Folder, Trash2, Edit3 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { LogOut, LogIn, Plus, Folder } from 'lucide-react'
 
 export interface Workspace {
   id: string
@@ -14,25 +14,24 @@ export interface Workspace {
 
 interface WorkspaceSelectorProps {
   currentWorkspace: string
+  currentWorkspaceName: string
   workspaces?: Workspace[]
-  onWorkspaceChange: (workspaceId: string) => void
+  onWorkspaceLeave: () => void
+  onWorkspaceJoin: (workspaceId: string) => void
   onWorkspaceCreate: (name: string) => void
-  onWorkspaceDelete: (workspaceId: string) => void
-  onWorkspaceRename: (workspaceId: string, newName: string) => void
 }
 
 export function WorkspaceSelector({
   currentWorkspace,
+  currentWorkspaceName,
   workspaces = [],
-  onWorkspaceChange,
-  onWorkspaceCreate,
-  onWorkspaceDelete,
-  onWorkspaceRename
+  onWorkspaceLeave,
+  onWorkspaceJoin,
+  onWorkspaceCreate
 }: WorkspaceSelectorProps) {
+  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [newWorkspaceName, setNewWorkspaceName] = useState('')
-  const [renamingWorkspace, setRenamingWorkspace] = useState<string | null>(null)
 
   const handleCreateWorkspace = () => {
     if (newWorkspaceName.trim()) {
@@ -42,156 +41,133 @@ export function WorkspaceSelector({
     }
   }
 
-  const handleDeleteWorkspace = (workspaceId: string) => {
-    if (workspaces.length > 1) {
-      onWorkspaceDelete(workspaceId)
-    }
+  const handleJoinWorkspace = (workspaceId: string) => {
+    onWorkspaceJoin(workspaceId)
+    setIsJoinDialogOpen(false)
   }
 
-  const handleRenameWorkspace = () => {
-    if (renamingWorkspace && newWorkspaceName.trim()) {
-      onWorkspaceRename(renamingWorkspace, newWorkspaceName.trim())
-      setNewWorkspaceName('')
-      setRenamingWorkspace(null)
-      setIsRenameDialogOpen(false)
-    }
-  }
-
-  const startRename = (workspace: Workspace) => {
-    setRenamingWorkspace(workspace.id)
-    setNewWorkspaceName(workspace.name)
-    setIsRenameDialogOpen(true)
-  }
-
-  const currentWorkspaceData = workspaces.find(w => w.id === currentWorkspace)
+  const availableWorkspaces = workspaces.filter(w => w.id !== currentWorkspace)
 
   return (
-    <div className="flex items-center gap-2 mb-4">
-      <Select value={currentWorkspace} onValueChange={onWorkspaceChange}>
-        <SelectTrigger className="flex-1">
-          <SelectValue>
-            <div className="flex items-center gap-2">
-              <Folder className="w-4 h-4" />
-              <span className="truncate">{currentWorkspaceData?.name || 'Select Workspace'}</span>
+    <div className="space-y-3 mb-4">
+      {/* Current Workspace Display */}
+      <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border">
+        <div className="flex items-center gap-2">
+          <Folder className="w-4 h-4 text-blue-600" />
+          <div>
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {currentWorkspaceName}
             </div>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {workspaces.map((workspace) => (
-            <SelectItem key={workspace.id} value={workspace.id}>
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-2">
-                  <Folder className="w-4 h-4" />
-                  <span>{workspace.name}</span>
-                </div>
-                <div className="flex gap-1 ml-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      startRename(workspace)
-                    }}
-                    className="h-6 w-6 p-0"
-                    title="Rename workspace"
-                  >
-                    <Edit3 className="w-3 h-3" />
-                  </Button>
-                  {workspaces.length > 1 && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteWorkspace(workspace.id)
-                      }}
-                      className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                      title="Delete workspace"
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Current workspace
+            </div>
+          </div>
+        </div>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={onWorkspaceLeave}
+          className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+          title="Leave workspace"
+        >
+          <LogOut className="w-4 h-4 mr-1" />
+          Leave
+        </Button>
+      </div>
+
+      {/* Join/Create Actions */}
+      <div className="flex gap-2">
+        {/* Join Existing Workspace */}
+        <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline" className="flex-1">
+              <LogIn className="w-4 h-4 mr-1" />
+              Join Workspace
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Join Workspace</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {availableWorkspaces.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Select a workspace to join:
+                  </p>
+                  {availableWorkspaces.map((workspace) => (
+                    <div 
+                      key={workspace.id}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  )}
+                      <div className="flex items-center gap-2">
+                        <Folder className="w-4 h-4" />
+                        <span>{workspace.name}</span>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleJoinWorkspace(workspace.id)}
+                      >
+                        Join
+                      </Button>
+                    </div>
+                  ))}
                 </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                  No other workspaces available to join.
+                </p>
+              )}
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={() => setIsJoinDialogOpen(false)}>
+                  Cancel
+                </Button>
               </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            </div>
+          </DialogContent>
+        </Dialog>
 
-      {/* Create New Workspace Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogTrigger asChild>
-          <Button size="sm" variant="ghost" title="Create new workspace">
-            <Plus className="w-4 h-4" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New Workspace</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="workspace-name" className="text-sm font-medium">
-                Workspace Name
-              </label>
-              <Input
-                id="workspace-name"
-                value={newWorkspaceName}
-                onChange={(e) => setNewWorkspaceName(e.target.value)}
-                placeholder="Enter workspace name..."
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleCreateWorkspace()
-                  if (e.key === 'Escape') setIsCreateDialogOpen(false)
-                }}
-                autoFocus
-              />
+        {/* Create New Workspace */}
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline" className="flex-1">
+              <Plus className="w-4 h-4 mr-1" />
+              Create New
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Workspace</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="workspace-name" className="text-sm font-medium">
+                  Workspace Name
+                </label>
+                <Input
+                  id="workspace-name"
+                  value={newWorkspaceName}
+                  onChange={(e) => setNewWorkspaceName(e.target.value)}
+                  placeholder="Enter workspace name..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleCreateWorkspace()
+                    if (e.key === 'Escape') setIsCreateDialogOpen(false)
+                  }}
+                  autoFocus
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateWorkspace} disabled={!newWorkspaceName.trim()}>
+                  Create & Join
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleCreateWorkspace} disabled={!newWorkspaceName.trim()}>
-                Create
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Rename Workspace Dialog */}
-      <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Rename Workspace</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="rename-workspace-name" className="text-sm font-medium">
-                Workspace Name
-              </label>
-              <Input
-                id="rename-workspace-name"
-                value={newWorkspaceName}
-                onChange={(e) => setNewWorkspaceName(e.target.value)}
-                placeholder="Enter new workspace name..."
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleRenameWorkspace()
-                  if (e.key === 'Escape') setIsRenameDialogOpen(false)
-                }}
-                autoFocus
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setIsRenameDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleRenameWorkspace} disabled={!newWorkspaceName.trim()}>
-                Rename
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   )
 }

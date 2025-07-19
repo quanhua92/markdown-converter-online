@@ -18,10 +18,9 @@ interface ExplorerFileTreePanelsProps {
   // Workspace management props
   currentWorkspaceId?: string
   workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
-  onWorkspaceChange?: (workspaceId: string) => void
+  onWorkspaceJoin?: (workspaceId: string) => void
+  onWorkspaceLeave?: () => void
   onWorkspaceCreate?: (name: string) => void
-  onWorkspaceDelete?: (workspaceId: string) => void
-  onWorkspaceRename?: (workspaceId: string, newName: string) => void
 }
 
 export function ExplorerFileTreePanels({
@@ -38,10 +37,9 @@ export function ExplorerFileTreePanels({
   onInitializeTemplate,
   currentWorkspaceId,
   workspaces,
-  onWorkspaceChange,
-  onWorkspaceCreate,
-  onWorkspaceDelete,
-  onWorkspaceRename
+  onWorkspaceJoin,
+  onWorkspaceLeave,
+  onWorkspaceCreate
 }: ExplorerFileTreePanelsProps) {
   return (
     <Collapsible
@@ -79,10 +77,9 @@ export function ExplorerFileTreePanels({
               showTemplateOptions={files.length === 0}
               currentWorkspaceId={currentWorkspaceId}
               workspaces={workspaces}
-              onWorkspaceChange={onWorkspaceChange}
+              onWorkspaceJoin={onWorkspaceJoin}
+              onWorkspaceLeave={onWorkspaceLeave}
               onWorkspaceCreate={onWorkspaceCreate}
-              onWorkspaceDelete={onWorkspaceDelete}
-              onWorkspaceRename={onWorkspaceRename}
             />
           </div>
         </CollapsibleContent>

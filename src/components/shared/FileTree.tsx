@@ -30,10 +30,9 @@ interface FileTreeProps {
   // Workspace management props
   currentWorkspaceId?: string
   workspaces?: Array<{id: string, name: string, createdAt: string, lastModified: string}>
-  onWorkspaceChange?: (workspaceId: string) => void
+  onWorkspaceJoin?: (workspaceId: string) => void
+  onWorkspaceLeave?: () => void
   onWorkspaceCreate?: (name: string) => void
-  onWorkspaceDelete?: (workspaceId: string) => void
-  onWorkspaceRename?: (workspaceId: string, newName: string) => void
 }
 
 interface FileTreeItemProps {
@@ -255,10 +254,9 @@ export function FileTree({
   showTemplateOptions = true,
   currentWorkspaceId,
   workspaces,
-  onWorkspaceChange,
-  onWorkspaceCreate,
-  onWorkspaceDelete,
-  onWorkspaceRename
+  onWorkspaceJoin,
+  onWorkspaceLeave,
+  onWorkspaceCreate
 }: FileTreeProps) {
   const [isCreating, setIsCreating] = useState<'file' | 'folder' | null>(null)
   const [newName, setNewName] = useState('')
@@ -278,15 +276,15 @@ export function FileTree({
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
-        {/* Workspace Selector - Temporarily disabled to fix React error #185 */}
-        {false && currentWorkspaceId && workspaces && onWorkspaceChange && onWorkspaceCreate && onWorkspaceDelete && onWorkspaceRename && (
+        {/* Workspace Selector */}
+        {currentWorkspaceId && workspaces && onWorkspaceJoin && onWorkspaceLeave && onWorkspaceCreate && (
           <WorkspaceSelector
             currentWorkspace={currentWorkspaceId}
+            currentWorkspaceName={workspaces.find(w => w.id === currentWorkspaceId)?.name || 'Unknown'}
             workspaces={workspaces}
-            onWorkspaceChange={onWorkspaceChange}
+            onWorkspaceJoin={onWorkspaceJoin}
+            onWorkspaceLeave={onWorkspaceLeave}
             onWorkspaceCreate={onWorkspaceCreate}
-            onWorkspaceDelete={onWorkspaceDelete}
-            onWorkspaceRename={onWorkspaceRename}
           />
         )}
         

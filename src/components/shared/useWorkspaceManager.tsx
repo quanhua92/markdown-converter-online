@@ -87,7 +87,7 @@ export function useWorkspaceManager() {
     setWorkspaceData(updatedWorkspace)
   }, [])
 
-  const switchWorkspace = useCallback((workspaceId: string) => {
+  const joinWorkspace = useCallback((workspaceId: string) => {
     // Save current workspace before switching
     if (workspaceData) {
       saveWorkspace(workspaceData)
@@ -97,7 +97,22 @@ export function useWorkspaceManager() {
     loadWorkspace(workspaceId)
   }, [workspaceData, saveWorkspace, loadWorkspace])
 
+  const leaveWorkspace = useCallback(() => {
+    // Save current workspace
+    if (workspaceData) {
+      saveWorkspace(workspaceData)
+    }
+    
+    // Switch to default workspace
+    loadWorkspace('default')
+  }, [workspaceData, saveWorkspace, loadWorkspace])
+
   const createWorkspace = useCallback((name: string) => {
+    // Save current workspace first
+    if (workspaceData) {
+      saveWorkspace(workspaceData)
+    }
+    
     const workspaceId = `workspace_${Date.now()}`
     const newWorkspace: WorkspaceData = {
       id: workspaceId,
@@ -107,9 +122,11 @@ export function useWorkspaceManager() {
       lastModified: new Date().toISOString()
     }
     
+    // Save and immediately join the new workspace
     saveWorkspace(newWorkspace)
+    loadWorkspace(workspaceId)
     return workspaceId
-  }, [saveWorkspace])
+  }, [workspaceData, saveWorkspace, loadWorkspace])
 
   const deleteWorkspace = useCallback((workspaceId: string) => {
     if (workspaceId === 'default') {
@@ -205,7 +222,8 @@ export function useWorkspaceManager() {
     currentWorkspaceId,
     workspaceData,
     workspaces: workspaceList,
-    switchWorkspace,
+    joinWorkspace,
+    leaveWorkspace,
     createWorkspace,
     deleteWorkspace,
     renameWorkspace,

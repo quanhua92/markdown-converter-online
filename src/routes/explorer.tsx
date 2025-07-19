@@ -37,7 +37,8 @@ function Explorer() {
     // Workspace management
     currentWorkspaceId,
     workspaces,
-    switchWorkspace,
+    joinWorkspace,
+    leaveWorkspace,
     createWorkspace,
     deleteWorkspace,
     renameWorkspace,
@@ -174,10 +175,9 @@ function Explorer() {
           onInitializeTemplate={initializeFromTemplate}
           currentWorkspaceId={currentWorkspaceId}
           workspaces={workspaces}
-          onWorkspaceChange={switchWorkspace}
+          onWorkspaceJoin={joinWorkspace}
+          onWorkspaceLeave={leaveWorkspace}
           onWorkspaceCreate={createWorkspace}
-          onWorkspaceDelete={deleteWorkspace}
-          onWorkspaceRename={renameWorkspace}
         />
 
         {/* Editor/Preview Area */}
