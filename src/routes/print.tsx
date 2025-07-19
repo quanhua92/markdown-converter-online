@@ -179,6 +179,7 @@ function PrintPage() {
             scrollbar-width: thin !important;
             border: 1px solid #ddd !important;
             border-radius: 4px !important;
+            display: block !important;
           }
           .table-container::-webkit-scrollbar {
             height: 8px !important;
@@ -223,14 +224,15 @@ function PrintPage() {
           }
           table {
             page-break-inside: avoid !important;
-            min-width: 100% !important;
-            white-space: nowrap !important;
+            width: auto !important;
+            min-width: max-content !important;
             background: white !important;
           }
           th, td {
-            white-space: nowrap !important;
             padding: 8px 12px !important;
             border: 1px solid #ddd !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
           }
           th {
             background: #f5f5f5 !important;
@@ -298,7 +300,7 @@ function PrintPage() {
         </div>
 
         {/* Content */}
-        <div className="print-content prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1">
+        <div className="print-content prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h1:border-b prose-h2:border-b prose-h1:border-gray-300 dark:prose-h1:border-gray-600 prose-h2:border-gray-200 dark:prose-h2:border-gray-700 prose-h1:pb-2 prose-h2:pb-1 overflow-x-auto w-full">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, [remarkMath, { singleDollarTextMath: false }]]}
             rehypePlugins={[rehypeSlug, rehypeHighlight, [rehypeKatex, { strict: false }], rehypeRaw]}
