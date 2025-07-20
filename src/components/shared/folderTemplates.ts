@@ -99,6 +99,125 @@ Description of the endpoint.
         ]
       },
       {
+        name: 'ultimate-showcase.md',
+        type: 'file',
+        path: '/ultimate-showcase.md',
+        content: `# 🎯 Ultimate Markdown & Mermaid Showcase
+*Complete demonstration of all markdown features and diagram types*
+
+## 📋 Table of Contents
+1. [Text Formatting](#text-formatting)
+2. [Code Examples](#code-examples)
+3. [Project Diagrams](#project-diagrams)
+4. [Best Practices](#best-practices)
+
+## ✍️ Text Formatting
+
+### Basic Emphasis
+- **Bold text** for important information
+- *Italic text* for emphasis
+- ***Bold and italic*** for strong emphasis
+- ~~Strikethrough~~ for deleted content
+- \`Inline code\` for technical terms
+
+### Task Lists
+- [x] ✅ Project setup completed
+- [x] ✅ Architecture designed
+- [ ] ⏳ Frontend development in progress
+- [ ] ⏳ Backend API development
+- [ ] ⏳ Testing and deployment
+
+## 💻 Code Examples
+
+### JavaScript/TypeScript
+\`\`\`typescript
+interface ProjectData {
+  id: string;
+  name: string;
+  status: 'planning' | 'development' | 'testing' | 'completed';
+  progress: number;
+}
+
+const ProjectDashboard: React.FC = () => {
+  const [projects, setProjects] = useState<ProjectData[]>([]);
+  
+  return (
+    <div className="project-dashboard">
+      <h1>Project Dashboard</h1>
+      {projects.map(project => (
+        <div key={project.id}>
+          <h3>{project.name}</h3>
+          <span>Status: {project.status}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+\`\`\`
+
+## 📊 Project Diagrams
+
+### Project Workflow
+\`\`\`mermaid
+flowchart TD
+    A[Project Start] --> B[Requirements]
+    B --> C[Development]
+    C --> D[Testing]
+    D --> E[Deployment]
+    
+    style A fill:#e1f5fe
+    style E fill:#e8f5e8
+\`\`\`
+
+### Team Collaboration
+\`\`\`mermaid
+sequenceDiagram
+    participant PM as Project Manager
+    participant DEV as Developer
+    participant QA as QA Engineer
+    
+    PM->>DEV: Assign task
+    DEV->>PM: Complete task
+    PM->>QA: Submit for testing
+    QA->>PM: Approve
+\`\`\`
+
+## 📋 Advanced Tables
+
+| Project | Status | Progress | Due Date |
+|---------|:------:|:--------:|----------|
+| **User Portal** | 🔄 Active | 75% | 2024-03-15 |
+| **Mobile App** | 🔄 Active | 45% | 2024-04-01 |
+| **API Gateway** | ✅ Complete | 100% | ✅ Done |
+
+## 🎯 Best Practices
+
+### Code Quality
+> **💡 Pro Tip:** Consistency is key to maintainable code!
+
+1. Use descriptive variable names
+2. Write clear documentation
+3. Include comprehensive tests
+
+### Project Management
+- Define clear requirements upfront
+- Break down large tasks
+- Regular stakeholder communication
+
+### Deployment Checklist
+- [ ] Code review completed
+- [ ] All tests passing
+- [ ] Security scan passed
+- [ ] Documentation updated
+
+## 🚀 Conclusion
+
+This showcase demonstrates the power of markdown with Mermaid diagrams for documentation.
+
+*Happy documenting! 📝*
+\`
+      },
+      {
         name: 'notes',
         type: 'folder',
         path: '/notes',
@@ -174,6 +293,79 @@ Welcome to your personal knowledge base!
 ---
 *This knowledge base uses markdown linking for easy navigation.*
 `
+      },
+      {
+        name: 'ultimate-learning-showcase.md',
+        type: 'file',
+        path: '/ultimate-learning-showcase.md',
+        content: \`# 🎓 Ultimate Learning & Knowledge Showcase
+
+## 📚 Learning Journey
+
+\\\`\\\`\\\`mermaid
+journey
+    title My Learning Journey 2024
+    section Q1 Foundations
+      Learn Markdown: 5: Me
+      Master Git: 4: Me
+      React Basics: 5: Me
+    section Q2 Development
+      Advanced React: 4: Me
+      Node.js Backend: 5: Me
+      Database Design: 3: Me
+    section Q3 Specialization
+      System Design: 3: Me
+      Performance: 4: Me
+      Security: 5: Me
+    section Q4 Mastery
+      Architecture: 4: Me
+      Leadership: 3: Me
+      Mentoring: 5: Me
+\\\`\\\`\\\`
+
+## 💻 Code Learning Examples
+
+### TypeScript Patterns
+\\\`\\\`\\\`typescript
+interface Repository<T> {
+  findById(id: string): Promise<T | null>;
+  create(data: Omit<T, 'id'>): Promise<T>;
+  update(id: string, data: Partial<T>): Promise<T>;
+}
+
+class UserRepository implements Repository<User> {
+  async findById(id: string): Promise<User | null> {
+    // Implementation here
+    return null;
+  }
+}
+\\\`\\\`\\\`
+
+## 📊 Learning Progress
+
+### Skill Development
+\\\`\\\`\\\`mermaid
+gitGraph
+    commit id: "Start Learning"
+    branch frontend
+    commit id: "HTML/CSS"
+    commit id: "JavaScript"
+    commit id: "React"
+    checkout main
+    merge frontend
+    commit id: "Full Stack"
+\\\`\\\`\\\`
+
+## 📈 Learning Goals
+
+| Technology | Progress | Status |
+|------------|:--------:|--------|
+| React | 85% | 🎯 Active |
+| TypeScript | 70% | 🎯 Active |
+| Node.js | 95% | ✅ Complete |
+
+*Keep learning, keep growing! 🌱*
+\`
       },
       {
         name: 'learning',
@@ -324,6 +516,77 @@ Description of your work or interests.
 - Email: your@email.com
 - Website: yourwebsite.com
 - Social: @yourusername
+`
+      },
+      {
+        name: 'ultimate-content-showcase.md',
+        type: 'file',
+        path: '/ultimate-content-showcase.md',
+        content: `# 📝 Ultimate Content Creation Showcase
+
+## 📈 Content Strategy Flow
+
+\`\`\`mermaid
+flowchart TD
+    A[Content Idea] --> B[Research]
+    B --> C[Outline] 
+    C --> D[Write]
+    D --> E[Edit]
+    E --> F[Publish]
+    F --> G[Promote]
+    
+    style A fill:#e1f5fe
+    style F fill:#e8f5e8
+\`\`\`
+
+## ✍️ Content Types
+
+### Blog Performance
+\`\`\`mermaid
+pie title Content Performance
+    "Blog Posts" : 45
+    "Videos" : 25  
+    "Social" : 20
+    "Podcasts" : 10
+\`\`\`
+
+### Editorial Calendar
+\`\`\`mermaid
+gantt
+    title Content Schedule
+    dateFormat YYYY-MM-DD
+    section Planning
+    Research    :2024-01-01, 3d
+    Outline     :2024-01-03, 2d
+    section Creation  
+    Writing     :2024-01-05, 3d
+    Editing     :2024-01-07, 2d
+    section Publishing
+    Publish     :2024-01-09, 1d
+    Promote     :2024-01-10, 3d
+\`\`\`
+
+## 📊 Performance Metrics
+
+| Metric | Target | Current | Status |
+|--------|--------|---------|--------|
+| Views | 10K | 8.5K | 🔄 Growing |
+| Engagement | 5% | 4.2% | 🔄 Improving |
+| Shares | 500 | 750 | ✅ Exceeded |
+
+## 🚀 Best Practices
+
+### Content Checklist
+- [ ] Research audience needs
+- [ ] Create compelling headlines  
+- [ ] Write engaging introductions
+- [ ] Include clear examples
+- [ ] Add visual elements
+- [ ] Optimize for SEO
+- [ ] Proofread content
+- [ ] Plan promotion strategy
+
+*Create engaging content that resonates with your audience! 📝*
 `
       },
       {
