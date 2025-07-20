@@ -131,7 +131,7 @@ export function ExplorerHeader({
                     onCreateFolder={onCreateFolder}
                     onDeleteItem={handleDeleteItem}
                     onRenameItem={handleRenameItem}
-                    onToggleFolder={handleToggleFolder}
+                    onToggleFolder={onToggleFolder}
                     onInitializeTemplate={onInitializeTemplate}
                     showTemplateOptions={files.length === 0}
                     {...memoizedWorkspaceProps}
