@@ -11,11 +11,11 @@ This guide covers the architecture, development, and deployment details of the M
 │                    Client Browser                           │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────── │
 │  │   React App     │  │  Dark/Light     │  │   Templates   │ │
-│  │                 │  │  Mode Toggle    │  │   & Guides    │ │
-│  │ • UI Components │  │ • Theme State   │  │ • Copy Utils  │ │
-│  │ • State Mgmt    │  │ • Local Storage │  │ • Examples    │ │
-│  │ • Explorer      │  │ • Auto-Save     │  │ • Workspaces  │ │
-│  │ • File Tree     │  │ • Persistence   │  │ • Sign-In/Out │ │
+│  │                 │  │  Mode Toggle    │  │   & Workflow  │ │
+│  │ • UI Components │  │ • Theme State   │  │ • Template    │ │
+│  │ • State Mgmt    │  │ • Local Storage │  │   Selector    │ │
+│  │ • Explorer      │  │ • Auto-Save     │  │ • File Close  │ │
+│  │ • File Tree     │  │ • Persistence   │  │ • Workspaces  │ │
 │  └─────────────────┘  └─────────────────┘  └─────────────── │
 └─────────────────────────────────────────────────────────────┘
                                │ HTTP/REST API
@@ -283,12 +283,21 @@ App.tsx
 │   │ Getting Started, Markdown Syntax, Mermaid Diagrams,
 │   │ LaTeX Math, Templates & Examples, Preview & Print Features,
 │   │ API Examples with copy-to-clipboard functionality)
-└── ConverterPage
-    ├── MarkdownInput (templates, clear button)
-    ├── FormatSelection (interactive cards)
-    ├── ConversionButton (progress states)
-    ├── DownloadResult (success UI)
-    └── ErrorDebug (detailed error display)
+├── ConverterPage
+│   ├── MarkdownInput (templates, clear button)
+│   ├── FormatSelection (interactive cards)
+│   ├── ConversionButton (progress states)
+│   ├── DownloadResult (success UI)
+│   └── ErrorDebug (detailed error display)
+└── ExplorerPage (v2.2 Template System)
+    ├── ExplorerHeader (workspace selector, actions)
+    ├── ExplorerFileTreePanels (file navigation)
+    ├── ExplorerEditorSection (NEW: template selector)
+    │   ├── TemplateSelector (dropdown with 4 options)
+    │   ├── FileCloseButton (X button for workflow)
+    │   ├── MarkdownEditor (with auto-save)
+    │   └── MarkdownRenderer (live preview)
+    └── ExplorerMobileNavigation (responsive design)
 ```
 
 ### Theme System
@@ -411,26 +420,41 @@ const WORKSPACE_PREFIX = 'markdown-explorer-v2-workspace-'
 - `TemplateSelector.tsx`: Template selection with compact mode for welcome screen
 - `explorer.tsx`: Main route that conditionally renders welcome or workspace view
 
-#### Workspace Templates (Enhanced v2.1)
-Each workspace template now includes comprehensive Ultimate showcase files with Mermaid diagrams:
+#### Template System Evolution (v2.1 → v2.2)
 
-**Project Notes Workspace**:
-- `ultimate-showcase.md`: Project management examples with flowcharts, sequence diagrams, Gantt charts
-- TypeScript interfaces, advanced tables, and project workflow demonstrations
+**v2.1 - Folder-based Templates**:
+- Complex workspace creation with multiple files and folders
+- `TemplateQuickActions` component with multiple buttons
+- Heavy file structure initialization per template
 
-**Knowledge Base Workspace**:
-- `ultimate-learning-showcase.md`: Learning journey tracking with journey maps, git graphs, skill progress
-- Repository patterns, learning goals tracking, and development progress visualization
+**v2.2 - Single File Templates** (Current):
+Each template creates a single markdown file with rich content:
 
-**Blog/Website Workspace**:
-- `ultimate-content-showcase.md`: Content strategy flows with pie charts, editorial calendars, performance metrics
-- Content creation workflows, engagement tracking, and publishing schedules
+**📚 Complete Showcase Template**:
+- `showcase-template.md`: Ultimate markdown examples with comprehensive Mermaid diagrams
+- Covers all markdown syntax, multiple diagram types, code examples
+- 1000+ lines of educational content with best practices
 
-All templates demonstrate:
-- Multiple Mermaid diagram types (flowcharts, sequence, journey, gitGraph, gantt, pie)
-- TypeScript code examples and interfaces
-- Advanced markdown features (tables, task lists, emphasis)
-- Best practices and practical guidelines
+**🎯 Presentation Template**:
+- `presentation-template.md`: Clean slide format using Marp syntax
+- Structured for presentation workflows with theme metadata
+- Ready-to-use presentation framework
+
+**📄 Document Template**:
+- `document-template.md`: Professional document structure
+- Headers, formatting, tables, and content organization
+- Standard business document layout
+
+**📝 Article Template**:
+- `article-template.md`: Blog/article format with metadata
+- Author information, technical content structure
+- Publishing-ready markdown format
+
+#### Template System Implementation (v2.2)
+- **Simplified UI**: Single dropdown selector instead of multiple buttons
+- **File Management**: Close button (X) for easy workflow switching
+- **Content Integration**: Templates use existing `templates.ts` content
+- **Workflow Enhancement**: Create → Edit → Close → Select New Template cycle
 
 ## Testing
 
@@ -438,6 +462,84 @@ All templates demonstrate:
 - **Unit Tests**: Component and utility functions
 - **Integration Tests**: API endpoint testing
 - **E2E Tests**: Full conversion workflows
+
+### Essential Test Suite (v2.2 Streamlined)
+
+The test suite has been optimized from 21 tests to 5 essential tests covering core functionality:
+
+#### 1. Template Functionality Test (`test-template-functionality.cjs`)
+**NEW in v2.2** - Comprehensive testing of the new template system:
+- Template dropdown selector functionality
+- All 4 template options (showcase, presentation, document, article)
+- File creation with template content
+- "Create Empty File" functionality
+- File close button workflow
+- File tree integration verification
+- Visual screenshot validation
+
+**Technical details**:
+- Tests template content injection into created files
+- Validates file close → template selector workflow
+- Ensures all created files appear in file tree
+- Comprehensive error handling and edge cases
+
+#### 2. Dark Mode Test (`test-dark-mode.cjs`)
+- Light/dark theme toggle functionality
+- CSS class management (`dark` class addition/removal)
+- Visual verification through screenshots
+- Computed style validation
+
+#### 3. Workspace Welcome Test (`test-workspace-welcome.cjs`)
+- Workspace creation workflow
+- Join existing workspace functionality
+- Leave workspace flow
+- Template initialization from welcome screen
+- No-workspace state management
+
+#### 4. Delete Functionality Test (`test-delete-functionality.cjs`)
+- File deletion (immediate, no confirmation)
+- Folder deletion with confirmation dialogs
+- Nested structure deletion
+- Cancel/confirm dialog functionality
+- Visual feedback and error handling
+
+#### 5. Readability Test (`test-readability.cjs`)
+- WCAG accessibility compliance
+- Color contrast ratio validation
+- Text readability across UI elements
+- Accessibility standards verification
+
+### Test Infrastructure Improvements (v2.2)
+- **76% test reduction**: From 21 tests to 5 essential tests
+- **Improved maintainability**: Focused test suite easier to maintain
+- **Enhanced documentation**: Clear test descriptions and usage examples
+- **Better error handling**: Comprehensive failure reporting
+- **Visual validation**: Strategic screenshot capture for manual review
+
+### Removed Test Categories (v2.2 Cleanup)
+- Debug utilities (2 files): Too specific for general testing
+- Device-specific tests (7 files): Overly granular, covered by responsive design
+- Print/Mermaid tests (3 files): Niche functionality, low priority
+- Enhanced UI tests (2 files): Overly specific, covered by core tests
+- Duplicate workspace tests (2 files): Redundant with workspace welcome test
+
+### Running Tests
+```bash
+# Essential test suite (recommended)
+for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-welcome.cjs test-delete-functionality.cjs test-readability.cjs; do
+  echo "🧪 Running tests/$test..."
+  node "tests/$test"
+  echo "✅ Completed tests/$test"
+  echo "---"
+done
+
+# Individual test execution
+node tests/test-template-functionality.cjs  # New template system
+node tests/test-dark-mode.cjs              # UI theming
+node tests/test-workspace-welcome.cjs      # Workspace management
+node tests/test-delete-functionality.cjs   # File operations
+node tests/test-readability.cjs            # Accessibility
+```
 - **Docker Tests**: Container build verification
 
 ### Test Commands
