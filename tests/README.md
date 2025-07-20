@@ -1,10 +1,10 @@
 # Tests
 
-This directory contains automated tests for the markdown converter application.
+This directory contains essential automated tests for the markdown converter application.
 
 ## Playwright Tests
 
-We use Playwright for end-to-end testing to verify UI functionality and visual behavior.
+We use Playwright for end-to-end testing to verify core functionality and user workflows.
 
 ### Prerequisites
 
@@ -18,20 +18,24 @@ We use Playwright for end-to-end testing to verify UI functionality and visual b
    pnpm add -D playwright
    ```
 
-### Test Overview
+## Essential Test Suite
 
-Our test suite includes **21 total tests** organized for different purposes:
-- **12 Core Tests** - Essential functionality for CI/regression testing
-- **7 Device-Specific Tests** - Cross-device verification and touch interaction testing  
-- **2 Debug Utilities** - Diagnostic tools for troubleshooting
+Our streamlined test suite includes **5 core tests** that cover the most critical functionality:
 
-All tests are end-to-end Playwright tests that verify real user workflows.
+### 1. Template Functionality Test (`test-template-functionality.cjs`)
+**NEW** - Tests the core template selection and file creation workflow.
 
-### Available Tests
+**What it tests:**
+- Template selector dropdown functionality
+- All 4 template options (showcase, presentation, document, article)
+- File creation with template content
+- "Create Empty File" functionality
+- File close button and workflow
+- File tree integration
 
-#### Core UI Tests
+**Run:** `node tests/test-template-functionality.cjs`
 
-##### Dark Mode Test (`test-dark-mode.cjs`)
+### 2. Dark Mode Test (`test-dark-mode.cjs`)
 Tests the light/dark mode toggle functionality and visual changes.
 
 **What it tests:**
@@ -42,17 +46,32 @@ Tests the light/dark mode toggle functionality and visual changes.
 
 **Run:** `node tests/test-dark-mode.cjs`
 
-##### Heading Styles Test (`test-heading-styles.cjs`)
-Tests markdown heading rendering consistency between preview and print modes.
+### 3. Workspace Welcome Test (`test-workspace-welcome.cjs`)
+Tests the workspace welcome flow and workspace state management.
 
 **What it tests:**
-- Heading font sizes, weights, and borders
-- Consistency between preview and print modes
-- Proper typography styling
+- Workspace welcome screen display (no-workspace state)
+- Create new workspace workflow with custom naming
+- Join existing workspace functionality
+- Leave workspace to return to welcome screen
+- Template initialization from welcome screen
 
-**Run:** `node tests/test-heading-styles.cjs`
+**Run:** `node tests/test-workspace-welcome.cjs`
 
-##### Readability Test (`test-readability.cjs`)
+### 4. Delete Functionality Test (`test-delete-functionality.cjs`)
+Tests file and folder deletion with confirmation dialogs.
+
+**What it tests:**
+- File deletion (immediate, no confirmation)
+- Folder deletion with confirmation dialog
+- Warning about deleting all folder contents
+- Cancel and confirm functionality in delete dialog
+- Nested file and folder deletion
+- Error handling and visual feedback
+
+**Run:** `node tests/test-delete-functionality.cjs`
+
+### 5. Readability Test (`test-readability.cjs`)
 Tests text readability and accessibility compliance (WCAG).
 
 **What it tests:**
@@ -63,161 +82,9 @@ Tests text readability and accessibility compliance (WCAG).
 
 **Run:** `node tests/test-readability.cjs`
 
-#### Explorer & Workspace Tests
+## Running Tests
 
-##### Explorer E2E Test (`test-e2e-explorer.cjs`)
-Comprehensive test for the Markdown Explorer functionality.
-
-**What it tests:**
-- Template initialization (Project Notes, Knowledge Base, Blog/Website)
-- File tree navigation and toggle functionality
-- Multi-file editing workflow with auto-save
-- Mobile responsive design with edit/preview tabs
-- Data persistence across browser sessions
-- Dark/light mode in Explorer interface
-
-**Run:** `node tests/test-e2e-explorer.cjs`
-
-##### Workspace Welcome Test (`test-workspace-welcome.cjs`)
-Tests the new workspace welcome flow and no-workspace state management.
-
-**What it tests:**
-- Workspace welcome screen display (no-workspace state)
-- Create new workspace workflow with custom naming
-- Join existing workspace functionality
-- Leave workspace to return to welcome screen
-- Template initialization from welcome screen
-- Import from ZIP placeholder functionality
-
-**Run:** `node tests/test-workspace-welcome.cjs`
-
-##### Workspace Functionality Test (`test-workspace-functionality.cjs`)
-Tests workspace management and session isolation.
-
-**What it tests:**
-- Workspace creation and automatic joining
-- Multi-workspace isolation and data persistence
-- Session management and localStorage structure
-- UI state changes between workspace sessions
-
-**Run:** `node tests/test-workspace-functionality.cjs`
-
-##### Workspace Sign-In/Out Test (`test-workspace-sign-in-out.cjs`)
-Tests complete workspace session management workflow.
-
-**What it tests:**
-- Workspace creation with "Create & Join" flow
-- Workspace leaving with "Leave" button
-- Workspace joining with "Join Workspace" dialog
-- Data persistence and isolation between sessions
-- localStorage structure and multi-workspace support
-
-**Run:** `node tests/test-workspace-sign-in-out.cjs`
-
-##### Enhanced Folder Toggle Test (`test-enhanced-folder-toggle.cjs`)
-Tests folder expand/collapse functionality in the file tree.
-
-**What it tests:**
-- Folder toggle button detection and interaction
-- Expand/collapse state changes and visual indicators
-- Children visibility when folders are expanded/collapsed
-- Proper hiding/showing of folder children
-- Consistent visual state indicators (arrows)
-- Correct aria-expanded attribute handling
-- JavaScript error detection during folder operations
-
-**Run:** `node tests/test-enhanced-folder-toggle.cjs`
-
-##### Delete Functionality Test (`test-delete-functionality.cjs`)
-Tests file and folder deletion with confirmation dialogs.
-
-**What it tests:**
-- File deletion (immediate, no confirmation)
-- Folder deletion with confirmation dialog
-- Warning about deleting all folder contents
-- Cancel and confirm functionality in delete dialog
-- Nested file and folder deletion
-- Deep folder structure deletion (3+ levels)
-- Error handling and visual feedback
-
-**Run:** `node tests/test-delete-functionality.cjs`
-
-#### Print & Features Tests
-
-##### Print Workflow Test (`test-print-workflow.cjs`)
-Tests the print functionality workflow.
-
-**What it tests:**
-- Print page generation and rendering
-- Content consistency between preview and print
-- Print URL generation and accessibility
-
-**Run:** `node tests/test-print-workflow.cjs`
-
-##### Print Mermaid Test (`test-print-mermaid.cjs`)
-Tests Mermaid diagram rendering in print mode.
-
-**What it tests:**
-- Mermaid diagrams render correctly in print view
-- Chart types supported in print mode
-- Visual consistency between preview and print
-
-**Run:** `node tests/test-print-mermaid.cjs`
-
-##### Mermaid Multiple Test (`test-mermaid-multiple.cjs`)
-Tests multiple Mermaid diagrams on the same page.
-
-**What it tests:**
-- Multiple diagram rendering
-- Different chart types in one document
-- Performance with multiple diagrams
-
-**Run:** `node tests/test-mermaid-multiple.cjs`
-
-#### Device-Specific Tests
-
-The `device-specific/` directory contains tests that verify functionality across different viewport sizes and device types:
-
-- `test-desktop-verification.cjs` - Desktop viewport 3-dots menu testing
-- `test-mobile-verification.cjs` - Mobile viewport iPhone testing  
-- `test-tablet-verification.cjs` - Tablet viewport iPad testing
-- `test-mobile-file-tree-access.cjs` - Mobile file tree interaction
-- `test-mobile-nested-collapse.cjs` - Mobile nested folder testing
-- `test-mobile-touch-targets.cjs` - Mobile touch target verification
-- `test-final-validation.cjs` - Complex nested folder validation
-
-**Run device-specific tests:**
-```bash
-node tests/device-specific/test-desktop-verification.cjs
-node tests/device-specific/test-mobile-verification.cjs
-# ... etc
-```
-
-#### Debug Utilities
-
-##### Workspace Debug (`debug-workspace.cjs`)
-Debugging tool for workspace system analysis.
-
-**What it does:**
-- Analyzes localStorage workspace data structure
-- Detects UI element rendering issues
-- Monitors console errors
-- Provides diagnostic information
-
-**Run:** `node tests/debug-workspace.cjs`
-
-##### Anchors Debug (`debug-anchors.cjs`)
-Debugging tool for anchor link functionality.
-
-**What it does:**
-- Tests anchor link generation and navigation
-- Verifies table of contents links
-- Debugs heading ID generation
-
-**Run:** `node tests/debug-anchors.cjs`
-
-### Running Tests
-
+### Quick Start
 1. **Start the application:**
    ```bash
    ./build-fresh.sh
@@ -227,71 +94,57 @@ Debugging tool for anchor link functionality.
 
 3. **Run individual tests:**
    ```bash
-   # Core UI Tests
+   # Template functionality (new feature)
+   node tests/test-template-functionality.cjs
+   
+   # Core UI and accessibility
    node tests/test-dark-mode.cjs
-   node tests/test-heading-styles.cjs
    node tests/test-readability.cjs
    
-   # Workspace & Explorer Tests  
+   # Workspace management
    node tests/test-workspace-welcome.cjs
-   node tests/test-workspace-functionality.cjs
-   node tests/test-workspace-sign-in-out.cjs
-   node tests/test-enhanced-folder-toggle.cjs
+   
+   # File operations
    node tests/test-delete-functionality.cjs
-   node tests/test-e2e-explorer.cjs
-   
-   # Print & Features Tests
-   node tests/test-print-workflow.cjs
-   node tests/test-print-mermaid.cjs
-   node tests/test-mermaid-multiple.cjs
-   
-   # Device-Specific Tests (optional)
-   node tests/device-specific/test-desktop-verification.cjs
-   node tests/device-specific/test-mobile-verification.cjs
-   
-   # Debug Utilities
-   node tests/debug-workspace.cjs
-   node tests/debug-anchors.cjs
    ```
 
-4. **Run core test suite:**
-   ```bash
-   # Run essential tests (recommended for CI/regression testing)
-   for test in test-dark-mode.cjs test-heading-styles.cjs test-readability.cjs test-workspace-welcome.cjs test-enhanced-folder-toggle.cjs test-delete-functionality.cjs test-e2e-explorer.cjs; do
-     echo "Running tests/$test..."
-     node "tests/$test"
-     echo "---"
-   done
-   ```
+### Run All Essential Tests
+```bash
+# Run complete essential test suite
+for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-welcome.cjs test-delete-functionality.cjs test-readability.cjs; do
+  echo "🧪 Running tests/$test..."
+  node "tests/$test"
+  echo "✅ Completed tests/$test"
+  echo "---"
+done
+```
 
-5. **Run all core tests:**
-   ```bash
-   # Run all core tests sequentially (excludes device-specific and debug utilities)
-   for test in tests/test-*.cjs; do
-     echo "Running $test..."
-     node "$test"
-     echo "---"
-   done
-   ```
+### Run All Tests (Alternative)
+```bash
+# Run all tests in the tests directory
+for test in tests/test-*.cjs; do
+  echo "🧪 Running $test..."
+  node "$test"
+  echo "✅ Completed $test"
+  echo "---"
+done
+```
 
-6. **Run device-specific tests:**
-   ```bash
-   # Run device-specific verification tests
-   for test in tests/device-specific/test-*.cjs; do
-     echo "Running $test..."
-     node "$test"
-     echo "---"
-   done
-   ```
-
-### Test Output
+## Test Output
 
 Tests generate:
 - **Screenshots** in the `tests/screenshots/` directory for visual verification
-- **Console logs** with detailed test results
+- **Console logs** with detailed test results and emojis for easy scanning
 - **Success/failure indicators** for each test case
 
-### Troubleshooting
+Key screenshots to review:
+- `template-functionality-final.png` - Shows all created template files
+- `delete-test-*.png` - Shows deletion workflow states
+- Dark mode screenshots for visual verification
+
+## Troubleshooting
+
+### Common Issues
 
 **Container not running:**
 - Ensure Docker is running
@@ -303,37 +156,76 @@ Tests generate:
 - Verify Docker container logs: `docker logs <container-name>`
 - Ensure no other process is using port 3000
 
-**Screenshot comparison:**
-- Compare generated screenshots manually to verify visual changes
-- Dark mode should show dramatically different backgrounds
-- Heading styles should be consistent and properly formatted
-
-**Folder toggle issues:**
-- If folders appear collapsed but children are still visible, run `node tests/test-enhanced-folder-toggle.cjs`
-- This was a known bug fixed in v2.1 - ensure you're running the latest version
-- Folder toggle functionality should work correctly after the fix
+**Template functionality issues:**
+- Verify all template options appear in the dropdown
+- Check that files are created with correct template content
+- Ensure close button (X) appears in file headers
 
 **Delete functionality issues:**
-- If files/folders don't delete properly, run `node tests/test-delete-functionality.cjs`
 - Files should delete immediately without confirmation
 - Folders should show a confirmation dialog before deletion
 - Check browser console for JavaScript errors during deletion
 
-### Adding New Tests
+**Accessibility issues:**
+- Review contrast ratios in the readability test output
+- Ensure WCAG compliance for all text elements
+- Check for proper color contrast in both light and dark modes
+
+### Performance Tips
+
+- Tests run sequentially to avoid conflicts
+- Each test clears localStorage to ensure clean state
+- Screenshots are only taken when necessary to save time
+- Tests use realistic delays to account for React state updates
+
+## Adding New Tests
+
+When adding new functionality, create corresponding tests:
 
 1. Create a new `.cjs` file in the `tests/` directory
 2. Follow the existing test structure:
    ```javascript
    const { chromium } = require('playwright');
-   
+
    (async () => {
-     const browser = await chromium.launch();
+     const browser = await chromium.launch({
+       headless: false,  // Set to true for CI
+       slowMo: 500       // Remove for faster execution
+     });
      const page = await browser.newPage();
      
-     // Your test logic here
-     
-     await browser.close();
+     try {
+       // Clear storage for clean state
+       await page.goto('http://localhost:3000/explorer');
+       await page.evaluate(() => localStorage.clear());
+       await page.reload();
+       
+       // Your test logic here
+       console.log('✅ Test passed');
+       
+     } catch (error) {
+       console.error('❌ Test failed:', error);
+       await page.screenshot({ path: 'tests/screenshots/error.png' });
+     } finally {
+       await browser.close();
+     }
    })();
    ```
 3. Document the test in this README
 4. Test with the Docker environment
+5. Add to the essential test suite if it covers core functionality
+
+## Test Philosophy
+
+Our test suite focuses on:
+- **User workflows** rather than implementation details
+- **Critical functionality** that affects all users
+- **Visual verification** through screenshots
+- **Accessibility compliance** for inclusive design
+- **Clean state management** to ensure reliable results
+
+We prioritize tests that:
+- Verify core features work end-to-end
+- Catch regressions in essential functionality
+- Validate accessibility and visual design
+- Are maintainable and reliable across environments
