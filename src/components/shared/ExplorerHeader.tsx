@@ -73,18 +73,10 @@ export function ExplorerHeader({
     setIsMobileSheetOpen(false)
   }, [onFileSelect, setIsMobileSheetOpen])
 
-  // Create stable wrapper functions that match FileTree's expected interface
-  const handleDeleteItem = useCallback((item: FileSystemItem) => {
-    onDeleteItem(item.path)
-  }, [onDeleteItem])
-
-  const handleRenameItem = useCallback((item: FileSystemItem, newName: string) => {
-    onRenameItem(item.path, newName)
-  }, [onRenameItem])
-
-  const handleToggleFolder = useCallback((item: FileSystemItem) => {
-    onToggleFolder(item.path)
-  }, [onToggleFolder])
+  // FileTree handlers - use original functions directly as they already match the expected signatures
+  // onDeleteItem: (path: string) => void
+  // onRenameItem: (path: string, newName: string) => void  
+  // onToggleFolder: (path: string) => void
 
   // Memoize workspace props to prevent unnecessary re-renders
   const memoizedWorkspaceProps = useMemo(() => {
@@ -129,8 +121,8 @@ export function ExplorerHeader({
                     onFileSelect={handleFileSelect}
                     onCreateFile={onCreateFile}
                     onCreateFolder={onCreateFolder}
-                    onDeleteItem={handleDeleteItem}
-                    onRenameItem={handleRenameItem}
+                    onDeleteItem={onDeleteItem}
+                    onRenameItem={onRenameItem}
                     onToggleFolder={onToggleFolder}
                     onInitializeTemplate={onInitializeTemplate}
                     showTemplateOptions={files.length === 0}
