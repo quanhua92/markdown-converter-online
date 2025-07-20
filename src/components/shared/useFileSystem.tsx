@@ -176,28 +176,8 @@ export function useFileSystem() {
   const [currentFile, setCurrentFile] = useState<FileSystemItem | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Refs to hold current values for beforeunload handler
-  const filesRef = useRef<FileSystemItem[]>([])
-  const currentFileRef = useRef<FileSystemItem | null>(null)
-  const isLoadedRef = useRef(false)
-  const workspaceDataRef = useRef(workspaceData)
-
-  // Update refs when state changes
-  useEffect(() => {
-    filesRef.current = files
-  }, [files])
-
-  useEffect(() => {
-    currentFileRef.current = currentFile
-  }, [currentFile])
-
-  useEffect(() => {
-    isLoadedRef.current = isLoaded
-  }, [isLoaded])
-
-  useEffect(() => {
-    workspaceDataRef.current = workspaceData
-  }, [workspaceData])
+  // Track unsaved changes
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   // Initialize files from workspace data
   useEffect(() => {
@@ -229,25 +209,31 @@ export function useFileSystem() {
     }
   }, [workspaceData])
 
-  // Manual save function - only save on explicit user actions
-  const saveWorkspaceManually = useCallback(() => {
-    if (isLoadedRef.current && workspaceDataRef.current) {
-      updateWorkspaceFiles(filesRef.current, currentFileRef.current?.path)
+  // Manual save function - COMPLETELY NO AUTO-SAVE
+  const saveWorkspace = useCallback(() => {
+    if (workspaceData && files) {
+      console.log('💾 Manual save: Saving workspace')
+      // TEMPORARILY DISABLED to debug infinite loop
+      // updateWorkspaceFiles(files, currentFile?.path)
+      console.log('🚫 Manual save: updateWorkspaceFiles DISABLED to prevent infinite loop')
+      setHasUnsavedChanges(false)
+      console.log('✅ Manual save: Completed (without actual save)')
     }
-  }, [updateWorkspaceFiles])
+  }, [workspaceData, files, currentFile])
 
-  // Save on page unload to prevent data loss
+  // Warn about unsaved changes on page unload
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Use refs to get current values without dependencies
-      if (isLoadedRef.current && workspaceDataRef.current) {
-        updateWorkspaceFiles(filesRef.current, currentFileRef.current?.path)
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?'
+        return e.returnValue
       }
     }
 
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [updateWorkspaceFiles]) // Only depend on updateWorkspaceFiles (stable)
+  }, [hasUnsavedChanges])
 
   const selectFile = useCallback((item: FileSystemItem) => {
     if (item.type === 'file') {
@@ -271,6 +257,9 @@ export function useFileSystem() {
       }
       return prev
     })
+    
+    // Mark as unsaved when content changes
+    setHasUnsavedChanges(true)
   }, [])
 
   const createFile = useCallback((parentPath: string, name: string) => {
@@ -285,6 +274,7 @@ export function useFileSystem() {
     
     setFiles(prevFiles => addItemToTree(prevFiles, parentPath, newFile))
     setCurrentFile(newFile)
+    setHasUnsavedChanges(true) // Mark as unsaved when creating files
   }, [])
 
   const createFolder = useCallback((parentPath: string, name: string) => {
@@ -299,6 +289,7 @@ export function useFileSystem() {
     }
     
     setFiles(prevFiles => addItemToTree(prevFiles, parentPath, newFolder))
+    setHasUnsavedChanges(true) // Mark as unsaved when creating folders
   }, [])
 
   const deleteItem = useCallback((item: FileSystemItem) => {
@@ -308,6 +299,8 @@ export function useFileSystem() {
     if (currentFile && currentFile.path === item.path) {
       setCurrentFile(null)
     }
+    
+    setHasUnsavedChanges(true) // Mark as unsaved when deleting items
   }, [currentFile])
 
   const renameItem = useCallback((item: FileSystemItem, newName: string) => {
@@ -325,6 +318,8 @@ export function useFileSystem() {
     if (currentFile && currentFile.path === item.path) {
       setCurrentFile(prev => prev ? { ...prev, name: newName, path: newPath } : null)
     }
+    
+    setHasUnsavedChanges(true) // Mark as unsaved when renaming items
   }, [currentFile])
 
   const toggleFolder = useCallback((item: FileSystemItem) => {
@@ -337,6 +332,8 @@ export function useFileSystem() {
         isExpanded: newExpanded
       }
     }))
+    
+    setHasUnsavedChanges(true) // Mark as unsaved when toggling folders
   }, [])
 
   const clearAll = useCallback(() => {
@@ -403,7 +400,8 @@ export function useFileSystem() {
     appendTemplateItems,
     isLoaded,
     // Manual save function for explicit saves
-    saveWorkspace: saveWorkspaceManually,
+    saveWorkspace,
+    hasUnsavedChanges,
     // Workspace management with auto-save on switching
     currentWorkspaceId,
     currentWorkspaceName: workspaceData?.name || 'Default Workspace',

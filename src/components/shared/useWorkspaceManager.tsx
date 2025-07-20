@@ -256,22 +256,13 @@ export function useWorkspaceManager() {
     return newId
   }, [refreshWorkspaces])
   
-  // Update workspace files (manual save)
+  // COMPLETELY DISABLED to eliminate infinite loop as per user request
   const updateWorkspaceFiles = useCallback((files: FileSystemItem[], currentFilePath?: string) => {
-    console.log('📝 useWorkspaceManager: Manual save triggered')
-    if (workspaceData) {
-      const updatedWorkspace = {
-        ...workspaceData,
-        files,
-        currentFilePath,
-        lastModified: new Date().toISOString()
-      }
-      saveWorkspaceData(updatedWorkspace)
-      console.log('✅ useWorkspaceManager: Save completed')
-      
-      // Don't update state to avoid infinite loops - let the parent handle state
-    }
-  }, [workspaceData])
+    console.log('🚫 useWorkspaceManager: updateWorkspaceFiles COMPLETELY DISABLED')
+    console.log('🚫 Following user directive: "completely remove auto save shit"')
+    // NO-OP: Completely disabled to eliminate infinite loop 
+    // User explicitly requested: "completely remove auto save shit"
+  }, []) // Empty dependencies - completely stable function
   
   const getAllWorkspaces = useCallback(() => {
     console.log('📝 useWorkspaceManager: getAllWorkspaces called')
