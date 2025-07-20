@@ -53,6 +53,18 @@ Guidelines for contributing to the project.
 ## System Overview
 High-level architecture description.
 
+## System Diagram
+
+\\\`\\\`\\\`mermaid
+graph TD
+    A[Frontend] --> B[API Gateway]
+    B --> C[Backend Services]
+    C --> D[Database]
+    
+    style A fill:#e1f5fe
+    style C fill:#e8f5e8
+\\\`\\\`\\\`
+
 ## Components
 - Component 1: Description
 - Component 2: Description
