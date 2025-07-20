@@ -60,13 +60,18 @@ The application offers two distinct interfaces:
 
 #### 2. Explorer Mode (File Management & Workspace)
 1. **Click the Explorer button** in the navigation
-2. **Choose a template** or start fresh:
-   - **Project Notes**: Organized documentation structure
-   - **Knowledge Base**: Personal knowledge management system  
-   - **Blog/Website**: Content structure for blogs and websites
+2. **Choose how to start** from the workspace welcome screen:
+   - **Join Existing Workspace**: Connect to a previously created workspace
+   - **Create New Workspace**: Start fresh with a custom workspace name
+   - **Import from ZIP**: Upload and extract a ZIP file with markdown files
+   - **Initialize from Template**: Quick start with pre-built templates:
+     - **Project Notes**: Organized documentation structure
+     - **Knowledge Base**: Personal knowledge management system  
+     - **Blog/Website**: Content structure for blogs and websites
 3. **Use the file tree** to navigate and organize your content
 4. **Edit multiple files** with auto-save functionality
-5. **Export individual files** or use the print function
+5. **Leave workspace** anytime to return to welcome screen
+6. **Export individual files** or use the print function
 
 ### Using Templates
 
@@ -97,6 +102,14 @@ The Explorer offers structured workspace templates:
 - **File Persistence**: Data saved across browser sessions
 - **Mobile Responsive**: Touch-friendly interface with edit/preview tabs
 - **Export Options**: Individual file export and print functionality
+
+#### Workspace Management
+- **Multiple Workspaces**: Create and manage separate isolated workspaces
+- **Workspace Switching**: Join existing workspaces or leave current ones
+- **Data Isolation**: Each workspace maintains its own files and settings
+- **Import/Export**: Import ZIP files or export workspace content
+- **Template Integration**: Initialize workspaces from pre-built templates
+- **No-Workspace State**: Clean welcome screen when no workspace is active
 
 ### Dark/Light Mode
 

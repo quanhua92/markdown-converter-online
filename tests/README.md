@@ -20,7 +20,11 @@ We use Playwright for end-to-end testing to verify UI functionality and visual b
 
 ### Available Tests
 
-#### Dark Mode Test (`test-dark-mode.cjs`)
+Our test suite has been optimized to focus on core functionality and remove redundant tests. All tests are end-to-end Playwright tests that verify real user workflows.
+
+#### Core UI Tests
+
+##### Dark Mode Test (`test-dark-mode.cjs`)
 Tests the light/dark mode toggle functionality and visual changes.
 
 **What it tests:**
@@ -29,18 +33,33 @@ Tests the light/dark mode toggle functionality and visual changes.
 - Takes screenshots for visual verification
 - Verifies computed styles and CSS application
 
-**Run the test:**
-```bash
-node tests/test-dark-mode.cjs
-```
+**Run:** `node tests/test-dark-mode.cjs`
 
-**Expected output:**
-- Screenshots: `tests/screenshots/light-mode-full.png`, `tests/screenshots/dark-mode-full.png`, etc.
-- Console logs showing color values and test results
-- Visual confirmation that backgrounds change dramatically
+##### Heading Styles Test (`test-heading-styles.cjs`)
+Tests markdown heading rendering consistency between preview and print modes.
 
-#### Explorer E2E Test (`test-e2e-explorer.cjs`)
-Comprehensive test for the new Markdown Explorer functionality.
+**What it tests:**
+- Heading font sizes, weights, and borders
+- Consistency between preview and print modes
+- Proper typography styling
+
+**Run:** `node tests/test-heading-styles.cjs`
+
+##### Readability Test (`test-readability.cjs`)
+Tests text readability and accessibility compliance (WCAG).
+
+**What it tests:**
+- WCAG contrast ratio compliance
+- Text readability across different elements
+- Color contrast between text and background
+- Accessibility standards verification
+
+**Run:** `node tests/test-readability.cjs`
+
+#### Explorer & Workspace Tests
+
+##### Explorer E2E Test (`test-e2e-explorer.cjs`)
+Comprehensive test for the Markdown Explorer functionality.
 
 **What it tests:**
 - Template initialization (Project Notes, Knowledge Base, Blog/Website)
@@ -50,119 +69,98 @@ Comprehensive test for the new Markdown Explorer functionality.
 - Data persistence across browser sessions
 - Dark/light mode in Explorer interface
 
-**Run the test:**
-```bash
-node tests/test-e2e-explorer.cjs
-```
+**Run:** `node tests/test-e2e-explorer.cjs`
 
-**Expected output:**
-- Screenshots: `tests/screenshots/explorer-desktop-*.png`, `tests/screenshots/explorer-mobile-*.png`
-- Template initialization verification
-- File tree interaction testing
-- Cross-device compatibility confirmation
-
-#### Workspace Functionality Test (`test-workspace-functionality.cjs`)
-Tests the workspace sign-in/sign-out management system.
+##### Workspace Welcome Test (`test-workspace-welcome.cjs`)
+Tests the new workspace welcome flow and no-workspace state management.
 
 **What it tests:**
-- Workspace selector UI rendering and visibility
-- Sign-in/sign-out workflow (join/leave workspace operations)
+- Workspace welcome screen display (no-workspace state)
+- Create new workspace workflow with custom naming
+- Join existing workspace functionality
+- Leave workspace to return to welcome screen
+- Template initialization from welcome screen
+- Import from ZIP placeholder functionality
+
+**Run:** `node tests/test-workspace-welcome.cjs`
+
+##### Workspace Functionality Test (`test-workspace-functionality.cjs`)
+Tests workspace management and session isolation.
+
+**What it tests:**
 - Workspace creation and automatic joining
 - Multi-workspace isolation and data persistence
 - Session management and localStorage structure
 - UI state changes between workspace sessions
 
-**Run the test:**
-```bash
-node tests/test-workspace-functionality.cjs
-```
+**Run:** `node tests/test-workspace-functionality.cjs`
 
-**Expected output:**
-- Screenshots: `tests/screenshots/workspace-selector.png`, `tests/screenshots/workspace-created.png`
-- Workspace session flow verification
-- Data isolation testing between workspaces
-- UI interaction confirmation for join/leave operations
-
-#### Workspace Sign-In/Sign-Out Test (`test-workspace-sign-in-out.cjs`)
-Tests the complete workspace session management workflow.
+##### Workspace Sign-In/Out Test (`test-workspace-sign-in-out.cjs`)
+Tests complete workspace session management workflow.
 
 **What it tests:**
-- Default workspace initial state and display
 - Workspace creation with "Create & Join" flow
-- Workspace leaving with "Leave" button (return to default)
+- Workspace leaving with "Leave" button
 - Workspace joining with "Join Workspace" dialog
-- Data persistence and isolation between workspace sessions
+- Data persistence and isolation between sessions
 - localStorage structure and multi-workspace support
-- UI state consistency during sign-in/sign-out operations
 
-**Run the test:**
-```bash
-node tests/test-workspace-sign-in-out.cjs
-```
+**Run:** `node tests/test-workspace-sign-in-out.cjs`
 
-**Expected output:**
-- Screenshots: `tests/screenshots/workspace-initial-state.png`, `workspace-create-dialog.png`, `workspace-new-joined.png`, etc.
-- Complete sign-in/sign-out workflow verification
-- localStorage data structure validation
-- Session isolation confirmation
+#### Print & Features Tests
 
-#### Workspace Debug Test (`debug-workspace.cjs`)
-Debugging tool for workspace system analysis and troubleshooting.
+##### Print Workflow Test (`test-print-workflow.cjs`)
+Tests the print functionality workflow.
 
 **What it tests:**
-- localStorage workspace data structure and integrity
-- Workspace UI element detection and analysis
-- File tree existence and rendering status
-- Console error monitoring and reporting
-- Workspace state consistency verification
+- Print page generation and rendering
+- Content consistency between preview and print
+- Print URL generation and accessibility
 
-**Run the test:**
-```bash
-node tests/debug-workspace.cjs
-```
+**Run:** `node tests/test-print-workflow.cjs`
 
-**Expected output:**
-- Screenshots: `tests/screenshots/workspace-debug.png`
-- Detailed localStorage content analysis
-- UI element inspection results
-- Error detection and diagnostic information
-
-#### Heading Styles Test (`test-heading-styles.cjs`)
-Tests markdown heading rendering in both preview and print modes.
+##### Print Mermaid Test (`test-print-mermaid.cjs`)
+Tests Mermaid diagram rendering in print mode.
 
 **What it tests:**
-- Heading font sizes, weights, and borders
-- Consistency between preview and print modes
-- Proper typography styling
+- Mermaid diagrams render correctly in print view
+- Chart types supported in print mode
+- Visual consistency between preview and print
 
-**Run the test:**
-```bash
-node tests/test-heading-styles.cjs
-```
+**Run:** `node tests/test-print-mermaid.cjs`
 
-**Expected output:**
-- Screenshots: `tests/screenshots/preview-styling-test.png`, `tests/screenshots/print-styling-test.png`
-- Console logs showing heading styles and test results
-- Confirmation that heading styles work correctly
-
-#### Readability Test (`test-readability.cjs`)
-Tests text readability and accessibility compliance in both light and dark modes.
+##### Mermaid Multiple Test (`test-mermaid-multiple.cjs`)
+Tests multiple Mermaid diagrams on the same page.
 
 **What it tests:**
-- WCAG contrast ratio compliance
-- Text readability across different elements (headings, paragraphs, links, code)
-- Color contrast between text and background
-- Accessibility standards verification
+- Multiple diagram rendering
+- Different chart types in one document
+- Performance with multiple diagrams
 
-**Run the test:**
-```bash
-node tests/test-readability.cjs
-```
+**Run:** `node tests/test-mermaid-multiple.cjs`
 
-**Expected output:**
-- Screenshots: `tests/screenshots/readability-light-mode.png`, `tests/screenshots/readability-dark-mode.png`
-- Console logs showing contrast ratios and WCAG compliance levels
-- Detailed accessibility analysis for both themes
+#### Debug Utilities
+
+##### Workspace Debug (`debug-workspace.cjs`)
+Debugging tool for workspace system analysis.
+
+**What it does:**
+- Analyzes localStorage workspace data structure
+- Detects UI element rendering issues
+- Monitors console errors
+- Provides diagnostic information
+
+**Run:** `node tests/debug-workspace.cjs`
+
+##### Anchors Debug (`debug-anchors.cjs`)
+Debugging tool for anchor link functionality.
+
+**What it does:**
+- Tests anchor link generation and navigation
+- Verifies table of contents links
+- Debugs heading ID generation
+
+**Run:** `node tests/debug-anchors.cjs`
 
 ### Running Tests
 
@@ -175,29 +173,41 @@ node tests/test-readability.cjs
 
 3. **Run individual tests:**
    ```bash
-   # Test dark mode functionality
+   # Core UI Tests
    node tests/test-dark-mode.cjs
-   
-   # Test heading styles
    node tests/test-heading-styles.cjs
+   node tests/test-readability.cjs
    
-   # Test workspace functionality
+   # Workspace & Explorer Tests
+   node tests/test-workspace-welcome.cjs
    node tests/test-workspace-functionality.cjs
-   
-   # Test workspace sign-in/sign-out flow
    node tests/test-workspace-sign-in-out.cjs
-   
-   # Debug workspace system
-   node tests/debug-workspace.cjs
-   
-   # Test full explorer functionality
    node tests/test-e2e-explorer.cjs
+   
+   # Print & Features Tests
+   node tests/test-print-workflow.cjs
+   node tests/test-print-mermaid.cjs
+   node tests/test-mermaid-multiple.cjs
+   
+   # Debug Utilities
+   node tests/debug-workspace.cjs
+   node tests/debug-anchors.cjs
    ```
 
-4. **Run all tests:**
+4. **Run core test suite:**
    ```bash
-   # Run all tests sequentially
-   for test in tests/*.cjs; do
+   # Run essential tests (recommended for CI/regression testing)
+   for test in test-dark-mode.cjs test-heading-styles.cjs test-readability.cjs test-workspace-welcome.cjs test-e2e-explorer.cjs; do
+     echo "Running tests/$test..."
+     node "tests/$test"
+     echo "---"
+   done
+   ```
+
+5. **Run all tests:**
+   ```bash
+   # Run all tests sequentially (excludes debug utilities)
+   for test in tests/test-*.cjs; do
      echo "Running $test..."
      node "$test"
      echo "---"

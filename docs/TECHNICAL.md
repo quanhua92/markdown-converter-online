@@ -308,15 +308,23 @@ App.tsx
 
 ### Workspace Management Architecture
 
-#### Sign-In/Sign-Out Model
-The workspace system uses an explicit session-based approach similar to user authentication:
+#### No-Workspace State & Welcome Flow
+The workspace system now supports a "no-workspace" state with an enhanced welcome experience:
 
 ```typescript
-// Core Workspace Operations
+// Enhanced Workspace Operations
 interface WorkspaceManager {
-  joinWorkspace(id: string): void      // Sign in to workspace
-  leaveWorkspace(): void               // Sign out (return to default)
-  createWorkspace(name: string): void  // Create and join new workspace
+  joinWorkspace(id: string): void                    // Join existing workspace
+  leaveWorkspace(): void                             // Leave to no-workspace state
+  createWorkspace(name: string): void                // Create new workspace
+  createWorkspaceFromTemplate(name: string, template: FileSystemItem[]): void
+  importWorkspaceFromZip(name: string, file: File): Promise<void>
+}
+
+// Workspace Welcome Flow
+enum WorkspaceState {
+  NO_WORKSPACE,    // Shows welcome screen with 4 options
+  IN_WORKSPACE     // Shows file tree and editor
 }
 ```
 
@@ -340,23 +348,32 @@ interface WorkspaceData {
 ```
 
 #### UI Design Principles
+- **Welcome Screen**: Full-screen onboarding when no workspace is active
+- **4 Entry Points**: Join existing, create new, import ZIP, init from template
 - **Current Session Display**: Shows active workspace with blue badge
-- **Explicit Actions**: "Leave" button for sign-out, "Join/Create" for sign-in
+- **Explicit Actions**: "Leave" button for sign-out, clear action cards for sign-in
 - **Modal Workflows**: Separate dialogs for joining vs creating workspaces
 - **Session Boundaries**: Clear visual separation between workspace states
 - **No Accidental Switching**: Prevents unintended workspace changes
+- **Template Integration**: Quick template buttons in welcome screen
 
 #### State Management Flow
-1. **User leaves workspace** → Saves current state → Returns to default
+1. **No workspace state** → Shows welcome screen with 4 action options
 2. **User joins workspace** → Loads target workspace data → Updates UI
-3. **User creates workspace** → Saves current state → Creates new → Auto-joins
-4. **File operations** → Isolated to current workspace → Auto-saved per session
+3. **User creates workspace** → Creates new → Auto-joins → Shows file tree
+4. **User leaves workspace** → Saves current state → Returns to welcome screen
+5. **Template initialization** → Creates workspace from template → Auto-joins
+6. **ZIP import** → Extracts files → Creates workspace → Auto-joins
+7. **File operations** → Isolated to current workspace → Auto-saved per session
 
 #### Implementation Components
-- `useWorkspaceManager.tsx`: Core session and persistence logic
-- `WorkspaceSelector.tsx`: Sign-in/sign-out UI component
-- `useFileSystem.tsx`: Integration layer with file operations
+- `useWorkspaceManager.tsx`: Core session and persistence logic with multi-workspace support
+- `WorkspaceWelcome.tsx`: Full-screen welcome interface for no-workspace state
+- `WorkspaceSelector.tsx`: Sign-in/sign-out UI component (legacy, used within workspaces)
+- `useFileSystem.tsx`: Integration layer with file operations and workspace management
 - `FileTree.tsx`: Workspace status display and controls
+- `TemplateSelector.tsx`: Template selection with compact mode for welcome screen
+- `explorer.tsx`: Main route that conditionally renders welcome or workspace view
 
 ## Testing
 
