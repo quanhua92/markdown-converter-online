@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Plus, Trash2, Edit3, Sparkles } from 'lucide-react'
+import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Plus, Trash2, Edit3, Sparkles, MoreVertical } from 'lucide-react'
 import { TemplateSelector } from './TemplateSelector'
 import { WorkspaceSelector } from './WorkspaceSelector'
 export interface FileSystemItem {
@@ -64,6 +64,8 @@ function FileTreeItem({
   const [isCreating, setIsCreating] = useState<'file' | 'folder' | null>(null)
   const [isRenaming, setIsRenaming] = useState(false)
   const [newName, setNewName] = useState('')
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const handleCreate = (type: 'file' | 'folder') => {
     if (newName.trim()) {
@@ -91,6 +93,38 @@ function FileTreeItem({
   }
 
   const isSelected = selectedFile === item.path
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isMenuOpen])
+
+  const handleMenuAction = (action: string) => {
+    setIsMenuOpen(false)
+    switch (action) {
+      case 'rename':
+        startRename()
+        break
+      case 'delete':
+        onDeleteItem(item)
+        break
+      case 'newFile':
+        setIsCreating('file')
+        break
+      case 'newFolder':
+        setIsCreating('folder')
+        break
+    }
+  }
 
   return (
     <div>
@@ -176,47 +210,58 @@ function FileTreeItem({
           </span>
         )}
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100">
-          {item.type === 'folder' && (
-            <>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-6 w-6 p-0"
-                onClick={() => setIsCreating('file')}
-                title="New file"
-              >
-                <Plus className="w-3 h-3" />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-6 w-6 p-0"
-                onClick={() => setIsCreating('folder')}
-                title="New folder"
-              >
-                <Folder className="w-3 h-3" />
-              </Button>
-            </>
+        <div className="relative" ref={menuRef}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 w-6 p-0"
+            onClick={(e) => {
+              e.stopPropagation()
+              setIsMenuOpen(!isMenuOpen)
+            }}
+            title="More actions"
+          >
+            <MoreVertical className="w-3 h-3" />
+          </Button>
+          
+          {isMenuOpen && (
+            <div className="absolute right-0 top-7 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 min-w-[120px]">
+              <div className="py-1">
+                {item.type === 'folder' && (
+                  <>
+                    <button
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                      onClick={() => handleMenuAction('newFile')}
+                    >
+                      <Plus className="w-3 h-3" />
+                      New File
+                    </button>
+                    <button
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                      onClick={() => handleMenuAction('newFolder')}
+                    >
+                      <Folder className="w-3 h-3" />
+                      New Folder
+                    </button>
+                  </>
+                )}
+                <button
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  onClick={() => handleMenuAction('rename')}
+                >
+                  <Edit3 className="w-3 h-3" />
+                  Rename
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 dark:text-red-400"
+                  onClick={() => handleMenuAction('delete')}
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Delete
+                </button>
+              </div>
+            </div>
           )}
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0"
-            onClick={startRename}
-            title="Rename"
-          >
-            <Edit3 className="w-3 h-3" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 w-6 p-0"
-            onClick={() => onDeleteItem(item)}
-            title="Delete"
-          >
-            <Trash2 className="w-3 h-3" />
-          </Button>
         </div>
       </div>
 
