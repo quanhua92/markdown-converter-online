@@ -214,3 +214,10 @@ npm run test      # Unit tests
 3. **Document changes** - Update this file for new workflows or important findings
 4. **Use meaningful commits** - Include what was fixed and why
 5. **Test both preview and print** - Ensure markdown rendering consistency
+
+## Scripts and Utility Commands
+
+- Use `@scripts/local-client.sh` to test local dev client only server
+```
+
+</invoke>
