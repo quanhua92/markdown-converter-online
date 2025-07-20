@@ -18,9 +18,16 @@ We use Playwright for end-to-end testing to verify UI functionality and visual b
    pnpm add -D playwright
    ```
 
-### Available Tests
+### Test Overview
 
-Our test suite has been optimized to focus on core functionality and remove redundant tests. All tests are end-to-end Playwright tests that verify real user workflows.
+Our test suite includes **21 total tests** organized for different purposes:
+- **12 Core Tests** - Essential functionality for CI/regression testing
+- **7 Device-Specific Tests** - Cross-device verification and touch interaction testing  
+- **2 Debug Utilities** - Diagnostic tools for troubleshooting
+
+All tests are end-to-end Playwright tests that verify real user workflows.
+
+### Available Tests
 
 #### Core UI Tests
 
@@ -107,7 +114,7 @@ Tests complete workspace session management workflow.
 
 **Run:** `node tests/test-workspace-sign-in-out.cjs`
 
-##### Folder Toggle Fix Test (`test-folder-toggle-fix.cjs`)
+##### Enhanced Folder Toggle Test (`test-enhanced-folder-toggle.cjs`)
 Tests folder expand/collapse functionality in the file tree.
 
 **What it tests:**
@@ -119,7 +126,21 @@ Tests folder expand/collapse functionality in the file tree.
 - Correct aria-expanded attribute handling
 - JavaScript error detection during folder operations
 
-**Run:** `node tests/test-folder-toggle-fix.cjs`
+**Run:** `node tests/test-enhanced-folder-toggle.cjs`
+
+##### Delete Functionality Test (`test-delete-functionality.cjs`)
+Tests file and folder deletion with confirmation dialogs.
+
+**What it tests:**
+- File deletion (immediate, no confirmation)
+- Folder deletion with confirmation dialog
+- Warning about deleting all folder contents
+- Cancel and confirm functionality in delete dialog
+- Nested file and folder deletion
+- Deep folder structure deletion (3+ levels)
+- Error handling and visual feedback
+
+**Run:** `node tests/test-delete-functionality.cjs`
 
 #### Print & Features Tests
 
@@ -152,6 +173,25 @@ Tests multiple Mermaid diagrams on the same page.
 - Performance with multiple diagrams
 
 **Run:** `node tests/test-mermaid-multiple.cjs`
+
+#### Device-Specific Tests
+
+The `device-specific/` directory contains tests that verify functionality across different viewport sizes and device types:
+
+- `test-desktop-verification.cjs` - Desktop viewport 3-dots menu testing
+- `test-mobile-verification.cjs` - Mobile viewport iPhone testing  
+- `test-tablet-verification.cjs` - Tablet viewport iPad testing
+- `test-mobile-file-tree-access.cjs` - Mobile file tree interaction
+- `test-mobile-nested-collapse.cjs` - Mobile nested folder testing
+- `test-mobile-touch-targets.cjs` - Mobile touch target verification
+- `test-final-validation.cjs` - Complex nested folder validation
+
+**Run device-specific tests:**
+```bash
+node tests/device-specific/test-desktop-verification.cjs
+node tests/device-specific/test-mobile-verification.cjs
+# ... etc
+```
 
 #### Debug Utilities
 
@@ -192,17 +232,22 @@ Debugging tool for anchor link functionality.
    node tests/test-heading-styles.cjs
    node tests/test-readability.cjs
    
-   # Workspace & Explorer Tests
+   # Workspace & Explorer Tests  
    node tests/test-workspace-welcome.cjs
    node tests/test-workspace-functionality.cjs
    node tests/test-workspace-sign-in-out.cjs
-   node tests/test-folder-toggle-fix.cjs
+   node tests/test-enhanced-folder-toggle.cjs
+   node tests/test-delete-functionality.cjs
    node tests/test-e2e-explorer.cjs
    
    # Print & Features Tests
    node tests/test-print-workflow.cjs
    node tests/test-print-mermaid.cjs
    node tests/test-mermaid-multiple.cjs
+   
+   # Device-Specific Tests (optional)
+   node tests/device-specific/test-desktop-verification.cjs
+   node tests/device-specific/test-mobile-verification.cjs
    
    # Debug Utilities
    node tests/debug-workspace.cjs
@@ -212,17 +257,27 @@ Debugging tool for anchor link functionality.
 4. **Run core test suite:**
    ```bash
    # Run essential tests (recommended for CI/regression testing)
-   for test in test-dark-mode.cjs test-heading-styles.cjs test-readability.cjs test-workspace-welcome.cjs test-folder-toggle-fix.cjs test-e2e-explorer.cjs; do
+   for test in test-dark-mode.cjs test-heading-styles.cjs test-readability.cjs test-workspace-welcome.cjs test-enhanced-folder-toggle.cjs test-delete-functionality.cjs test-e2e-explorer.cjs; do
      echo "Running tests/$test..."
      node "tests/$test"
      echo "---"
    done
    ```
 
-5. **Run all tests:**
+5. **Run all core tests:**
    ```bash
-   # Run all tests sequentially (excludes debug utilities)
+   # Run all core tests sequentially (excludes device-specific and debug utilities)
    for test in tests/test-*.cjs; do
+     echo "Running $test..."
+     node "$test"
+     echo "---"
+   done
+   ```
+
+6. **Run device-specific tests:**
+   ```bash
+   # Run device-specific verification tests
+   for test in tests/device-specific/test-*.cjs; do
      echo "Running $test..."
      node "$test"
      echo "---"
@@ -254,9 +309,15 @@ Tests generate:
 - Heading styles should be consistent and properly formatted
 
 **Folder toggle issues:**
-- If folders appear collapsed but children are still visible, run `node tests/test-folder-toggle-fix.cjs`
+- If folders appear collapsed but children are still visible, run `node tests/test-enhanced-folder-toggle.cjs`
 - This was a known bug fixed in v2.1 - ensure you're running the latest version
 - Folder toggle functionality should work correctly after the fix
+
+**Delete functionality issues:**
+- If files/folders don't delete properly, run `node tests/test-delete-functionality.cjs`
+- Files should delete immediately without confirmation
+- Folders should show a confirmation dialog before deletion
+- Check browser console for JavaScript errors during deletion
 
 ### Adding New Tests
 
