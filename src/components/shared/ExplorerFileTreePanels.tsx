@@ -65,8 +65,8 @@ export function ExplorerFileTreePanels({
           </Button>
         </CollapsibleTrigger>
         
-        <CollapsibleContent className="h-full">
-          <div className="p-4 h-full">
+        <CollapsibleContent className="h-screen overflow-hidden">
+          <div className="p-4 h-full overflow-y-auto">
             <FileTree
               items={files}
               selectedFile={currentFile?.path}
