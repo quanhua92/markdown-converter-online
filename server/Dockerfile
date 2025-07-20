@@ -22,9 +22,12 @@ FROM node:20-slim AS backend
 # Install system dependencies for Pandoc and Marp
 RUN apt-get update && apt-get install -y \
     pandoc \
-    texlive-xelatex \
-    texlive-fonts-recommended \
+    texlive-base \
+    texlive-latex-recommended \
     texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-xetex \
+    lmodern \
     chromium \
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -34,9 +37,9 @@ ENV CHROME_PATH=/usr/bin/chromium
 
 WORKDIR /app
 
-# Install backend dependencies
+# Install backend dependencies (including dev deps for build)
 COPY server/package*.json ./
-RUN npm ci --only=production
+RUN npm install
 
 # Install Marp CLI globally
 RUN npm install -g @marp-team/marp-cli
@@ -47,11 +50,14 @@ COPY server/ .
 # Build TypeScript
 RUN npm run build
 
+# Remove dev dependencies to reduce image size
+RUN npm prune --omit=dev
+
 # Copy frontend build from frontend-builder stage
 COPY --from=frontend-builder /frontend/dist ./public
 
 # Create directories for file operations
-RUN mkdir -p downloads temp
+RUN mkdir -p downloads
 
 # Expose port
 EXPOSE 3000

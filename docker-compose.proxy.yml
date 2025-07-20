@@ -10,8 +10,7 @@ services:
     networks:
       - markdown-converter-network
     volumes:
-      - ./server/downloads:/app/downloads
-      - ./server/temp:/app/temp
+      - markdown_downloads:/app/downloads
     environment:
       - NODE_ENV=production
       - GIT_COMMIT_HASH=${GIT_COMMIT:-unknown}
@@ -21,6 +20,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
+volumes:
+  markdown_downloads:
 
 networks:
   markdown-converter-network:

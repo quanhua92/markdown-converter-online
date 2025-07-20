@@ -32,7 +32,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 const downloadsDir = path.join(__dirname, 'downloads');
-const tempDir = path.join(__dirname, 'temp');
+const tempDir = '/tmp';
 
 // Marp conversion endpoint
 app.post('/api/convert/marp', async (req, res) => {
@@ -290,13 +290,18 @@ async function setupStaticFiles() {
       console.log(`📁 Setting up static files from: ${staticPath}`);
       console.log('📁 Static files available:', files.slice(0, 5), files.length > 5 ? `... and ${files.length - 5} more` : '');
       
-      // Serve static files
+      // Check if index.html exists
+      const indexPath = path.join(staticPath, 'index.html');
+      try {
+        await fs.access(indexPath);
+      } catch {
+        console.log(`❌ index.html NOT found at: ${indexPath}`);
+        continue;
+      }
+      
+      // Serve static files with explicit index setting
       app.use(express.static(staticPath, {
-        setHeaders: (_res, filePath) => {
-          if (process.env.NODE_ENV !== 'production') {
-            console.log('📄 Serving static file:', path.basename(filePath));
-          }
-        }
+        index: 'index.html'
       }));
       
       // Handle client-side routing for SPA (must be after API routes)
@@ -307,7 +312,6 @@ async function setupStaticFiles() {
         }
         
         console.log('🔀 SPA fallback triggered for:', req.path);
-        const indexPath = path.join(staticPath, 'index.html');
         res.sendFile(indexPath, (err) => {
           if (err) {
             console.error('❌ Failed to send index.html:', err);
@@ -332,7 +336,7 @@ async function startServer() {
     console.log('🚀 Starting server...');
     // Ensure directories exist
     await fs.mkdir(downloadsDir, { recursive: true });
-    await fs.mkdir(tempDir, { recursive: true });
+    // tempDir uses /tmp which always exists
     console.log('✓ Server directories created');
 
     // Setup static file serving AFTER all routes
