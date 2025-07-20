@@ -330,7 +330,13 @@ enum WorkspaceState {
 
 #### Data Isolation Strategy
 ```typescript
-// localStorage Structure
+// localStorage Structure (v2 - Current)
+{
+  "markdown-explorer-v2-current-workspace": "workspace_id",
+  "markdown-explorer-v2-workspace-{id}": WorkspaceData
+}
+
+// Legacy localStorage Structure (v1 - Deprecated)
 {
   "markdown-explorer-current-workspace": "workspace_id",
   "markdown-explorer-workspace-default": WorkspaceData,
@@ -347,6 +353,35 @@ interface WorkspaceData {
 }
 ```
 
+#### Storage Migration (v1 → v2)
+
+**Recent Changes (January 2025)**:
+- **Problem**: Legacy system automatically created a 'default' workspace that persisted through localStorage.clear()
+- **Solution**: Migrated to v2 storage prefix to avoid legacy workspace data
+- **Impact**: Users now start with no workspace and must explicitly create one
+- **Benefits**: 
+  - Eliminates unwanted default workspace behavior
+  - Provides clean welcome screen experience
+  - Ensures explicit workspace creation workflow
+  - Avoids data conflicts with previous versions
+
+**Migration Details**:
+```typescript
+// v1 Storage Keys (Legacy - Deprecated)
+const CURRENT_WORKSPACE_KEY = 'markdown-explorer-current-workspace'
+const WORKSPACE_PREFIX = 'markdown-explorer-workspace-'
+
+// v2 Storage Keys (Current)
+const CURRENT_WORKSPACE_KEY = 'markdown-explorer-v2-current-workspace'
+const WORKSPACE_PREFIX = 'markdown-explorer-v2-workspace-'
+```
+
+**Breaking Changes**:
+- No automatic workspace creation
+- Users must explicitly create first workspace
+- Legacy workspaces are ignored (not migrated)
+- Welcome screen is now the default state
+
 #### UI Design Principles
 - **Welcome Screen**: Full-screen onboarding when no workspace is active
 - **4 Entry Points**: Join existing, create new, import ZIP, init from template
@@ -356,6 +391,7 @@ interface WorkspaceData {
 - **Session Boundaries**: Clear visual separation between workspace states
 - **No Accidental Switching**: Prevents unintended workspace changes
 - **Template Integration**: Quick template buttons in welcome screen
+- **No Default Workspace**: System starts with no workspace, requiring explicit creation
 
 #### State Management Flow
 1. **No workspace state** → Shows welcome screen with 4 action options

@@ -87,18 +87,18 @@ All test screenshots are saved in `tests/screenshots/` directory:
 
 #### Workspace Management
 - **Multiple Workspaces**: Users can create and switch between isolated file systems
-- **Workspace Persistence**: Each workspace is stored separately in localStorage
-- **Workspace Selector**: Dropdown in Files panel header for switching workspaces
-- **Workspace Operations**: Create, rename, delete workspaces via dialog interfaces
+- **No Default Workspace**: System starts with welcome screen, requiring explicit workspace creation
+- **Workspace Persistence**: Each workspace is stored separately in localStorage (v2 storage)
+- **Welcome Screen**: Full-screen onboarding with 4 workspace options (create, join, import, template)
+- **Leave/Join Flow**: Clear workspace boundaries with explicit leave button in sidebar
 - **Auto-save**: Current workspace and selected file are automatically saved
 - **Isolation**: Each workspace maintains its own files, folders, and current file state
 
-##### Workspace Storage Structure
+##### Workspace Storage Structure (v2)
 ```
 localStorage:
-├── markdown-explorer-current-workspace: "workspace_id"
-├── markdown-explorer-workspace-default: { WorkspaceData }
-├── markdown-explorer-workspace-{id}: { WorkspaceData }
+├── markdown-explorer-v2-current-workspace: "workspace_id"
+├── markdown-explorer-v2-workspace-{id}: { WorkspaceData }
 └── ...
 
 WorkspaceData:
@@ -129,24 +129,22 @@ FileSystemItem:
 - **useFileSystem.tsx**: Integration layer connecting workspace management to file operations
 - **FileTree.tsx**: Contains workspace selector in header (currently disabled for debugging)
 
-##### Storage Keys
-- `markdown-explorer-current-workspace`: Stores active workspace ID
-- `markdown-explorer-workspace-{id}`: Stores individual workspace data
-- `markdown-explorer-workspaces`: Legacy key for workspace list (deprecated)
+##### Storage Keys (v2)
+- `markdown-explorer-v2-current-workspace`: Stores active workspace ID
+- `markdown-explorer-v2-workspace-{id}`: Stores individual workspace data
 
-##### Default Workspace
-- **ID**: `default`
-- **Name**: "Default Workspace"
-- **Creation**: Automatically created if no workspaces exist
-- **Protection**: Cannot be deleted (minimum one workspace required)
-- **Initialization**: Contains Welcome.md and sample files on first use
+##### Storage Migration Notes
+- **v1 → v2**: Migrated storage prefix to eliminate legacy default workspace
+- **Legacy Keys**: `markdown-explorer-*` keys are ignored (not migrated)
+- **Breaking Change**: No automatic workspace creation - users must explicitly create first workspace
+- **Benefits**: Clean slate, no unwanted default workspace, proper welcome screen flow
 
-##### Workspace Switching Flow
-1. User selects workspace from dropdown
-2. Current workspace data is saved to localStorage
-3. New workspace data is loaded from localStorage
-4. UI updates to show new workspace files
-5. Current workspace ID is updated in localStorage
+##### Workspace Flow (Updated)
+1. **Initial State**: No workspace → Welcome screen with 4 options
+2. **Create/Join**: User creates new or joins existing workspace
+3. **Active Session**: File tree and editor with leave button in sidebar
+4. **Leave Workspace**: User clicks leave → Returns to welcome screen
+5. **Re-enter**: User selects workspace option → Returns to active session
 
 ### Common Commands
 
@@ -187,6 +185,12 @@ npm run test      # Unit tests
 1. Check if port 3000 is available: `lsof -i :3000`
 2. Stop any conflicting processes
 3. Run `./build-fresh.sh` again
+
+#### Workspace Issues
+1. **No Welcome Screen**: Clear all localStorage data and reload
+2. **Legacy Workspace Stuck**: Look for old `markdown-explorer-*` keys in localStorage and remove them
+3. **Storage Migration**: New users start with welcome screen (v2 storage), existing users keep old workspaces until manually recreated
+4. **Test Welcome Flow**: `node tests/test-workspace-welcome.cjs`
 
 #### Dark Mode Not Working
 1. Run `node tests/test-dark-mode.cjs` to verify
