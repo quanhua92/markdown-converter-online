@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Plus, Trash2, Edit3, Sparkles, MoreVertical } from 'lucide-react'
 // Remove TemplateSelector import to avoid circular dependency
 import { WorkspaceSelector } from './WorkspaceSelector'
@@ -66,6 +67,7 @@ function FileTreeItem({
   const [isRenaming, setIsRenaming] = useState(false)
   const [newName, setNewName] = useState('')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const handleCreate = (type: 'file' | 'folder') => {
@@ -109,6 +111,19 @@ function FileTreeItem({
     }
   }, [isMenuOpen])
 
+  const handleDelete = () => {
+    if (item.type === 'folder') {
+      setShowDeleteDialog(true)
+    } else {
+      onDeleteItem(item.path)
+    }
+  }
+
+  const confirmDelete = () => {
+    onDeleteItem(item.path)
+    setShowDeleteDialog(false)
+  }
+
   const handleMenuAction = (action: string) => {
     setIsMenuOpen(false)
     switch (action) {
@@ -125,7 +140,7 @@ function FileTreeItem({
         startRename()
         break
       case 'delete':
-        onDeleteItem(item.path)
+        handleDelete()
         break
       case 'newFile':
         setIsCreating('file')
@@ -318,6 +333,26 @@ function FileTreeItem({
           ))}
         </div>
       )}
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Folder</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the folder "{item.name}" and all its contents? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

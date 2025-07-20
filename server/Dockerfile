@@ -31,10 +31,6 @@ RUN pnpm run build
 # Backend stage
 FROM node:20-slim AS backend
 
-# Build args
-ARG GIT_COMMIT=unknown
-ARG CACHEBUST=1
-
 # Install system dependencies for Pandoc and Marp
 RUN apt-get update && apt-get install -y \
     pandoc \
@@ -52,6 +48,10 @@ RUN apt-get update && apt-get install -y \
 ENV CHROME_PATH=/usr/bin/chromium
 
 WORKDIR /app
+
+# Build args (after apt-get for better caching)
+ARG GIT_COMMIT=unknown
+ARG CACHEBUST=1
 
 # Copy backend package files first for better caching
 COPY server/package*.json ./
