@@ -141,13 +141,27 @@ export function TemplateSelector({ onTemplateSelect, trigger, className }: Templ
   )
 }
 
-export function TemplateQuickActions({ onTemplateSelect, className }: { onTemplateSelect: (items: FileSystemItem[]) => void, className?: string }) {
+export function TemplateQuickActions({ 
+  onTemplateSelect, 
+  className, 
+  variant = 'default' 
+}: { 
+  onTemplateSelect: (templateKey: string) => void
+  className?: string
+  variant?: 'default' | 'compact'
+}) {
   const quickTemplates = ['project-notes', 'knowledge-base', 'blog-site']
 
   const handleQuickSelect = (templateId: string) => {
-    const template = folderTemplates[templateId]
-    const items = initializeTemplateStructure(template)
-    onTemplateSelect(items)
+    if (variant === 'compact') {
+      // In compact mode, just pass the template key
+      onTemplateSelect(templateId)
+    } else {
+      // Legacy behavior for existing usage
+      const template = folderTemplates[templateId]
+      const items = initializeTemplateStructure(template)
+      onTemplateSelect(items as any)
+    }
   }
 
   return (
@@ -158,13 +172,13 @@ export function TemplateQuickActions({ onTemplateSelect, className }: { onTempla
           <Button
             key={templateId}
             variant="outline"
-            size="sm"
+            size={variant === 'compact' ? 'sm' : 'sm'}
             onClick={() => handleQuickSelect(templateId)}
-            className="text-xs"
+            className={variant === 'compact' ? 'text-xs px-2 py-1' : 'text-xs'}
             data-testid={`quick-template-${templateId}`}
           >
             <span className="mr-1">{template.icon}</span>
-            {template.name}
+            {variant === 'compact' ? template.name.split(' ')[0] : template.name}
           </Button>
         )
       })}

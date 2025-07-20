@@ -159,6 +159,8 @@ export function useFileSystem() {
     createWorkspace,
     deleteWorkspace,
     renameWorkspace,
+    createWorkspaceFromTemplate,
+    importWorkspaceFromZip,
     updateWorkspaceFiles,
     getAllWorkspaces
   } = useWorkspaceManager()
@@ -209,6 +211,11 @@ export function useFileSystem() {
         }
       }
       
+      setIsLoaded(true)
+    } else {
+      // No workspace - clear files and set loaded
+      setFiles([])
+      setCurrentFile(null)
       setIsLoaded(true)
     }
   }, [workspaceData])
@@ -392,6 +399,8 @@ export function useFileSystem() {
     createWorkspace: createWorkspaceWithoutSave,
     deleteWorkspace,
     renameWorkspace,
+    createWorkspaceFromTemplate,
+    importWorkspaceFromZip,
     getAllWorkspaces
   }
 }

@@ -12,6 +12,8 @@ import { ExplorerHeader } from '@/components/shared/ExplorerHeader'
 import { ExplorerMobileNavigation } from '@/components/shared/ExplorerMobileNavigation'
 import { ExplorerFileTreePanels } from '@/components/shared/ExplorerFileTreePanels'
 import { ExplorerEditorSection } from '@/components/shared/ExplorerEditorSection'
+import { WorkspaceWelcome } from '@/components/shared/WorkspaceWelcome'
+import { folderTemplates, initializeTemplateStructure } from '@/components/shared/folderTemplates'
 
 export const Route = createFileRoute('/explorer')({
   component: Explorer,
@@ -43,7 +45,10 @@ function Explorer() {
     createWorkspace,
     deleteWorkspace,
     renameWorkspace,
-    getAllWorkspaces
+    getAllWorkspaces,
+    // Enhanced workspace functionality
+    createWorkspaceFromTemplate,
+    importWorkspaceFromZip
   } = useFileSystem()
 
   const [isFileTreeCollapsed, setIsFileTreeCollapsed] = useState(false)
@@ -125,6 +130,42 @@ function Explorer() {
     }
   }, [currentFile, markdownContent, updateFileContent])
 
+  // Workspace welcome handlers
+  const handleJoinWorkspace = useCallback((workspaceId: string) => {
+    joinWorkspace(workspaceId)
+    toast.success('Joined workspace successfully!')
+  }, [joinWorkspace])
+
+  const handleCreateWorkspace = useCallback((name: string) => {
+    createWorkspace(name)
+    toast.success(`Created workspace "${name}"!`)
+  }, [createWorkspace])
+
+  const handleImportFromZip = useCallback(async (file: File) => {
+    try {
+      const baseName = file.name.replace(/\.zip$/i, '')
+      await importWorkspaceFromZip(baseName, file)
+      toast.success(`Imported workspace from ${file.name}!`)
+    } catch (error) {
+      console.error('Import failed:', error)
+      toast.error('Failed to import workspace from ZIP file')
+    }
+  }, [importWorkspaceFromZip])
+
+  const handleInitFromTemplate = useCallback((templateKey: string) => {
+    try {
+      const template = folderTemplates[templateKey]
+      if (template) {
+        const templateFiles = initializeTemplateStructure(template)
+        createWorkspaceFromTemplate(template.name, templateFiles)
+        toast.success(`Created workspace from ${template.name} template!`)
+      }
+    } catch (error) {
+      console.error('Template initialization failed:', error)
+      toast.error('Failed to create workspace from template')
+    }
+  }, [createWorkspaceFromTemplate])
+
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-blue-50 dark:bg-gray-900 flex items-center justify-center">
@@ -133,6 +174,22 @@ function Explorer() {
           <p className="text-gray-600 dark:text-gray-400">Loading your workspace...</p>
         </div>
       </div>
+    )
+  }
+
+  // Show workspace welcome screen when no workspace is active
+  if (!currentWorkspaceId) {
+    return (
+      <>
+        <WorkspaceWelcome
+          workspaces={workspaces}
+          onJoinWorkspace={handleJoinWorkspace}
+          onCreateWorkspace={handleCreateWorkspace}
+          onImportFromZip={handleImportFromZip}
+          onInitFromTemplate={handleInitFromTemplate}
+        />
+        <Toaster position="top-right" />
+      </>
     )
   }
 
