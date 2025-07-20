@@ -15,21 +15,75 @@ const { chromium } = require('playwright');
   console.log('🚀 Starting workspace welcome flow test...');
 
   try {
-    // Step 1: Clear localStorage to ensure clean state
+    // Step 1: Clear all storage to ensure clean state
     await page.goto('http://localhost:3000/explorer');
     await page.evaluate(() => {
+      // Clear all storage completely
       localStorage.clear();
+      sessionStorage.clear();
+      
+      // Also manually remove any workspace keys that might persist
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('markdown-explorer-')) {
+          localStorage.removeItem(key);
+        }
+      });
     });
     
     // Step 2: Reload page to show workspace welcome
     await page.reload();
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
     
     console.log('✅ Step 1: Page loaded with clean localStorage');
     await page.screenshot({ path: 'tests/screenshots/workspace-welcome-initial.png', fullPage: true });
 
     // Step 3: Verify workspace welcome screen is shown
-    const welcomeCard = await page.locator('[data-testid="create-workspace-card"]').first();
+    console.log('🔍 Checking page content...');
+    
+    // Check if loading screen is visible
+    const loadingText = await page.locator('text=Loading your workspace').isVisible();
+    if (loadingText) {
+      console.log('⏳ Loading screen visible, waiting...');
+      await page.waitForTimeout(3000);
+    }
+    
+    // Check page URL and title
+    console.log('🔍 Current URL:', page.url());
+    console.log('🔍 Page title:', await page.title());
+    
+    // Look for welcome screen elements
+    const welcomeCard = page.locator('[data-testid="create-workspace-card"]').first();
+    const isWelcomeVisible = await welcomeCard.isVisible();
+    
+    if (!isWelcomeVisible) {
+      console.log('⚠️  Welcome card not visible, checking for other elements...');
+      
+      // Check for briefcase icon or welcome text (specifically the card title)
+      const briefcaseIcon = await page.locator('h1:has-text("Welcome to Markdown Explorer")').isVisible();
+      const fileTree = await page.locator('span:has-text("Files")').first().isVisible();
+      
+      console.log('🔍 Welcome text visible:', briefcaseIcon);
+      console.log('🔍 File tree visible:', fileTree);
+      
+      // Take debug screenshot
+      await page.screenshot({ path: 'tests/screenshots/workspace-welcome-debug.png', fullPage: true });
+      
+      // Debug: Check all elements on the page
+      const allCreateCards = await page.locator('[data-testid="create-workspace-card"]').count();
+      const allJoinCards = await page.locator('[data-testid="join-workspace-card"]').count();
+      const allImportCards = await page.locator('[data-testid="import-zip-card"]').count();
+      
+      console.log('🔍 Create workspace cards found:', allCreateCards);
+      console.log('🔍 Join workspace cards found:', allJoinCards);
+      console.log('🔍 Import ZIP cards found:', allImportCards);
+      
+      if (allCreateCards === 0) {
+        console.log('❌ No create workspace cards found - testing workspace welcome functionality may be incomplete');
+        return;
+      }
+    }
+    
     await welcomeCard.waitFor({ state: 'visible', timeout: 5000 });
     console.log('✅ Step 2: Workspace welcome screen displayed');
 

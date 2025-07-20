@@ -281,14 +281,11 @@ export function FileTree({
     <Card className="h-full">
       <CardHeader className="pb-4">
         {/* Workspace Selector */}
-        {currentWorkspaceId && workspaces && onWorkspaceJoin && onWorkspaceLeave && onWorkspaceCreate && (
+        {currentWorkspaceId && onWorkspaceLeave && (
           <WorkspaceSelector
             currentWorkspace={currentWorkspaceId}
             currentWorkspaceName={currentWorkspaceName || 'Default Workspace'}
-            workspaces={workspaces}
-            onWorkspaceJoin={onWorkspaceJoin}
             onWorkspaceLeave={onWorkspaceLeave}
-            onWorkspaceCreate={onWorkspaceCreate}
           />
         )}
         

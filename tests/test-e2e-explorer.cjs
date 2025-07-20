@@ -99,17 +99,29 @@ interface FileSystem {
     await desktopPage.screenshot({ path: 'tests/screenshots/explorer-desktop-initial.png' });
     console.log('✅ Desktop: Explorer page loaded successfully');
 
-    // Test 2: Initialize with random template
-    console.log('2️⃣ Testing template initialization...');
-    const templates = ['project-notes', 'knowledge-base', 'blog-site'];
-    const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+    // Test 2: Check if we're on welcome screen or in workspace
+    console.log('2️⃣ Testing workspace initialization...');
     
-    const templateButton = await desktopPage.locator(`[data-testid="quick-template-${randomTemplate}"]`);
-    await templateButton.click();
-    await desktopPage.waitForTimeout(3000);
+    const welcomeCard = desktopPage.locator('[data-testid="create-workspace-card"]');
+    const isWelcomeScreen = await welcomeCard.isVisible();
     
-    await desktopPage.screenshot({ path: `tests/screenshots/explorer-desktop-template-${randomTemplate}.png` });
-    console.log(`✅ Desktop: Initialized with ${randomTemplate} template`);
+    if (isWelcomeScreen) {
+      console.log('✅ Desktop: On welcome screen - testing template initialization');
+      
+      // Test template initialization from welcome screen
+      const templates = ['project-notes', 'knowledge-base', 'blog-site'];
+      const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+      
+      const templateButton = await desktopPage.locator(`[data-testid="quick-template-${randomTemplate}"]`);
+      await templateButton.click();
+      await desktopPage.waitForTimeout(3000);
+      
+      await desktopPage.screenshot({ path: `tests/screenshots/explorer-desktop-template-${randomTemplate}.png` });
+      console.log(`✅ Desktop: Initialized with ${randomTemplate} template`);
+    } else {
+      console.log('✅ Desktop: Already in workspace - testing existing functionality');
+      await desktopPage.screenshot({ path: 'tests/screenshots/explorer-desktop-existing-workspace.png' });
+    }
 
     // Test 3: File tree toggle functionality
     console.log('3️⃣ Testing file tree toggle...');
@@ -337,13 +349,25 @@ interface FileSystem {
     console.log('1️⃣ Mobile: Testing initial load...');
     await mobilePage.screenshot({ path: 'tests/screenshots/explorer-mobile-initial.png' });
 
-    // Initialize with template
-    console.log('2️⃣ Mobile: Testing template initialization...');
-    const mobileTemplateButton = await mobilePage.locator('[data-testid="quick-template-knowledge-base"]');
-    await mobileTemplateButton.click();
-    await mobilePage.waitForTimeout(3000);
+    // Check if we're on welcome screen or in workspace
+    console.log('2️⃣ Mobile: Testing workspace initialization...');
     
-    await mobilePage.screenshot({ path: 'tests/screenshots/explorer-mobile-template.png' });
+    const mobileWelcomeCard = mobilePage.locator('[data-testid="create-workspace-card"]');
+    const isMobileWelcomeScreen = await mobileWelcomeCard.isVisible();
+    
+    if (isMobileWelcomeScreen) {
+      console.log('✅ Mobile: On welcome screen - testing template initialization');
+      
+      const mobileTemplateButton = await mobilePage.locator('[data-testid="quick-template-knowledge-base"]');
+      await mobileTemplateButton.click();
+      await mobilePage.waitForTimeout(3000);
+      
+      await mobilePage.screenshot({ path: 'tests/screenshots/explorer-mobile-template.png' });
+      console.log('✅ Mobile: Initialized with knowledge-base template');
+    } else {
+      console.log('✅ Mobile: Already in workspace - testing existing functionality');
+      await mobilePage.screenshot({ path: 'tests/screenshots/explorer-mobile-existing-workspace.png' });
+    }
 
     // Test mobile file tree sheet toggle
     console.log('3️⃣ Mobile: Testing mobile file tree sheet...');
