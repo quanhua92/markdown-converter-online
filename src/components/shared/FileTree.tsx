@@ -24,9 +24,9 @@ interface FileTreeProps {
   onFileSelect: (item: FileSystemItem) => void
   onCreateFile: (parentPath: string, name: string) => void
   onCreateFolder: (parentPath: string, name: string) => void
-  onDeleteItem: (item: FileSystemItem) => void
-  onRenameItem: (item: FileSystemItem, newName: string) => void
-  onToggleFolder: (item: FileSystemItem) => void
+  onDeleteItem: (path: string) => void
+  onRenameItem: (path: string, newName: string) => void
+  onToggleFolder: (path: string) => void
   onInitializeTemplate?: (items: FileSystemItem[]) => void
   showTemplateOptions?: boolean
   // Workspace management props
@@ -45,9 +45,9 @@ interface FileTreeItemProps {
   onFileSelect: (item: FileSystemItem) => void
   onCreateFile: (parentPath: string, name: string) => void
   onCreateFolder: (parentPath: string, name: string) => void
-  onDeleteItem: (item: FileSystemItem) => void
-  onRenameItem: (item: FileSystemItem, newName: string) => void
-  onToggleFolder: (item: FileSystemItem) => void
+  onDeleteItem: (path: string) => void
+  onRenameItem: (path: string, newName: string) => void
+  onToggleFolder: (path: string) => void
 }
 
 function FileTreeItem({
@@ -81,7 +81,7 @@ function FileTreeItem({
 
   const handleRename = () => {
     if (newName.trim() && newName !== item.name) {
-      onRenameItem(item, newName.trim())
+      onRenameItem(item.path, newName.trim())
     }
     setIsRenaming(false)
     setNewName('')
@@ -112,13 +112,13 @@ function FileTreeItem({
     setIsMenuOpen(false)
     switch (action) {
       case 'toggle':
-        onToggleFolder(item)
+        onToggleFolder(item.path)
         break
       case 'rename':
         startRename()
         break
       case 'delete':
-        onDeleteItem(item)
+        onDeleteItem(item.path)
         break
       case 'newFile':
         setIsCreating('file')
@@ -142,7 +142,7 @@ function FileTreeItem({
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              onToggleFolder(item)
+              onToggleFolder(item.path)
             }}
             className="p-0 w-4 h-4 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
             title="Toggle folder"
@@ -153,7 +153,7 @@ function FileTreeItem({
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  onToggleFolder(item)
+                  onToggleFolder(item.path)
                 }}
               />
             ) : (
@@ -162,7 +162,7 @@ function FileTreeItem({
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  onToggleFolder(item)
+                  onToggleFolder(item.path)
                 }}
               />
             )}
@@ -204,7 +204,7 @@ function FileTreeItem({
               if (item.type === 'file') {
                 onFileSelect(item)
               } else if (item.type === 'folder') {
-                onToggleFolder(item)
+                onToggleFolder(item.path)
               }
             }}
             data-testid={`file-tree-item-${item.name}`}
