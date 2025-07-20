@@ -27,6 +27,7 @@ function Explorer() {
     files,
     currentFile,
     selectFile,
+    closeFile,
     updateFileContent,
     createFile,
     createFolder,
@@ -273,8 +274,18 @@ function Explorer() {
             showPreviewPanel={showPreviewPanel}
             setShowEditPanel={setShowEditPanel}
             setShowPreviewPanel={setShowPreviewPanel}
-            onCreateFile={createFile}
+            onCreateFile={(parentPath: string, name: string, content?: string) => {
+              createFile(parentPath, name)
+              if (content) {
+                // Find the newly created file and update its content
+                setTimeout(() => {
+                  const filePath = parentPath === '/' ? `/${name}` : `${parentPath}/${name}`
+                  updateFileContent(filePath, content)
+                }, 100)
+              }
+            }}
             onInitializeTemplate={initializeFromTemplate}
+            onCloseFile={closeFile}
           />
         </div>
       </div>

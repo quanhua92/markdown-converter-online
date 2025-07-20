@@ -241,6 +241,10 @@ export function useFileSystem() {
     }
   }, [])
 
+  const closeFile = useCallback(() => {
+    setCurrentFile(null)
+  }, [])
+
   const updateFileContent = useCallback((path: string, content: string) => {
     setFiles(prevFiles => {
       const updated = updateItemInTree(prevFiles, path, (item) => ({
@@ -389,6 +393,7 @@ export function useFileSystem() {
     files,
     currentFile,
     selectFile,
+    closeFile,
     updateFileContent,
     createFile,
     createFolder,

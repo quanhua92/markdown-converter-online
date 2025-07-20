@@ -2,10 +2,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Edit3, Eye } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Edit3, Eye, FileText, X } from 'lucide-react'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import type { FileSystemItem } from './FileTree'
-import { TemplateQuickActions } from './TemplateSelector'
+import { templates } from './templates'
 
 interface ExplorerEditorSectionProps {
   currentFile: FileSystemItem | null
@@ -17,8 +18,9 @@ interface ExplorerEditorSectionProps {
   showPreviewPanel: boolean
   setShowEditPanel: (show: boolean) => void
   setShowPreviewPanel: (show: boolean) => void
-  onCreateFile: (parentPath: string, name: string) => void
+  onCreateFile: (parentPath: string, name: string, content?: string) => void
   onInitializeTemplate: (templateKey: string) => void
+  onCloseFile: () => void
 }
 
 export function ExplorerEditorSection({
@@ -32,8 +34,16 @@ export function ExplorerEditorSection({
   setShowEditPanel,
   setShowPreviewPanel,
   onCreateFile,
-  onInitializeTemplate
+  onInitializeTemplate,
+  onCloseFile
 }: ExplorerEditorSectionProps) {
+  const handleTemplateSelect = (templateKey: string) => {
+    const content = templates[templateKey as keyof typeof templates]
+    if (content) {
+      const fileName = `${templateKey}-template.md`
+      onCreateFile('/', fileName, content)
+    }
+  }
   if (!currentFile) {
     return (
       // Welcome screen when no file is selected
@@ -49,11 +59,20 @@ export function ExplorerEditorSection({
             
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Quick Start Templates</h3>
-                <TemplateQuickActions 
-                  onTemplateSelect={onInitializeTemplate}
-                  className="justify-center"
-                />
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Create from Template</h3>
+                <div className="flex justify-center">
+                  <Select onValueChange={handleTemplateSelect}>
+                    <SelectTrigger className="w-[240px]">
+                      <SelectValue placeholder="Choose a template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="showcase">📚 Complete Showcase</SelectItem>
+                      <SelectItem value="presentation">🎯 Presentation</SelectItem>
+                      <SelectItem value="document">📄 Document</SelectItem>
+                      <SelectItem value="article">📝 Article</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
               <div className="text-sm text-gray-500 dark:text-gray-400">or</div>
@@ -62,7 +81,8 @@ export function ExplorerEditorSection({
                 onClick={() => onCreateFile('/', 'new-file.md')}
                 data-testid="create-new-file-btn"
               >
-                Create New File
+                <FileText className="w-4 h-4 mr-2" />
+                Create Empty File
               </Button>
             </div>
           </CardContent>
@@ -108,9 +128,20 @@ export function ExplorerEditorSection({
           isDesktop ? (!showEditPanel ? 'hidden' : '') : ''
         }`}>
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2">
-              <Edit3 className="w-5 h-5" />
-              {currentFile.name}
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Edit3 className="w-5 h-5" />
+                {currentFile.name}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onCloseFile}
+                className="h-8 w-8 p-0"
+                data-testid="close-file-btn"
+              >
+                <X className="w-4 h-4" />
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className={!isDesktop && activeTab === 'preview' ? 'hidden' : ''}>
