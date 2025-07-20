@@ -292,11 +292,11 @@ export function useFileSystem() {
     setHasUnsavedChanges(true) // Mark as unsaved when creating folders
   }, [])
 
-  const deleteItem = useCallback((item: FileSystemItem) => {
-    setFiles(prevFiles => removeItemFromTree(prevFiles, item.path))
+  const deleteItem = useCallback((path: string) => {
+    setFiles(prevFiles => removeItemFromTree(prevFiles, path))
     
     // If the deleted item was current, clear current file
-    if (currentFile && currentFile.path === item.path) {
+    if (currentFile && currentFile.path === path) {
       setCurrentFile(null)
     }
     
