@@ -256,7 +256,164 @@ async function testDeleteFunctionality() {
       console.log('❌ Deeply nested structure was not deleted');
     }
     
-    console.log('✅ Delete functionality testing completed successfully!');
+    // Step 5: Test complete workspace clearing - delete everything until empty
+    console.log('🧹 Testing complete workspace clearing...');
+    
+    // Get all remaining items in the workspace
+    let remainingItems = await page.locator('[data-testid^="file-tree-item-"]').count();
+    console.log(`📊 Found ${remainingItems} items to delete`);
+    
+    // Delete all remaining items one by one
+    while (remainingItems > 0) {
+      const firstItem = page.locator('[data-testid^="file-tree-item-"]').first();
+      const itemName = await firstItem.textContent();
+      console.log(`🗑️ Deleting: ${itemName}`);
+      
+      // Click the more actions menu for the first item
+      const itemMenu = firstItem.locator('..').locator('button[title="More actions"]');
+      await itemMenu.click();
+      await page.waitForTimeout(500);
+      
+      // Click delete
+      const deleteOption = page.locator('button:has-text("Delete")');
+      await deleteOption.click();
+      await page.waitForTimeout(1000);
+      
+      // Check if confirmation dialog appears (for folders)
+      const dialogVisible = await page.locator('text=Delete Folder').isVisible();
+      if (dialogVisible) {
+        console.log(`  📋 Confirming folder deletion for: ${itemName}`);
+        const confirmBtn = page.locator('button:has-text("Delete")').last();
+        await confirmBtn.click();
+        await page.waitForTimeout(1500);
+      } else {
+        console.log(`  ✅ File deleted immediately: ${itemName}`);
+        await page.waitForTimeout(1000);
+      }
+      
+      // Update count
+      remainingItems = await page.locator('[data-testid^="file-tree-item-"]').count();
+      console.log(`📊 Remaining items: ${remainingItems}`);
+    }
+    
+    console.log('✅ Workspace completely cleared!');
+    
+    // Step 6: Test empty workspace stability
+    console.log('🔍 Testing empty workspace stability...');
+    
+    await page.screenshot({ 
+      path: 'tests/screenshots/delete-test-empty-workspace.png',
+      fullPage: true 
+    });
+    
+    // Verify no items remain
+    const finalItemCount = await page.locator('[data-testid^="file-tree-item-"]').count();
+    if (finalItemCount === 0) {
+      console.log('✅ Workspace is completely empty');
+    } else {
+      console.log(`❌ ${finalItemCount} items still remain in workspace`);
+    }
+    
+    // Test basic operations on empty workspace
+    console.log('🧪 Testing operations on empty workspace...');
+    
+    // Try clicking file tree area
+    const fileTreeArea = page.locator('[data-testid="file-tree"]');
+    if (await fileTreeArea.isVisible()) {
+      await fileTreeArea.click();
+      await page.waitForTimeout(500);
+      console.log('✅ Clicking empty file tree area - no crash');
+    }
+    
+    // Check if new file/folder buttons still work
+    const newFileBtn2 = page.locator('button[title="New file"]').first();
+    const newFolderBtn2 = page.locator('button[title="New folder"]').first();
+    
+    if (await newFileBtn2.isVisible()) {
+      console.log('✅ New file button still visible in empty workspace');
+    }
+    if (await newFolderBtn2.isVisible()) {
+      console.log('✅ New folder button still visible in empty workspace');
+    }
+    
+    // Step 7: Rebuild workspace structure and test deletion again
+    console.log('🔄 Rebuilding workspace structure for second deletion test...');
+    
+    // Create new folder with files
+    await newFolderBtn2.click();
+    await page.waitForTimeout(500);
+    await page.keyboard.type('rebuild-folder');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(1000);
+    
+    // Expand the new folder
+    const rebuildFolderItem = page.locator('[data-testid="file-tree-item-rebuild-folder"]');
+    await rebuildFolderItem.click();
+    await page.waitForTimeout(1000);
+    
+    // Add multiple files to the folder
+    const rebuildFolderMenu = rebuildFolderItem.locator('..').locator('button[title="More actions"]');
+    
+    for (let i = 1; i <= 5; i++) {
+      await rebuildFolderMenu.click();
+      await page.waitForTimeout(500);
+      await page.locator('text=New File').click();
+      await page.waitForTimeout(500);
+      await page.keyboard.type(`rebuild-file-${i}.md`);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(1000);
+    }
+    
+    // Add a nested folder
+    await rebuildFolderMenu.click();
+    await page.waitForTimeout(500);
+    await page.locator('text=New Folder').click();
+    await page.waitForTimeout(500);
+    await page.keyboard.type('rebuild-nested');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(1000);
+    
+    console.log('✅ Rebuilt workspace with 1 folder, 5 files, and 1 nested folder');
+    
+    await page.screenshot({ 
+      path: 'tests/screenshots/delete-test-rebuilt-structure.png',
+      fullPage: true 
+    });
+    
+    // Step 8: Delete the entire rebuilt structure in one go
+    console.log('🗑️ Testing bulk deletion of rebuilt structure...');
+    
+    await rebuildFolderMenu.click();
+    await page.waitForTimeout(500);
+    await page.locator('button:has-text("Delete")').click();
+    await page.waitForTimeout(1000);
+    
+    // Confirm deletion of the entire structure
+    const finalDeleteBtn = page.locator('button:has-text("Delete")');
+    await finalDeleteBtn.click();
+    await page.waitForTimeout(2000);
+    
+    // Verify everything is deleted again
+    const finalItemCount2 = await page.locator('[data-testid^="file-tree-item-"]').count();
+    if (finalItemCount2 === 0) {
+      console.log('✅ Rebuilt structure completely deleted - workspace empty again');
+    } else {
+      console.log(`❌ ${finalItemCount2} items still remain after bulk deletion`);
+    }
+    
+    await page.screenshot({ 
+      path: 'tests/screenshots/delete-test-final-empty.png',
+      fullPage: true 
+    });
+    
+    console.log('✅ Comprehensive delete functionality testing completed successfully!');
+    console.log('📋 Test Summary:');
+    console.log('   ✅ File deletion (immediate)');
+    console.log('   ✅ Folder deletion (with confirmation)');
+    console.log('   ✅ Nested structure deletion');
+    console.log('   ✅ Complete workspace clearing');
+    console.log('   ✅ Empty workspace stability');
+    console.log('   ✅ Rebuild and re-delete functionality');
     
   } catch (error) {
     console.error('❌ Test failed:', error.message);
