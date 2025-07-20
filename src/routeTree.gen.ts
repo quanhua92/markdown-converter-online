@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrintRouteImport } from './routes/print'
 import { Route as ExplorerRouteImport } from './routes/explorer'
+import { Route as DeploymentRouteImport } from './routes/deployment'
 import { Route as IndexRouteImport } from './routes/index'
 
 const PrintRoute = PrintRouteImport.update({
@@ -23,6 +24,11 @@ const ExplorerRoute = ExplorerRouteImport.update({
   path: '/explorer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeploymentRoute = DeploymentRouteImport.update({
+  id: '/deployment',
+  path: '/deployment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,30 +37,34 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/deployment': typeof DeploymentRoute
   '/explorer': typeof ExplorerRoute
   '/print': typeof PrintRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/deployment': typeof DeploymentRoute
   '/explorer': typeof ExplorerRoute
   '/print': typeof PrintRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/deployment': typeof DeploymentRoute
   '/explorer': typeof ExplorerRoute
   '/print': typeof PrintRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/explorer' | '/print'
+  fullPaths: '/' | '/deployment' | '/explorer' | '/print'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/explorer' | '/print'
-  id: '__root__' | '/' | '/explorer' | '/print'
+  to: '/' | '/deployment' | '/explorer' | '/print'
+  id: '__root__' | '/' | '/deployment' | '/explorer' | '/print'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DeploymentRoute: typeof DeploymentRoute
   ExplorerRoute: typeof ExplorerRoute
   PrintRoute: typeof PrintRoute
 }
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExplorerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/deployment': {
+      id: '/deployment'
+      path: '/deployment'
+      fullPath: '/deployment'
+      preLoaderRoute: typeof DeploymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DeploymentRoute: DeploymentRoute,
   ExplorerRoute: ExplorerRoute,
   PrintRoute: PrintRoute,
 }

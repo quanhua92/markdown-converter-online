@@ -36,6 +36,7 @@ interface OutputFormatAndConversionSectionProps {
   onDismissError: () => void
   onCopyToClipboard: () => void
   onDownload: () => void
+  backendAvailable?: boolean
 }
 
 export function OutputFormatAndConversionSection({
@@ -55,7 +56,8 @@ export function OutputFormatAndConversionSection({
   conversionError,
   onDismissError,
   onCopyToClipboard,
-  onDownload
+  onDownload,
+  backendAvailable = true
 }: OutputFormatAndConversionSectionProps) {
   const currentConfig = formatConfig[selectedFormat]
   const IconComponent = currentConfig.icon
@@ -209,14 +211,23 @@ export function OutputFormatAndConversionSection({
         {!downloadResult ? (
           <Button 
             onClick={onConvert}
-            disabled={isConverting || !hasContent}
+            disabled={isConverting || !hasContent || !backendAvailable}
             size="lg"
-            className="w-full sm:w-auto px-8 py-3 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 rounded-full font-semibold text-lg relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity"
+            className={`w-full sm:w-auto px-8 py-3 h-12 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 rounded-full font-semibold text-lg relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity ${
+              !backendAvailable 
+                ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed opacity-50' 
+                : 'bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 text-white'
+            }`}
           >
             {isConverting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Converting...
+              </>
+            ) : !backendAvailable ? (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Backend Required
               </>
             ) : (
               <>

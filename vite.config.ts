@@ -35,12 +35,16 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true
+    // Remove proxy for production - frontend will call external API
+    // For local development, set VITE_API_BASE_URL=http://localhost:3000
+    ...(process.env.NODE_ENV === 'development' && process.env.VITE_API_BASE_URL?.includes('localhost') ? {
+      proxy: {
+        '/api': {
+          target: process.env.VITE_API_BASE_URL || 'http://localhost:3000',
+          changeOrigin: true
+        }
       }
-    }
+    } : {})
   },
   define: {
     __GIT_COMMIT_HASH__: JSON.stringify(gitCommitHash)

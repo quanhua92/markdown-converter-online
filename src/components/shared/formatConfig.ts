@@ -1,31 +1,44 @@
 import { Download, FileText, Presentation, File } from 'lucide-react'
 
+// Get API base URL from environment variable, fallback to local development
+const getApiBaseUrl = (): string => {
+  // For Vercel deployment, use environment variable
+  if (typeof window !== 'undefined') {
+    // Client-side: check for runtime config
+    return (window as any).__API_BASE_URL__ || ''
+  }
+  // Build-time: use Vite environment variable
+  return import.meta.env.VITE_API_BASE_URL || ''
+}
+
+const API_BASE_URL = getApiBaseUrl()
+
 export const formatConfig = {
   pptx: { 
     label: 'PowerPoint', 
     icon: Presentation, 
-    endpoint: '/api/convert/marp',
+    endpoint: `${API_BASE_URL}/api/convert/marp`,
     description: 'Interactive presentation slides',
     badge: 'Popular'
   },
   html: { 
     label: 'HTML', 
     icon: FileText, 
-    endpoint: '/api/convert/pandoc',
+    endpoint: `${API_BASE_URL}/api/convert/pandoc`,
     description: 'Web-ready HTML document',
     badge: 'Fast'
   },
   docx: { 
     label: 'Word', 
     icon: File, 
-    endpoint: '/api/convert/pandoc',
+    endpoint: `${API_BASE_URL}/api/convert/pandoc`,
     description: 'Microsoft Word document',
     badge: 'Standard'
   },
   pdf: { 
     label: 'PDF', 
     icon: FileText, 
-    endpoint: '/api/convert/pandoc',
+    endpoint: `${API_BASE_URL}/api/convert/pandoc`,
     description: 'Portable document format',
     badge: 'Print-ready'
   }

@@ -18,7 +18,9 @@ import {
   templates,
   formatConfig,
   defaultConversionOptions,
-  type ConversionOptions
+  type ConversionOptions,
+  useBackendHealth,
+  BackendStatusAlert
 } from '@/components/shared'
 import { TemplateSection } from '@/components/shared/TemplateSection'
 import { ActionButtonsSection } from '@/components/shared/ActionButtonsSection'
@@ -40,6 +42,7 @@ function Index() {
   const { isDarkMode, toggleTheme } = useTheme()
   const { markdown, setMarkdown, draftSaveStatus, clearDraft } = useDraft()
   const { activeTab, setActiveTab, isDesktop, showEditPanel, setShowEditPanel, showPreviewPanel, setShowPreviewPanel } = useEditor()
+  const backendHealth = useBackendHealth()
   
   const [selectedFormat, setSelectedFormat] = useState<string>('pptx')
   const [isConverting, setIsConverting] = useState(false)
@@ -69,6 +72,16 @@ function Index() {
   const handleConvert = async () => {
     if (!markdown.trim()) {
       toast.error('Please enter some markdown content')
+      return
+    }
+
+    if (!backendHealth.isAvailable) {
+      toast.error('Backend not available. Please check your deployment configuration.', {
+        action: {
+          label: 'View Setup Guide',
+          onClick: () => window.open('/docs/DEPLOYMENT.md', '_blank')
+        }
+      })
       return
     }
 
@@ -133,7 +146,22 @@ function Index() {
     if (!downloadResult) return
     
     try {
-      const downloadResponse = await fetch(downloadResult.downloadUrl)
+      // Get API base URL for download
+      const getApiBaseUrl = (): string => {
+        if (typeof window !== 'undefined') {
+          return (window as any).__API_BASE_URL__ || ''
+        }
+        return import.meta.env.VITE_API_BASE_URL || ''
+      }
+      
+      // Construct full download URL if it's relative
+      let downloadUrl = downloadResult.downloadUrl
+      if (downloadUrl.startsWith('/api/')) {
+        const apiBaseUrl = getApiBaseUrl()
+        downloadUrl = `${apiBaseUrl}${downloadUrl}`
+      }
+      
+      const downloadResponse = await fetch(downloadUrl)
       if (!downloadResponse.ok) {
         throw new Error('Failed to download file')
       }
@@ -232,6 +260,16 @@ function Index() {
         draftSaveStatus={draftSaveStatus}
       />
 
+      {/* Backend Status Alert */}
+      <BackendStatusAlert
+        isAvailable={backendHealth.isAvailable}
+        isChecking={backendHealth.isChecking}
+        lastChecked={backendHealth.lastChecked}
+        error={backendHealth.error}
+        apiBaseUrl={backendHealth.apiBaseUrl}
+        onRetry={backendHealth.retry}
+      />
+
       {/* Output Format and Conversion Section */}
       <OutputFormatAndConversionSection
         selectedFormat={selectedFormat}
@@ -242,8 +280,10 @@ function Index() {
         showAdvancedOptions={showAdvancedOptions}
         onAdvancedOptionsToggle={setShowAdvancedOptions}
         isConverting={isConverting}
-        hasContent={!!markdown.trim()}
-        onConvert={handleConvert}
+        hasContent={!!markdown.trim() && backendHealth.isAvailable}
+        onConvert={backendHealth.isAvailable ? handleConvert : () => {
+          toast.error('Backend not available. Please check deployment configuration.')
+        }}
         onPrint={handlePrint}
         downloadResult={downloadResult}
         onClearResult={clearResult}
@@ -251,6 +291,7 @@ function Index() {
         onDismissError={() => setConversionError(null)}
         onCopyToClipboard={() => {}}
         onDownload={handleDownload}
+        backendAvailable={backendHealth.isAvailable}
       />
     </>
   )

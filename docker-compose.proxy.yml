@@ -2,6 +2,7 @@ services:
   markdown-converter:
     build: 
       context: .
+      dockerfile: server/Dockerfile
       args:
         - GIT_COMMIT=${GIT_COMMIT:-unknown}
     container_name: markdown-converter
@@ -9,10 +10,17 @@ services:
     networks:
       - markdown-converter-network
     volumes:
-      - ./server/downloads:/usr/src/app/server/downloads
-      - ./server/temp:/usr/src/app/server/temp
+      - ./server/downloads:/app/downloads
+      - ./server/temp:/app/temp
     environment:
       - NODE_ENV=production
+      - GIT_COMMIT_HASH=${GIT_COMMIT:-unknown}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
 networks:
   markdown-converter-network:

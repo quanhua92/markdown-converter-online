@@ -278,46 +278,52 @@ app.get('/debug', (_req, res) => {
 
 // Setup static file serving (called after all routes are defined)
 async function setupStaticFiles() {
-  if (process.env.NODE_ENV === 'production') {
-    const distPath = path.resolve('dist');
-    console.log('Setting up static files from:', distPath);
+  // Try to serve static frontend files (for standalone deployment)
+  const staticPaths = ['public', 'dist']; // Check both public (Docker) and dist (local)
+  
+  for (const staticDir of staticPaths) {
+    const staticPath = path.resolve(staticDir);
     
     try {
-      await fs.access(distPath);
-      const files = await fs.readdir(distPath);
-      console.log('Static files available:', files);
-      
-      // Debug middleware to log all requests
-      app.use('*', (req, _res, next) => {
-        console.log('📥 Request:', req.method, req.originalUrl, req.path);
-        next();
-      });
+      await fs.access(staticPath);
+      const files = await fs.readdir(staticPath);
+      console.log(`📁 Setting up static files from: ${staticPath}`);
+      console.log('📁 Static files available:', files.slice(0, 5), files.length > 5 ? `... and ${files.length - 5} more` : '');
       
       // Serve static files
-      app.use(express.static(distPath, {
-        setHeaders: (_res, path) => {
-          console.log('📁 Serving static file:', path);
+      app.use(express.static(staticPath, {
+        setHeaders: (_res, filePath) => {
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('📄 Serving static file:', path.basename(filePath));
+          }
         }
       }));
       
-      // Handle client-side routing for SPA
+      // Handle client-side routing for SPA (must be after API routes)
       app.get('*', (req, res) => {
         // Skip API routes
         if (req.path.startsWith('/api/')) {
           return res.status(404).json({ error: 'API endpoint not found' });
         }
         
-        console.log('SPA fallback triggered for:', req.path);
-        const indexPath = path.join(distPath, 'index.html');
-        console.log('Sending file:', indexPath);
-        res.sendFile(indexPath);
+        console.log('🔀 SPA fallback triggered for:', req.path);
+        const indexPath = path.join(staticPath, 'index.html');
+        res.sendFile(indexPath, (err) => {
+          if (err) {
+            console.error('❌ Failed to send index.html:', err);
+            res.status(500).send('Frontend not available');
+          }
+        });
       });
       
-      console.log('✓ Static file serving configured');
+      console.log(`✅ Static file serving configured from: ${staticDir}`);
+      return; // Exit after first successful setup
     } catch (error) {
-      console.error('✗ Static files setup failed:', error);
+      console.log(`⏭️  Static directory ${staticDir} not found, trying next...`);
     }
   }
+  
+  console.log('ℹ️  No static files found - API-only mode (frontend deployed separately)');
 }
 
 // Async startup function
