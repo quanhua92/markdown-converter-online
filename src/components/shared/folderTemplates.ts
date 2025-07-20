@@ -215,7 +215,7 @@ sequenceDiagram
 This showcase demonstrates the power of markdown with Mermaid diagrams for documentation.
 
 *Happy documenting! 📝*
-\`
+`
       },
       {
         name: 'notes',
@@ -298,11 +298,11 @@ Welcome to your personal knowledge base!
         name: 'ultimate-learning-showcase.md',
         type: 'file',
         path: '/ultimate-learning-showcase.md',
-        content: \`# 🎓 Ultimate Learning & Knowledge Showcase
+        content: `# 🎓 Ultimate Learning & Knowledge Showcase
 
 ## 📚 Learning Journey
 
-\\\`\\\`\\\`mermaid
+\`\`\`mermaid
 journey
     title My Learning Journey 2024
     section Q1 Foundations
@@ -321,12 +321,12 @@ journey
       Architecture: 4: Me
       Leadership: 3: Me
       Mentoring: 5: Me
-\\\`\\\`\\\`
+\`\`\`
 
 ## 💻 Code Learning Examples
 
 ### TypeScript Patterns
-\\\`\\\`\\\`typescript
+\`\`\`typescript
 interface Repository<T> {
   findById(id: string): Promise<T | null>;
   create(data: Omit<T, 'id'>): Promise<T>;
@@ -339,12 +339,12 @@ class UserRepository implements Repository<User> {
     return null;
   }
 }
-\\\`\\\`\\\`
+\`\`\`
 
 ## 📊 Learning Progress
 
 ### Skill Development
-\\\`\\\`\\\`mermaid
+\`\`\`mermaid
 gitGraph
     commit id: "Start Learning"
     branch frontend
@@ -354,7 +354,7 @@ gitGraph
     checkout main
     merge frontend
     commit id: "Full Stack"
-\\\`\\\`\\\`
+\`\`\`
 
 ## 📈 Learning Goals
 
@@ -365,7 +365,7 @@ gitGraph
 | Node.js | 95% | ✅ Complete |
 
 *Keep learning, keep growing! 🌱*
-\`
+`
       },
       {
         name: 'learning',
