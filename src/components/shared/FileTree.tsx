@@ -139,7 +139,7 @@ function FileTreeItem({
   return (
     <div>
       <div
-        className={`group flex items-center gap-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer ${
+        className={`group flex items-center gap-1 py-2 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded ${
           isSelected ? 'bg-blue-100 dark:bg-blue-900' : ''
         }`}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
@@ -151,32 +151,18 @@ function FileTreeItem({
               e.stopPropagation()
               onToggleFolder(item.path)
             }}
-            className="p-0 w-4 h-4 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+            className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded touch-manipulation"
             title="Toggle folder"
           >
             {item.isExpanded ? (
-              <ChevronDown 
-                className="w-3 h-3 cursor-pointer" 
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  onToggleFolder(item.path)
-                }}
-              />
+              <ChevronDown className="w-4 h-4 pointer-events-none" />
             ) : (
-              <ChevronRight 
-                className="w-3 h-3 cursor-pointer" 
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  onToggleFolder(item.path)
-                }}
-              />
+              <ChevronRight className="w-4 h-4 pointer-events-none" />
             )}
           </button>
         )}
         
-        {item.type === 'file' && <div className="w-4" />}
+        {item.type === 'file' && <div className="min-w-[44px]" />}
         
         {item.type === 'folder' ? (
           item.isExpanded ? (
@@ -224,60 +210,60 @@ function FileTreeItem({
           <Button
             size="sm"
             variant="ghost"
-            className="h-6 w-6 p-0"
+            className="min-h-[44px] min-w-[44px] p-2 touch-manipulation"
             onClick={(e) => {
               e.stopPropagation()
               setIsMenuOpen(!isMenuOpen)
             }}
             title="More actions"
           >
-            <MoreVertical className="w-3 h-3" />
+            <MoreVertical className="w-4 h-4" />
           </Button>
           
           {isMenuOpen && (
-            <div className="absolute right-0 top-7 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 min-w-[120px]">
+            <div className="absolute right-0 top-11 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-[100] min-w-[140px]">
               <div className="py-1">
                 {item.type === 'folder' && (
                   <>
                     <button
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 touch-manipulation min-h-[44px]"
                       onClick={() => handleMenuAction('toggle')}
                     >
                       {item.isExpanded ? (
-                        <ChevronDown className="w-3 h-3" />
+                        <ChevronDown className="w-4 h-4" />
                       ) : (
-                        <ChevronRight className="w-3 h-3" />
+                        <ChevronRight className="w-4 h-4" />
                       )}
                       {item.isExpanded ? 'Collapse' : 'Expand'}
                     </button>
                     <button
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 touch-manipulation min-h-[44px]"
                       onClick={() => handleMenuAction('newFile')}
                     >
-                      <Plus className="w-3 h-3" />
+                      <Plus className="w-4 h-4" />
                       New File
                     </button>
                     <button
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 touch-manipulation min-h-[44px]"
                       onClick={() => handleMenuAction('newFolder')}
                     >
-                      <Folder className="w-3 h-3" />
+                      <Folder className="w-4 h-4" />
                       New Folder
                     </button>
                   </>
                 )}
                 <button
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 touch-manipulation min-h-[44px]"
                   onClick={() => handleMenuAction('rename')}
                 >
-                  <Edit3 className="w-3 h-3" />
+                  <Edit3 className="w-4 h-4" />
                   Rename
                 </button>
                 <button
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 dark:text-red-400"
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 text-red-600 dark:text-red-400 touch-manipulation min-h-[44px]"
                   onClick={() => handleMenuAction('delete')}
                 >
-                  <Trash2 className="w-3 h-3" />
+                  <Trash2 className="w-4 h-4" />
                   Delete
                 </button>
               </div>
