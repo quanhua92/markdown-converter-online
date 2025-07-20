@@ -55,7 +55,7 @@ High-level architecture description.
 
 ## System Diagram
 
-\\\`\\\`\\\`mermaid
+\`\`\`mermaid
 graph TD
     A[Frontend] --> B[API Gateway]
     B --> C[Backend Services]
@@ -63,7 +63,7 @@ graph TD
     
     style A fill:#e1f5fe
     style C fill:#e8f5e8
-\\\`\\\`\\\`
+\`\`\`
 
 ## Components
 - Component 1: Description
