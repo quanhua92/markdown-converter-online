@@ -14,8 +14,8 @@ interface WorkspaceData {
 }
 
 // Multi-workspace storage functions
-const CURRENT_WORKSPACE_KEY = 'markdown-explorer-current-workspace'
-const WORKSPACE_PREFIX = 'markdown-explorer-workspace-'
+const CURRENT_WORKSPACE_KEY = 'markdown-explorer-v2-current-workspace'
+const WORKSPACE_PREFIX = 'markdown-explorer-v2-workspace-'
 
 function getDefaultFiles(): FileSystemItem[] {
   return [

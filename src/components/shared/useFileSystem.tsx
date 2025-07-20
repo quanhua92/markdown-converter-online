@@ -195,17 +195,19 @@ export function useFileSystem() {
   // Initialize files from workspace data
   useEffect(() => {
     if (workspaceData) {
-      setFiles(workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles())
+      // Only use getInitialFiles() if the workspace has no files at all
+      const filesToUse = workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles()
+      setFiles(filesToUse)
       
       // Set current file from workspace or find default
       if (workspaceData.currentFilePath) {
-        const savedCurrentFile = findItemByPath(workspaceData.files, workspaceData.currentFilePath)
+        const savedCurrentFile = findItemByPath(filesToUse, workspaceData.currentFilePath)
         if (savedCurrentFile) {
           setCurrentFile(savedCurrentFile)
         }
       } else {
-        // Set the first file as current
-        const firstFile = findItemByPath(workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles(), '/Welcome.md')
+        // Set the first file as current from the actual files we're using
+        const firstFile = findItemByPath(filesToUse, '/Welcome.md')
         if (firstFile) {
           setCurrentFile(firstFile)
         }

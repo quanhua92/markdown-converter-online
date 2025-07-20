@@ -17,23 +17,84 @@ const { chromium } = require('playwright');
   try {
     // Step 1: Clear all storage to ensure clean state
     await page.goto('http://localhost:3000/explorer');
-    await page.evaluate(() => {
-      // Clear all storage completely
-      localStorage.clear();
-      sessionStorage.clear();
-      
-      // Also manually remove any workspace keys that might persist
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith('markdown-explorer-')) {
+    
+    // Clear localStorage multiple times to ensure it's really gone
+    for (let i = 0; i < 3; i++) {
+      await page.evaluate(() => {
+        // Clear all storage completely
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Manually clear all possible workspace-related keys (including new v2 keys)
+        const keysToRemove = [
+          'markdown-explorer-current-workspace',
+          'markdown-explorer-files', 
+          'markdown-explorer-workspace-default',
+          'markdown-explorer-workspaces',
+          'markdown-explorer-v2-current-workspace'
+        ];
+        
+        keysToRemove.forEach(key => {
           localStorage.removeItem(key);
+        });
+        
+        // Also remove any dynamically created workspace keys (both old and new prefixes)
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('markdown-explorer-') || key.startsWith('markdown-explorer-v2-'))) {
+            localStorage.removeItem(key);
+          }
         }
       });
-    });
+      
+      await page.waitForTimeout(500); // Wait between clearing attempts
+    }
     
-    // Step 2: Reload page to show workspace welcome
+    // Verify localStorage is actually empty
+    const postClearState = await page.evaluate(() => {
+      const allKeys = Object.keys(localStorage);
+      const workspaceKeys = allKeys.filter(k => k.startsWith('markdown-explorer-') || k.startsWith('markdown-explorer-v2-'));
+      return {
+        totalKeys: allKeys.length,
+        workspaceKeys: workspaceKeys,
+        currentWorkspace: localStorage.getItem('markdown-explorer-current-workspace'),
+        currentWorkspaceV2: localStorage.getItem('markdown-explorer-v2-current-workspace')
+      };
+    });
+    console.log('📊 Post-clear localStorage state:', postClearState);
+    
+    // Step 2: Reload page and monitor localStorage changes
     await page.reload();
-    await page.waitForTimeout(3000);
+    
+    // Check localStorage immediately after reload
+    const immediateState = await page.evaluate(() => {
+      const allKeys = Object.keys(localStorage);
+      const workspaceKeys = allKeys.filter(k => k.startsWith('markdown-explorer-') || k.startsWith('markdown-explorer-v2-'));
+      return {
+        totalKeys: allKeys.length,
+        workspaceKeys: workspaceKeys,
+        currentWorkspace: localStorage.getItem('markdown-explorer-current-workspace'),
+        currentWorkspaceV2: localStorage.getItem('markdown-explorer-v2-current-workspace')
+      };
+    });
+    console.log('📊 Immediate post-reload state:', immediateState);
+    
+    await page.waitForTimeout(1000);
+    
+    // Check again after 1 second
+    const afterWaitState = await page.evaluate(() => {
+      const allKeys = Object.keys(localStorage);
+      const workspaceKeys = allKeys.filter(k => k.startsWith('markdown-explorer-') || k.startsWith('markdown-explorer-v2-'));
+      return {
+        totalKeys: allKeys.length,
+        workspaceKeys: workspaceKeys,
+        currentWorkspace: localStorage.getItem('markdown-explorer-current-workspace'),
+        currentWorkspaceV2: localStorage.getItem('markdown-explorer-v2-current-workspace')
+      };
+    });
+    console.log('📊 After 1s wait state:', afterWaitState);
+    
+    await page.waitForTimeout(2000);
     
     console.log('✅ Step 1: Page loaded with clean localStorage');
     await page.screenshot({ path: 'tests/screenshots/workspace-welcome-initial.png', fullPage: true });
@@ -77,6 +138,45 @@ const { chromium } = require('playwright');
       console.log('🔍 Create workspace cards found:', allCreateCards);
       console.log('🔍 Join workspace cards found:', allJoinCards);
       console.log('🔍 Import ZIP cards found:', allImportCards);
+      
+      // Check for any error messages or loading states
+      const errorMessages = await page.locator('text=Error').count();
+      const loadingMessages = await page.locator('text=Loading').count();
+      console.log('🔍 Error messages found:', errorMessages);
+      console.log('🔍 Loading messages found:', loadingMessages);
+      
+      // Check if page has any buttons at all
+      const allButtons = await page.locator('button').count();
+      console.log('🔍 Total buttons found on page:', allButtons);
+      
+      // Check for the workspace welcome main card wrapper
+      const mainCards = await page.locator('.max-w-4xl').count();
+      console.log('🔍 Main card containers found:', mainCards);
+      
+      // Check the page content itself
+      const pageText = await page.textContent('body');
+      console.log('🔍 Page contains "Get started":', pageText?.includes('Get started') || false);
+      console.log('🔍 Page contains "Create New":', pageText?.includes('Create New') || false);
+      
+      // Debug: Check what workspace state the app thinks it's in
+      const workspaceState = await page.evaluate(() => {
+        const currentWorkspace = localStorage.getItem('markdown-explorer-current-workspace');
+        const currentWorkspaceV2 = localStorage.getItem('markdown-explorer-v2-current-workspace');
+        const allKeys = Object.keys(localStorage).filter(k => k.startsWith('markdown-explorer-') || k.startsWith('markdown-explorer-v2-'));
+        const defaultWorkspaceData = localStorage.getItem('markdown-explorer-workspace-default');
+        return {
+          currentWorkspace,
+          currentWorkspaceV2,
+          allWorkspaceKeys: allKeys,
+          storageLength: localStorage.length,
+          defaultWorkspaceData: defaultWorkspaceData ? JSON.parse(defaultWorkspaceData) : null
+        };
+      });
+      console.log('🔍 Workspace state:', workspaceState);
+      
+      // Take a detailed screenshot to see what's actually rendering
+      await page.screenshot({ path: 'tests/screenshots/workspace-welcome-detailed-debug.png', fullPage: true });
+      console.log('📸 Detailed debug screenshot saved');
       
       if (allCreateCards === 0) {
         console.log('❌ No create workspace cards found - testing workspace welcome functionality may be incomplete');
