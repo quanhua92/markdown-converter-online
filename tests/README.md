@@ -107,6 +107,20 @@ Tests complete workspace session management workflow.
 
 **Run:** `node tests/test-workspace-sign-in-out.cjs`
 
+##### Folder Toggle Fix Test (`test-folder-toggle-fix.cjs`)
+Tests folder expand/collapse functionality in the file tree.
+
+**What it tests:**
+- Folder toggle button detection and interaction
+- Expand/collapse state changes and visual indicators
+- Children visibility when folders are expanded/collapsed
+- Proper hiding/showing of folder children
+- Consistent visual state indicators (arrows)
+- Correct aria-expanded attribute handling
+- JavaScript error detection during folder operations
+
+**Run:** `node tests/test-folder-toggle-fix.cjs`
+
 #### Print & Features Tests
 
 ##### Print Workflow Test (`test-print-workflow.cjs`)
@@ -182,6 +196,7 @@ Debugging tool for anchor link functionality.
    node tests/test-workspace-welcome.cjs
    node tests/test-workspace-functionality.cjs
    node tests/test-workspace-sign-in-out.cjs
+   node tests/test-folder-toggle-fix.cjs
    node tests/test-e2e-explorer.cjs
    
    # Print & Features Tests
@@ -197,7 +212,7 @@ Debugging tool for anchor link functionality.
 4. **Run core test suite:**
    ```bash
    # Run essential tests (recommended for CI/regression testing)
-   for test in test-dark-mode.cjs test-heading-styles.cjs test-readability.cjs test-workspace-welcome.cjs test-e2e-explorer.cjs; do
+   for test in test-dark-mode.cjs test-heading-styles.cjs test-readability.cjs test-workspace-welcome.cjs test-folder-toggle-fix.cjs test-e2e-explorer.cjs; do
      echo "Running tests/$test..."
      node "tests/$test"
      echo "---"
@@ -237,6 +252,11 @@ Tests generate:
 - Compare generated screenshots manually to verify visual changes
 - Dark mode should show dramatically different backgrounds
 - Heading styles should be consistent and properly formatted
+
+**Folder toggle issues:**
+- If folders appear collapsed but children are still visible, run `node tests/test-folder-toggle-fix.cjs`
+- This was a known bug fixed in v2.1 - ensure you're running the latest version
+- Folder toggle functionality should work correctly after the fix
 
 ### Adding New Tests
 

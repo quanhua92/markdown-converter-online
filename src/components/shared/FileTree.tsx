@@ -95,20 +95,39 @@ function FileTreeItem({
   return (
     <div>
       <div
-        className={`flex items-center gap-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer ${
+        className={`group flex items-center gap-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer ${
           isSelected ? 'bg-blue-100 dark:bg-blue-900' : ''
         }`}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
         {item.type === 'folder' && (
           <button
-            onClick={() => onToggleFolder(item)}
-            className="p-0 w-4 h-4 flex items-center justify-center"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              onToggleFolder(item)
+            }}
+            className="p-0 w-4 h-4 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+            title="Toggle folder"
           >
             {item.isExpanded ? (
-              <ChevronDown className="w-3 h-3" />
+              <ChevronDown 
+                className="w-3 h-3 cursor-pointer" 
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onToggleFolder(item)
+                }}
+              />
             ) : (
-              <ChevronRight className="w-3 h-3" />
+              <ChevronRight 
+                className="w-3 h-3 cursor-pointer" 
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onToggleFolder(item)
+                }}
+              />
             )}
           </button>
         )}
@@ -142,8 +161,15 @@ function FileTreeItem({
           />
         ) : (
           <span
-            className="flex-1 text-sm"
-            onClick={() => item.type === 'file' && onFileSelect(item)}
+            className="flex-1 text-sm cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (item.type === 'file') {
+                onFileSelect(item)
+              } else if (item.type === 'folder') {
+                onToggleFolder(item)
+              }
+            }}
             data-testid={`file-tree-item-${item.name}`}
           >
             {item.name}
@@ -222,7 +248,7 @@ function FileTreeItem({
         </div>
       )}
 
-      {item.type === 'folder' && item.isExpanded && item.children && (
+      {item.type === 'folder' && item.isExpanded === true && item.children && (
         <div className="group">
           {item.children.map((child) => (
             <FileTreeItem

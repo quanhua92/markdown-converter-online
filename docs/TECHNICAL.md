@@ -407,9 +407,30 @@ const WORKSPACE_PREFIX = 'markdown-explorer-v2-workspace-'
 - `WorkspaceWelcome.tsx`: Full-screen welcome interface for no-workspace state
 - `WorkspaceSelector.tsx`: Sign-in/sign-out UI component (legacy, used within workspaces)
 - `useFileSystem.tsx`: Integration layer with file operations and workspace management
-- `FileTree.tsx`: Workspace status display and controls
+- `FileTree.tsx`: Workspace status display and controls with fixed folder toggle functionality
 - `TemplateSelector.tsx`: Template selection with compact mode for welcome screen
 - `explorer.tsx`: Main route that conditionally renders welcome or workspace view
+
+#### Workspace Templates (Enhanced v2.1)
+Each workspace template now includes comprehensive Ultimate showcase files with Mermaid diagrams:
+
+**Project Notes Workspace**:
+- `ultimate-showcase.md`: Project management examples with flowcharts, sequence diagrams, Gantt charts
+- TypeScript interfaces, advanced tables, and project workflow demonstrations
+
+**Knowledge Base Workspace**:
+- `ultimate-learning-showcase.md`: Learning journey tracking with journey maps, git graphs, skill progress
+- Repository patterns, learning goals tracking, and development progress visualization
+
+**Blog/Website Workspace**:
+- `ultimate-content-showcase.md`: Content strategy flows with pie charts, editorial calendars, performance metrics
+- Content creation workflows, engagement tracking, and publishing schedules
+
+All templates demonstrate:
+- Multiple Mermaid diagram types (flowcharts, sequence, journey, gitGraph, gantt, pie)
+- TypeScript code examples and interfaces
+- Advanced markdown features (tables, task lists, emphasis)
+- Best practices and practical guidelines
 
 ## Testing
 
@@ -489,6 +510,21 @@ kill -9 <PID>
 
 # Use alternative port
 PORT=3001 pnpm dev
+```
+
+#### File Tree Issues
+```bash
+# Folder toggle not working (fixed in v2.1)
+# Issue: Folders showed as collapsed but children remained visible
+# Root cause: Weak condition checking in FileTree.tsx
+
+# Fixed by:
+# 1. Explicit boolean check: item.isExpanded === true
+# 2. Proper undefined state handling in toggleFolder function
+# 3. Ensured collapsed folders hide their children correctly
+
+# Test folder toggle functionality:
+node tests/test-folder-toggle-fix.cjs
 ```
 
 ### Debugging Tools

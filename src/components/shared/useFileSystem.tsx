@@ -2,6 +2,13 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { FileSystemItem } from './FileTree'
 import { useWorkspaceManager } from './useWorkspaceManager'
 
+// Add timeout to window for folder toggle debouncing
+declare global {
+  interface Window {
+    folderToggleTimeout?: NodeJS.Timeout
+  }
+}
+
 const STORAGE_KEY = 'markdown-explorer-files'
 
 interface FileSystemState {
@@ -321,10 +328,15 @@ export function useFileSystem() {
   }, [currentFile])
 
   const toggleFolder = useCallback((item: FileSystemItem) => {
-    setFiles(prevFiles => updateItemInTree(prevFiles, item.path, (folder) => ({
-      ...folder,
-      isExpanded: !folder.isExpanded
-    })))
+    console.log('🔧 toggleFolder: Toggling', item.path, 'from', item.isExpanded)
+    setFiles(prevFiles => updateItemInTree(prevFiles, item.path, (folder) => {
+      const newExpanded = folder.isExpanded === true ? false : true
+      console.log('🔧 toggleFolder: Setting isExpanded to', newExpanded)
+      return {
+        ...folder,
+        isExpanded: newExpanded
+      }
+    }))
   }, [])
 
   const clearAll = useCallback(() => {
