@@ -111,6 +111,9 @@ function FileTreeItem({
   const handleMenuAction = (action: string) => {
     setIsMenuOpen(false)
     switch (action) {
+      case 'toggle':
+        onToggleFolder(item)
+        break
       case 'rename':
         startRename()
         break
@@ -229,6 +232,17 @@ function FileTreeItem({
               <div className="py-1">
                 {item.type === 'folder' && (
                   <>
+                    <button
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                      onClick={() => handleMenuAction('toggle')}
+                    >
+                      {item.isExpanded ? (
+                        <ChevronDown className="w-3 h-3" />
+                      ) : (
+                        <ChevronRight className="w-3 h-3" />
+                      )}
+                      {item.isExpanded ? 'Collapse' : 'Expand'}
+                    </button>
                     <button
                       className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                       onClick={() => handleMenuAction('newFile')}
