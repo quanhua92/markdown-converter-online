@@ -10,7 +10,8 @@ import {
   Sun, 
   Moon 
 } from 'lucide-react'
-import { FileTree, FileSystemItem } from './FileTree'
+import { FileTree } from './FileTree'
+import type { FileSystemItem } from './FileTree'
 import { useCallback, useMemo } from 'react'
 
 interface ExplorerHeaderProps {

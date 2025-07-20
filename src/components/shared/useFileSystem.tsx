@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { FileSystemItem } from './FileTree'
+import type { FileSystemItem } from './FileTree'
 import { useWorkspaceManager } from './useWorkspaceManager'
 
 // Add timeout to window for folder toggle debouncing
@@ -322,11 +322,11 @@ export function useFileSystem() {
     setHasUnsavedChanges(true) // Mark as unsaved when renaming items
   }, [currentFile])
 
-  const toggleFolder = useCallback((item: FileSystemItem) => {
-    console.log('🔧 toggleFolder: Toggling', item.path, 'from', item.isExpanded)
-    setFiles(prevFiles => updateItemInTree(prevFiles, item.path, (folder) => {
+  const toggleFolder = useCallback((path: string) => {
+    console.log('🔧 toggleFolder: Toggling', path)
+    setFiles(prevFiles => updateItemInTree(prevFiles, path, (folder) => {
       const newExpanded = folder.isExpanded === true ? false : true
-      console.log('🔧 toggleFolder: Setting isExpanded to', newExpanded)
+      console.log('🔧 toggleFolder: Setting isExpanded from', folder.isExpanded, 'to', newExpanded)
       return {
         ...folder,
         isExpanded: newExpanded

@@ -4,8 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { FolderPlus, Sparkles } from 'lucide-react'
-import { folderTemplates, FolderTemplate, initializeTemplateStructure } from './folderTemplates'
-import { FileSystemItem } from './FileTree'
+import { folderTemplates, initializeTemplateStructure } from './folderTemplates'
+import type { FolderTemplate } from './folderTemplates'
+import type { FileSystemItem } from './FileTree'
 
 interface TemplateSelectorProps {
   onTemplateSelect: (items: FileSystemItem[]) => void

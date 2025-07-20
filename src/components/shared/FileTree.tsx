@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Plus, Trash2, Edit3, Sparkles, MoreVertical } from 'lucide-react'
-import { TemplateSelector } from './TemplateSelector'
+// Remove TemplateSelector import to avoid circular dependency
 import { WorkspaceSelector } from './WorkspaceSelector'
+// Define FileSystemItem interface here to be exported
 export interface FileSystemItem {
   id: string
   name: string
@@ -15,8 +16,8 @@ export interface FileSystemItem {
   isExpanded?: boolean
 }
 
-// Explicit type export for better compatibility
-export type { FileSystemItem as FileSystemItemType }
+// Export a concrete value to ensure the interface is properly exported
+export const FileSystemItemType = 'FileSystemItem' as const
 
 interface FileTreeProps {
   items: FileSystemItem[]
@@ -112,6 +113,12 @@ function FileTreeItem({
     setIsMenuOpen(false)
     switch (action) {
       case 'toggle':
+        console.log('🔧 handleMenuAction: toggle called for item', item)
+        console.log('🔧 handleMenuAction: item.path is', item.path)
+        console.log('🔧 handleMenuAction: item.name is', item.name)
+        console.log('🔧 handleMenuAction: item keys:', Object.keys(item))
+        console.log('🔧 handleMenuAction: item type:', item.type)
+        console.log('🔧 handleMenuAction: item id:', item.id)
         onToggleFolder(item.path)
         break
       case 'rename':
@@ -396,6 +403,7 @@ export function FileTree({
             >
               <Folder className="w-4 h-4" />
             </Button>
+            {/* Temporarily disabled to avoid circular dependency
             {showTemplateOptions && onInitializeTemplate && (
               <TemplateSelector
                 onTemplateSelect={onInitializeTemplate}
@@ -410,6 +418,7 @@ export function FileTree({
                 }
               />
             )}
+            */}
           </div>
         </CardTitle>
       </CardHeader>

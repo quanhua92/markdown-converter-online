@@ -6,7 +6,7 @@ import {
   useEditor,
   debounce
 } from '@/components/shared'
-import { FileSystemItem } from '@/components/shared/FileTree'
+import type { FileSystemItem } from '@/components/shared/FileTree'
 import { useFileSystem } from '@/components/shared/useFileSystem'
 import { ExplorerHeader } from '@/components/shared/ExplorerHeader'
 import { ExplorerMobileNavigation } from '@/components/shared/ExplorerMobileNavigation'

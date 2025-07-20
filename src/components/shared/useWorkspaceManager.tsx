@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { FileSystemItem } from './FileTree'
+import type { FileSystemItem } from './FileTree'
 
 // Enhanced workspace manager with no-workspace state support
 // Supports: no workspace state, multiple workspaces, import from zip

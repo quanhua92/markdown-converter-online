@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Edit3, Eye, Save, Download, Printer } from 'lucide-react'
-import { FileSystemItem } from './FileTree'
+import type { FileSystemItem } from './FileTree'
 
 interface ExplorerMobileNavigationProps {
   currentFile: FileSystemItem | null

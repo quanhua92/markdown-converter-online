@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Edit3, Eye } from 'lucide-react'
 import { MarkdownRenderer } from './MarkdownRenderer'
-import { FileSystemItem } from './FileTree'
+import type { FileSystemItem } from './FileTree'
 import { TemplateQuickActions } from './TemplateSelector'
 
 interface ExplorerEditorSectionProps {
