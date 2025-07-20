@@ -21,7 +21,9 @@ echo "📝 Git commit: $GIT_COMMIT"
 
 # Build with git commit as build arg (forces cache invalidation)
 echo "🔨 Building with fresh cache..."
-GIT_COMMIT=$GIT_COMMIT docker compose -f "$COMPOSE_FILE" build --build-arg GIT_COMMIT=$GIT_COMMIT
+CACHEBUST=$(date +%s)
+echo "🔄 Cache bust: $CACHEBUST"
+GIT_COMMIT=$GIT_COMMIT docker compose -f "$COMPOSE_FILE" build --build-arg GIT_COMMIT=$GIT_COMMIT --build-arg CACHEBUST=$CACHEBUST
 
 # Start/restart containers with new image
 echo "🔄 Starting containers with new image..."

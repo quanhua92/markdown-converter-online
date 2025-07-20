@@ -34,11 +34,17 @@ Thumbs.db
 
 # Testing
 coverage
+tests/screenshots/
 playwright-test-screenshot.png
 console-test-screenshot.png
 git-hash-test-screenshot.png
 playwright-conversion-test.png
 playwright-debug-screenshot.png
+*.test.*
+*.spec.*
+test-results/
+playwright-report/
+playwright/.cache/
 
 # Temporary files
 *.tmp
@@ -48,6 +54,8 @@ test-define.js
 test-footer-build.js
 playwright-*.js
 playwright-testing-guide.md
+.cache/
+.vite/
 
 # Docker
 Dockerfile*
