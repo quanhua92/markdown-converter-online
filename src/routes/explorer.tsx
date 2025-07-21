@@ -7,13 +7,17 @@ import {
   debounce
 } from '@/components/shared'
 import type { FileSystemItem } from '@/components/shared/FileTree'
-import { useFileSystem } from '@/components/shared/useFileSystem'
-import { ExplorerHeader } from '@/components/shared/ExplorerHeader'
+import { useIntegratedFileSystem, useWorkspaceActions } from '../hooks/useIntegratedFileSystem'
+import { useEnhancedWorkspaceManager } from '../hooks/useEnhancedWorkspaceManager'
+import { EnhancedExplorerHeader } from '../components/git/EnhancedExplorerHeader'
 import { ExplorerMobileNavigation } from '@/components/shared/ExplorerMobileNavigation'
 import { ExplorerFileTreePanels } from '@/components/shared/ExplorerFileTreePanels'
 import { ExplorerEditorSection } from '@/components/shared/ExplorerEditorSection'
 import { WorkspaceWelcome } from '@/components/shared/WorkspaceWelcome'
+import { GitWorkspaceCreator } from '../components/git/GitWorkspaceCreator'
+import { GitStatus } from '../components/git/GitStatus'
 import { folderTemplates, initializeTemplateStructure } from '@/components/shared/folderTemplates'
+import type { GitRepository } from '../types/git'
 
 export const Route = createFileRoute('/explorer')({
   component: Explorer,
@@ -23,9 +27,30 @@ function Explorer() {
   const { isDarkMode, toggleTheme } = useTheme()
   const { activeTab, setActiveTab, isDesktop, showEditPanel, setShowEditPanel, showPreviewPanel, setShowPreviewPanel } = useEditor()
   
+  // Enhanced workspace management
+  const {
+    currentWorkspaceId,
+    currentWorkspace,
+    allWorkspaces,
+    isLoading: workspaceLoading,
+    joinWorkspace,
+    leaveWorkspace,
+    createLocalWorkspace,
+    createGitWorkspace,
+    deleteWorkspace,
+    renameWorkspace,
+    refreshWorkspaces,
+    hasGitSupport
+  } = useEnhancedWorkspaceManager()
+
+  // Integrated file system
   const {
     files,
     currentFile,
+    isLoaded,
+    isLoading,
+    hasUnsavedChanges,
+    workspaceType,
     selectFile,
     closeFile,
     updateFileContent,
@@ -34,259 +59,256 @@ function Explorer() {
     deleteItem,
     renameItem,
     toggleFolder,
-    clearAll,
-    initializeFromTemplate,
-    isLoaded,
-    // Workspace management
-    currentWorkspaceId,
-    currentWorkspaceName,
-    workspaces,
-    joinWorkspace,
-    leaveWorkspace,
-    createWorkspace,
-    deleteWorkspace,
-    renameWorkspace,
-    getAllWorkspaces,
-    // Enhanced workspace functionality
-    createWorkspaceFromTemplate,
-    importWorkspaceFromZip
-  } = useFileSystem()
+    saveWorkspace,
+    createLocalWorkspace: createLocalWorkspaceFS,
+    createGitWorkspace: createGitWorkspaceFS
+  } = useIntegratedFileSystem()
 
-  const [isFileTreeCollapsed, setIsFileTreeCollapsed] = useState(false)
-  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
-  const [markdownContent, setMarkdownContent] = useState('')
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  // Git-specific actions
+  const {
+    repositoryUrl,
+    currentBranch,
+    canCommit,
+    canSync,
+    syncStatus,
+    isSyncing,
+    commitChanges,
+    syncWithRemote,
+    switchBranch
+  } = useWorkspaceActions()
 
-  // Sync markdown content with current file
-  useEffect(() => {
-    if (currentFile) {
-      setMarkdownContent(currentFile.content || '')
-    }
-  }, [currentFile])
+  // Local state
+  const [showGitWorkspaceCreator, setShowGitWorkspaceCreator] = useState(false)
+  const [fileTreeCollapsed, setFileTreeCollapsed] = useState(false)
 
-  // Debounced save function - memoized to prevent recreation on every render
+  // Auto-save for local workspaces
   const debouncedSave = useCallback(
-    debounce((content: string) => {
-      if (currentFile) {
-        updateFileContent(currentFile.path, content)
-        setSaveStatus('saved')
-        setTimeout(() => setSaveStatus('idle'), 2000)
+    debounce(() => {
+      if (workspaceType === 'local' && saveWorkspace) {
+        saveWorkspace()
       }
-    }, 500),
-    [currentFile, updateFileContent]
+    }, 1000),
+    [workspaceType, saveWorkspace]
   )
 
-  const handleMarkdownChange = useCallback((value: string) => {
-    setMarkdownContent(value)
-    setSaveStatus('saving')
-    debouncedSave(value)
-  }, [debouncedSave])
-
-  const handleFileSelect = useCallback((item: FileSystemItem) => {
-    selectFile(item)
-  }, [selectFile])
-
-  const handlePrint = useCallback(() => {
-    if (!currentFile || !markdownContent.trim()) {
-      toast.error('No content to print')
-      return
+  useEffect(() => {
+    if (workspaceType === 'local' && hasUnsavedChanges) {
+      debouncedSave()
     }
+  }, [workspaceType, hasUnsavedChanges, debouncedSave])
 
+  // Handle workspace operations
+  const handleJoinWorkspace = useCallback(async (workspaceId: string) => {
     try {
-      localStorage.setItem('markdownDraft', markdownContent)
-      const printUrl = `/print`
-      const newWindow = window.open(printUrl, '_blank')
-      
-      if (!newWindow) {
-        toast.error('Failed to open print window. Please check your popup blocker settings.')
-      }
+      await joinWorkspace(workspaceId)
+      toast.success('Workspace loaded successfully')
     } catch (error) {
-      console.error('Print error:', error)
-      toast.error('Failed to prepare content for printing')
+      console.error('Failed to join workspace:', error)
+      toast.error('Failed to load workspace')
     }
-  }, [currentFile, markdownContent])
-
-  const handleExport = useCallback(() => {
-    if (!currentFile || !markdownContent.trim()) {
-      toast.error('No content to export')
-      return
-    }
-
-    const blob = new Blob([markdownContent], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = currentFile.name.endsWith('.md') ? currentFile.name : `${currentFile.name}.md`
-    a.click()
-    URL.revokeObjectURL(url)
-    toast.success('Markdown file exported successfully!')
-  }, [currentFile, markdownContent])
-
-  const handleManualSave = useCallback(() => {
-    if (currentFile) {
-      updateFileContent(currentFile.path, markdownContent)
-      setSaveStatus('saved')
-      setTimeout(() => setSaveStatus('idle'), 2000)
-      toast.success('File saved!')
-    }
-  }, [currentFile, markdownContent, updateFileContent])
-
-  // Workspace welcome handlers
-  const handleJoinWorkspace = useCallback((workspaceId: string) => {
-    joinWorkspace(workspaceId)
-    toast.success('Joined workspace successfully!')
   }, [joinWorkspace])
 
-  const handleCreateWorkspace = useCallback((name: string) => {
-    createWorkspace(name)
-    toast.success(`Created workspace "${name}"!`)
-  }, [createWorkspace])
+  const handleCreateWorkspace = useCallback(async (name: string) => {
+    try {
+      await createLocalWorkspace(name)
+      toast.success('Workspace created successfully')
+    } catch (error) {
+      console.error('Failed to create workspace:', error)
+      toast.error('Failed to create workspace')
+    }
+  }, [createLocalWorkspace])
+
+  const handleCreateGitWorkspace = useCallback(async (
+    repository: GitRepository, 
+    branch: string, 
+    workspaceName: string
+  ) => {
+    try {
+      await createGitWorkspace(workspaceName, repository, branch)
+      toast.success(`Git workspace created from ${repository.name}`)
+    } catch (error) {
+      console.error('Failed to create Git workspace:', error)
+      toast.error('Failed to create Git workspace')
+    }
+  }, [createGitWorkspace])
 
   const handleImportFromZip = useCallback(async (file: File) => {
     try {
-      const baseName = file.name.replace(/\.zip$/i, '')
-      await importWorkspaceFromZip(baseName, file)
-      toast.success(`Imported workspace from ${file.name}!`)
+      // TODO: Implement ZIP import
+      toast.info('ZIP import coming soon!')
     } catch (error) {
-      console.error('Import failed:', error)
-      toast.error('Failed to import workspace from ZIP file')
+      console.error('Failed to import from ZIP:', error)
+      toast.error('Failed to import from ZIP')
     }
-  }, [importWorkspaceFromZip])
+  }, [])
 
-  const handleInitFromTemplate = useCallback((templateKey: string) => {
+  const handleInitFromTemplate = useCallback(async (templateKey: string) => {
     try {
-      const template = folderTemplates[templateKey]
-      if (template) {
-        const templateFiles = initializeTemplateStructure(template)
-        createWorkspaceFromTemplate(template.name, templateFiles)
-        toast.success(`Created workspace from ${template.name} template!`)
+      const template = folderTemplates.find(t => t.id === templateKey)
+      if (!template) {
+        throw new Error('Template not found')
       }
+
+      const workspaceName = `${template.name} Workspace`
+      const workspaceId = await createLocalWorkspace(workspaceName)
+      
+      // Initialize template structure would need to be adapted for the new system
+      toast.success(`Workspace created from ${template.name} template`)
     } catch (error) {
-      console.error('Template initialization failed:', error)
+      console.error('Failed to create workspace from template:', error)
       toast.error('Failed to create workspace from template')
     }
-  }, [createWorkspaceFromTemplate])
+  }, [createLocalWorkspace])
 
-  if (!isLoaded) {
+  // Handle Git operations
+  const handleCommitChanges = useCallback(async (message: string) => {
+    if (!commitChanges) return
+    
+    try {
+      await commitChanges(message)
+      toast.success('Changes committed successfully')
+    } catch (error) {
+      console.error('Failed to commit changes:', error)
+      toast.error('Failed to commit changes')
+    }
+  }, [commitChanges])
+
+  const handleSyncWithRemote = useCallback(async () => {
+    if (!syncWithRemote) return
+    
+    try {
+      await syncWithRemote()
+      toast.success('Synced with remote repository')
+    } catch (error) {
+      console.error('Failed to sync with remote:', error)
+      toast.error('Failed to sync with remote')
+    }
+  }, [syncWithRemote])
+
+  // Handle folder toggling
+  const handleToggleFolder = useCallback((path: string) => {
+    toggleFolder(path)
+  }, [toggleFolder])
+
+  // Render workspace welcome if no workspace is selected
+  if (!currentWorkspaceId || !isLoaded) {
     return (
-      <div className="min-h-screen bg-blue-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {workspaceLoading ? (
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <WorkspaceWelcome
+            workspaces={allWorkspaces}
+            onJoinWorkspace={handleJoinWorkspace}
+            onCreateWorkspace={handleCreateWorkspace}
+            onImportFromZip={handleImportFromZip}
+            onInitFromTemplate={handleInitFromTemplate}
+            onCreateGitWorkspace={hasGitSupport ? () => setShowGitWorkspaceCreator(true) : undefined}
+          />
+        )}
+        
+        <GitWorkspaceCreator
+          isOpen={showGitWorkspaceCreator}
+          onClose={() => setShowGitWorkspaceCreator(false)}
+          onCreateWorkspace={handleCreateGitWorkspace}
+        />
+      </div>
+    )
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading your workspace...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading workspace...</p>
         </div>
       </div>
     )
   }
 
-  // Show workspace welcome screen when no workspace is active
-  if (!currentWorkspaceId) {
-    return (
-      <>
-        <WorkspaceWelcome
-          workspaces={workspaces}
-          onJoinWorkspace={handleJoinWorkspace}
-          onCreateWorkspace={handleCreateWorkspace}
-          onImportFromZip={handleImportFromZip}
-          onInitFromTemplate={handleInitFromTemplate}
-        />
-        <Toaster position="top-right" />
-      </>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-blue-50 dark:bg-gray-900">
-      {/* Header */}
-      <ExplorerHeader
-        isDarkMode={isDarkMode}
-        toggleTheme={toggleTheme}
-        currentFile={currentFile}
-        saveStatus={saveStatus}
-        isMobileSheetOpen={isMobileSheetOpen}
-        setIsMobileSheetOpen={setIsMobileSheetOpen}
-        files={files}
-        onFileSelect={handleFileSelect}
-        onCreateFile={createFile}
-        onCreateFolder={createFolder}
-        onDeleteItem={deleteItem}
-        onRenameItem={renameItem}
-        onToggleFolder={toggleFolder}
-        onInitializeTemplate={initializeFromTemplate}
-        onManualSave={handleManualSave}
-        onExport={handleExport}
-        onPrint={handlePrint}
-        currentWorkspaceId={currentWorkspaceId}
-        currentWorkspaceName={currentWorkspaceName}
-        workspaces={workspaces}
-        onWorkspaceJoin={joinWorkspace}
-        onWorkspaceLeave={leaveWorkspace}
-        onWorkspaceCreate={createWorkspace}
-      />
-
-      {/* Main Content */}
-      <div className="flex h-[calc(100vh-80px)]">
-        {/* Desktop File Tree Panel */}
-        <ExplorerFileTreePanels
-          isFileTreeCollapsed={isFileTreeCollapsed}
-          setIsFileTreeCollapsed={setIsFileTreeCollapsed}
-          files={files}
-          currentFile={currentFile}
-          onFileSelect={handleFileSelect}
-          onCreateFile={createFile}
-          onCreateFolder={createFolder}
-          onDeleteItem={deleteItem}
-          onRenameItem={renameItem}
-          onToggleFolder={toggleFolder}
-          onInitializeTemplate={initializeFromTemplate}
-          currentWorkspaceId={currentWorkspaceId}
-          currentWorkspaceName={currentWorkspaceName}
-          workspaces={workspaces}
-          onWorkspaceJoin={joinWorkspace}
-          onWorkspaceLeave={leaveWorkspace}
-          onWorkspaceCreate={createWorkspace}
+    <div className="h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+      <div className="h-full flex flex-col">
+        {/* Header */}
+        <EnhancedExplorerHeader
+          workspaceName={currentWorkspace?.name || 'Unknown Workspace'}
+          workspaceType={workspaceType}
+          repositoryUrl={repositoryUrl}
+          currentBranch={currentBranch}
+          syncStatus={syncStatus}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSyncing={isSyncing}
+          onLeaveWorkspace={leaveWorkspace}
+          onSyncWithRemote={handleSyncWithRemote}
+          fileTreeCollapsed={fileTreeCollapsed}
+          onToggleFileTree={() => setFileTreeCollapsed(!fileTreeCollapsed)}
+          isDarkMode={isDarkMode}
+          onToggleTheme={toggleTheme}
         />
 
-        {/* Editor/Preview Area */}
-        <div className="flex-1 p-2 lg:p-4">
-          {currentFile && (
-            <>
-              {/* Mobile Tab Buttons and Actions */}
-              {!isDesktop && (
-                <ExplorerMobileNavigation
-                  currentFile={currentFile}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                  onManualSave={handleManualSave}
-                  onExport={handleExport}
-                  onPrint={handlePrint}
-                />
-              )}
-            </>
-          )}
-          
-          <ExplorerEditorSection
-            currentFile={currentFile}
-            markdownContent={markdownContent}
-            onMarkdownChange={handleMarkdownChange}
-            isDesktop={isDesktop}
+        {/* Mobile Navigation */}
+        {!isDesktop && (
+          <ExplorerMobileNavigation
             activeTab={activeTab}
+            onTabChange={setActiveTab}
             showEditPanel={showEditPanel}
+            onToggleEditPanel={() => setShowEditPanel(!showEditPanel)}
             showPreviewPanel={showPreviewPanel}
-            setShowEditPanel={setShowEditPanel}
-            setShowPreviewPanel={setShowPreviewPanel}
-            onCreateFile={(parentPath: string, name: string, content?: string) => {
-              createFile(parentPath, name)
-              if (content) {
-                // Find the newly created file and update its content
-                setTimeout(() => {
-                  const filePath = parentPath === '/' ? `/${name}` : `${parentPath}/${name}`
-                  updateFileContent(filePath, content)
-                }, 100)
-              }
-            }}
-            onInitializeTemplate={initializeFromTemplate}
-            onCloseFile={closeFile}
+            onTogglePreviewPanel={() => setShowPreviewPanel(!showPreviewPanel)}
           />
+        )}
+
+        {/* Main Content */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* File Tree Panel */}
+          {(isDesktop || activeTab === 'files') && !fileTreeCollapsed && (
+            <div className="w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col">
+              <ExplorerFileTreePanels
+                files={files}
+                currentFile={currentFile}
+                onSelectFile={selectFile}
+                onCreateFile={createFile}
+                onCreateFolder={createFolder}
+                onDeleteItem={deleteItem}
+                onRenameItem={renameItem}
+                onToggleFolder={handleToggleFolder}
+              />
+              
+              {/* Git Status Panel */}
+              {workspaceType === 'git' && (
+                <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+                  <GitStatus
+                    workspaceName={currentWorkspace?.name || ''}
+                    repositoryUrl={repositoryUrl}
+                    currentBranch={currentBranch}
+                    syncStatus={syncStatus}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                    isSyncing={isSyncing || false}
+                    onCommit={handleCommitChanges}
+                    onSync={handleSyncWithRemote}
+                    onSwitchBranch={switchBranch}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Editor Section */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <ExplorerEditorSection
+              currentFile={currentFile}
+              onUpdateContent={updateFileContent}
+              onCloseFile={closeFile}
+              showEditPanel={showEditPanel}
+              showPreviewPanel={showPreviewPanel}
+              isDesktop={isDesktop}
+              activeTab={activeTab}
+            />
+          </div>
         </div>
       </div>
 
@@ -294,5 +316,3 @@ function Explorer() {
     </div>
   )
 }
-
-export default Explorer

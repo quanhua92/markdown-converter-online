@@ -26,6 +26,7 @@ interface IntegratedFileSystemActions {
   createFolder: (parentPath: string, name: string) => void
   deleteItem: (path: string) => void
   renameItem: (item: FileSystemItem, newName: string) => void
+  toggleFolder: (path: string) => void
   
   // Save operations
   saveWorkspace?: () => void
@@ -157,6 +158,11 @@ export function useIntegratedFileSystem(): IntegratedFileSystemState & Integrate
         createFolder: gitFS.createFolder,
         deleteItem: gitFS.deleteItem,
         renameItem: gitFS.renameItem,
+        toggleFolder: (path: string) => {
+          // For Git files, we need to update the gitFS state
+          // This is a simplified implementation - ideally this would be in gitFS
+          console.log('Git folder toggle:', path)
+        },
         commitChanges: gitFS.commitChanges,
         syncWithRemote: gitFS.syncWithRemote,
         switchBranch: gitFS.switchBranch
@@ -170,6 +176,7 @@ export function useIntegratedFileSystem(): IntegratedFileSystemState & Integrate
         createFolder: localFS.createFolder,
         deleteItem: localFS.deleteItem,
         renameItem: localFS.renameItem,
+        toggleFolder: localFS.toggleFolder,
         saveWorkspace: localFS.saveWorkspace
       }
     } else {
@@ -181,7 +188,8 @@ export function useIntegratedFileSystem(): IntegratedFileSystemState & Integrate
         createFile: () => {},
         createFolder: () => {},
         deleteItem: () => {},
-        renameItem: () => {}
+        renameItem: () => {},
+        toggleFolder: () => {}
       }
     }
   }
@@ -221,4 +229,24 @@ export function useWorkspaceActions() {
     switchBranch: fs.switchBranch,
     saveWorkspace: fs.saveWorkspace
   }
+}
+
+// Helper function for updating items in file tree
+function updateItemInTree(
+  items: FileSystemItem[], 
+  targetPath: string, 
+  updater: (item: FileSystemItem) => FileSystemItem
+): FileSystemItem[] {
+  return items.map(item => {
+    if (item.path === targetPath) {
+      return updater(item)
+    }
+    if (item.children) {
+      return {
+        ...item,
+        children: updateItemInTree(item.children, targetPath, updater)
+      }
+    }
+    return item
+  })
 }
