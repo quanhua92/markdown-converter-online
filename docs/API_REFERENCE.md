@@ -15,7 +15,7 @@ For production deployments, replace `localhost:3000` with your domain.
 ### Main Application Routes
 
 - **`/`** - Homepage with Converter, Explorer navigation, and Guides
-- **`/explorer`** - File management workspace with template initialization
+- **`/explorer`** - File management workspace with template initialization and multiple workspace support
 - **`/print`** - Print-optimized view for markdown content
 
 ### API Base URL

@@ -20,7 +20,7 @@ We use Playwright for end-to-end testing to verify core functionality and user w
 
 ## Essential Test Suite
 
-Our streamlined test suite includes **5 core tests** that cover the most critical functionality:
+Our comprehensive test suite includes **7 core tests** plus **2 migration tests** that cover all critical functionality:
 
 ### 1. Template Functionality Test (`test-template-functionality.cjs`)
 **NEW** - Tests the core template selection and file creation workflow.
@@ -82,6 +82,58 @@ Tests text readability and accessibility compliance (WCAG).
 
 **Run:** `node tests/test-readability.cjs`
 
+### 6. IndexedDB Migration Test (`test-indexeddb-migration.cjs`)
+**NEW in v3** - Tests the automatic migration from localStorage to IndexedDB.
+
+**What it tests:**
+- Migration detection when localStorage contains data
+- Migration dialog appearance and functionality
+- Progress tracking with console interface and progress bar
+- Data integrity preservation during migration
+- Error handling for failed migrations
+- Prevention of duplicate migrations
+- Complex data structure migration (nested objects, special characters)
+
+**Run:** `node tests/test-indexeddb-migration.cjs`
+
+### 7. IndexedDB Workflow Test (`test-indexeddb-workflows.cjs`)
+**NEW in v3** - Tests IndexedDB operations and workflows in production scenarios.
+
+**What it tests:**
+- Workspace creation and persistence with IndexedDB
+- Data loading from IndexedDB on page refresh
+- Large file handling (1MB+ content)
+- Concurrent workspace operations
+- Theme persistence across sessions
+- Draft auto-save functionality
+- Storage quota error handling
+- Browser compatibility testing
+
+**Run:** `node tests/test-indexeddb-workflows.cjs`
+
+## Additional Test Files
+
+### Manual Migration Dialog Test (`test-migration-dialog-manual.cjs`)
+Manual test for the migration dialog UI and interaction testing.
+
+**What it tests:**
+- Manual testing of migration dialog appearance
+- UI interaction testing for migration progress
+- Manual validation of console interface
+- Dialog behavior and button functionality
+
+**Run:** `node tests/test-migration-dialog-manual.cjs`
+
+### Basic Functionality Test (`test-basic-functionality.cjs`)
+Legacy test for basic application functionality verification.
+
+**What it tests:**
+- Basic application loading and navigation
+- Core UI element presence
+- Simple interaction workflows
+
+**Run:** `node tests/test-basic-functionality.cjs`
+
 ## Running Tests
 
 ### Quick Start
@@ -106,12 +158,16 @@ Tests text readability and accessibility compliance (WCAG).
    
    # File operations
    node tests/test-delete-functionality.cjs
+   
+   # IndexedDB storage (v3 features)
+   node tests/test-indexeddb-migration.cjs
+   node tests/test-indexeddb-workflows.cjs
    ```
 
 ### Run All Essential Tests
 ```bash
-# Run complete essential test suite
-for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-welcome.cjs test-delete-functionality.cjs test-readability.cjs; do
+# Run complete essential test suite (7 core tests)
+for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-welcome.cjs test-delete-functionality.cjs test-readability.cjs test-indexeddb-migration.cjs test-indexeddb-workflows.cjs; do
   echo "🧪 Running tests/$test..."
   node "tests/$test"
   echo "✅ Completed tests/$test"
@@ -140,6 +196,8 @@ Tests generate:
 Key screenshots to review:
 - `template-functionality-final.png` - Shows all created template files
 - `delete-test-*.png` - Shows deletion workflow states
+- `migration-*.png` - Shows IndexedDB migration progress and completion
+- `workspace-*.png` - Shows workspace creation and management workflows
 - Dark mode screenshots for visual verification
 
 ## Troubleshooting
@@ -171,12 +229,25 @@ Key screenshots to review:
 - Ensure WCAG compliance for all text elements
 - Check for proper color contrast in both light and dark modes
 
+**IndexedDB migration issues:**
+- Verify localStorage data exists before running migration tests
+- Check migration dialog appears when localStorage contains data
+- Ensure progress tracking works correctly during migration
+- Verify data integrity after migration completion
+
+**IndexedDB workflow issues:**
+- Check browser support for IndexedDB
+- Verify async operations complete correctly
+- Test storage quota handling for large datasets
+- Ensure cross-session persistence works properly
+
 ### Performance Tips
 
 - Tests run sequentially to avoid conflicts
-- Each test clears localStorage to ensure clean state
+- Each test clears localStorage and IndexedDB to ensure clean state
 - Screenshots are only taken when necessary to save time
-- Tests use realistic delays to account for React state updates
+- Tests use realistic delays to account for React state updates and async operations
+- IndexedDB operations are tested with appropriate async handling
 
 ## Adding New Tests
 
@@ -197,7 +268,11 @@ When adding new functionality, create corresponding tests:
      try {
        // Clear storage for clean state
        await page.goto('http://localhost:3000/explorer');
-       await page.evaluate(() => localStorage.clear());
+       await page.evaluate(() => {
+         localStorage.clear();
+         // Clear IndexedDB if needed
+         indexedDB.deleteDatabase('MarkdownFilesDB');
+       });
        await page.reload();
        
        // Your test logic here
@@ -223,9 +298,13 @@ Our test suite focuses on:
 - **Visual verification** through screenshots
 - **Accessibility compliance** for inclusive design
 - **Clean state management** to ensure reliable results
+- **Storage layer testing** for IndexedDB operations and migrations
+- **Cross-session persistence** to verify data durability
 
 We prioritize tests that:
 - Verify core features work end-to-end
 - Catch regressions in essential functionality
 - Validate accessibility and visual design
+- Test storage operations and data integrity
+- Ensure migration processes work correctly
 - Are maintainable and reliable across environments

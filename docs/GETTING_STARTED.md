@@ -19,6 +19,11 @@ This guide will help you get the Markdown Converter Online up and running quickl
 
 2. **Start the application**
    ```bash
+   ./build-fresh.sh
+   ```
+   
+   Or manually:
+   ```bash
    docker compose up -d
    ```
 
@@ -164,7 +169,7 @@ The Explorer offers structured workspace templates:
 
 For local development without Docker:
 
-1. **Install Node.js 18+** and pnpm
+1. **Install Node.js 18+** and pnpm (project uses pnpm, not npm)
 2. **Install dependencies**
    ```bash
    pnpm install

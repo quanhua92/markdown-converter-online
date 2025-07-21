@@ -45,7 +45,7 @@ This guide covers the architecture, development, and deployment details of the M
 ### Tech Stack
 
 #### Frontend
-- **React 18**: Modern hooks and concurrent features
+- **React 19**: Modern hooks and concurrent features
 - **TypeScript**: Type safety and developer experience
 - **Tailwind CSS 4**: Utility-first styling with dark mode
 - **Vite**: Fast build tool and dev server
@@ -189,7 +189,10 @@ PORT=3000
 
 #### Standard Deployment
 ```bash
-# Build and start
+# Build and start fresh
+./build-fresh.sh
+
+# Or manually
 docker compose up -d
 
 # View logs
@@ -673,6 +676,13 @@ The test suite includes comprehensive testing for the new IndexedDB migration sy
 - Duplicate workspace tests (2 files): Redundant with workspace welcome test
 
 ### Running Tests
+
+First ensure the application is running:
+```bash
+./build-fresh.sh
+```
+
+Then run tests:
 ```bash
 # Complete test suite (recommended)
 for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-welcome.cjs test-delete-functionality.cjs test-readability.cjs test-indexeddb-migration.cjs test-indexeddb-workflows.cjs; do
@@ -744,7 +754,7 @@ pnpm install
 
 # Docker build issues
 docker system prune -f
-docker compose build --no-cache
+./build-fresh.sh
 ```
 
 #### Conversion Errors
@@ -825,7 +835,7 @@ git checkout -b feature/new-feature
 
 # Make changes and test
 pnpm dev
-docker compose up -d
+./build-fresh.sh
 
 # Commit changes
 git commit -m "feat: add new feature"

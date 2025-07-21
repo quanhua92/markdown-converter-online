@@ -17,6 +17,9 @@ A powerful web application that converts markdown content to multiple formats in
 - **🔄 Error debugging**: Comprehensive error display for troubleshooting
 
 ### Advanced Features
+- **File Explorer**: Full workspace management with file tree navigation
+- **IndexedDB Storage**: Robust client-side persistence with migration from localStorage
+- **Multiple Workspaces**: Create and manage isolated workspaces with templates
 - **LLM integration**: Ready-to-use prompts for ChatGPT/Claude article conversion
 - **Template showcase**: Interactive examples demonstrating markdown capabilities
 - **REST API**: Programmatic access for integration with other applications
@@ -28,11 +31,16 @@ A powerful web application that converts markdown content to multiple formats in
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/quanhua92/markdown-converter-online
    cd markdown-converter-online
    ```
 
 2. **Start the application**
+   ```bash
+   ./build-fresh.sh
+   ```
+   
+   Or manually:
    ```bash
    docker compose up -d
    ```
@@ -64,32 +72,29 @@ Comprehensive documentation is available in the `docs/` folder:
 
 1. **Install dependencies**
    ```bash
-   npm install
-   # or
    pnpm install
    ```
 
 2. **Start development server**
    ```bash
-   npm run dev
-   # or
    pnpm dev
    ```
 
 3. **Build for production**
    ```bash
-   npm run build
-   # or
    pnpm build
    ```
 
 ### Tech Stack
 
-- **Frontend**: React 18, TypeScript, Tailwind CSS 4, Vite
+- **Frontend**: React 19, TypeScript, Tailwind CSS 4, Vite
 - **Backend**: Node.js, Express 4, TypeScript
 - **Conversion**: Pandoc, Marp CLI, XeLaTeX
+- **Storage**: IndexedDB (Dexie.js), localStorage migration
+- **Routing**: TanStack Router
 - **Deployment**: Docker, Docker Compose
 - **UI Components**: Radix UI, Lucide React, Sonner
+- **Testing**: Playwright, Vitest
 
 ## 🎯 Use Cases
 
@@ -97,16 +102,19 @@ Comprehensive documentation is available in the `docs/` folder:
 - Convert blog posts to presentation slides
 - Transform documentation to PDF reports
 - Create professional presentations from markdown
+- Manage multiple content projects in separate workspaces
 
 ### Developers
 - Convert README files to presentations
 - Generate documentation in multiple formats
 - Integrate conversion API into applications
+- Organize project documentation with file tree navigation
 
 ### Teams
 - Standardize content formats across organization
 - Automate document generation workflows
 - Create consistent brand presentations
+- Share workspaces and templates across team members
 
 ## 🔌 API Integration
 
@@ -132,7 +140,7 @@ curl -X POST http://localhost:3000/api/convert/marp \
 - 1GB disk space
 
 ### Browser Support
-- Modern browsers with ES2020 support
+- Modern browsers with ES2020 support and IndexedDB
 - Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 
 ## 🤝 Contributing
@@ -159,9 +167,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   React App     │    │  Express API    │    │   Converters    │
 │                 │    │                 │    │                 │
-│ • Dark/Light    │────│ • REST Routes   │────│ • Pandoc        │
-│ • Templates     │    │ • File Handling │    │ • Marp CLI      │
-│ • Copy Features │    │ • Error Debug   │    │ • XeLaTeX       │
+│ • File Explorer │────│ • REST Routes   │────│ • Pandoc        │
+│ • Workspaces    │    │ • File Handling │    │ • Marp CLI      │
+│ • IndexedDB     │    │ • Error Debug   │    │ • XeLaTeX       │
+│ • Dark/Light    │    │ • Rate Limiting │    │ • Health Check  │
+│ • Templates     │    │                 │    │                 │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
