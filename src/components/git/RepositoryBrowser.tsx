@@ -24,7 +24,7 @@ import {
   ChevronRight,
   GitBranch
 } from 'lucide-react'
-import type { GitRepository, GitBranch } from '../../types/git'
+import type { GitRepository, GitBranch as GitBranchType } from '../../types/git'
 
 interface RepositoryBrowserProps {
   isOpen: boolean
@@ -36,7 +36,7 @@ export function RepositoryBrowser({ isOpen, onClose, onSelectRepository }: Repos
   const github = useGitHubAPI()
   
   const [repositories, setRepositories] = useState<GitRepository[]>([])
-  const [branches, setBranches] = useState<GitBranch[]>([])
+  const [branches, setBranches] = useState<GitBranchType[]>([])
   const [selectedRepo, setSelectedRepo] = useState<GitRepository | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState('')
