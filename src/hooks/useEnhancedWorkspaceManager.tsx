@@ -50,39 +50,6 @@ export function useEnhancedWorkspaceManager() {
     createGitDataAPI(githubAPI)
   ) : null
 
-  // Initialize data on mount
-  useEffect(() => {
-    initializeWorkspaces()
-  }, [])
-
-  /**
-   * Load all workspaces (both local and Git)
-   */
-  const initializeWorkspaces = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      
-      // Load current workspace ID
-      const currentId = await getCurrentWorkspaceId()
-      setCurrentWorkspaceIdState(currentId)
-      
-      // Load all workspaces
-      const workspaces = await loadAllWorkspaces()
-      setAllWorkspaces(workspaces)
-      
-      // Set current workspace
-      if (currentId) {
-        const current = workspaces.find(w => w.id === currentId)
-        setCurrentWorkspace(current || null)
-      }
-      
-    } catch (error) {
-      console.error('Failed to initialize workspaces:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
   /**
    * Load all workspaces from both storage systems
    */
@@ -132,6 +99,39 @@ export function useEnhancedWorkspaceManager() {
       console.error('Failed to load workspaces:', error)
       return []
     }
+  }, [])
+
+  /**
+   * Initialize workspaces on mount
+   */
+  const initializeWorkspaces = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      
+      // Load current workspace ID
+      const currentId = await getCurrentWorkspaceId()
+      setCurrentWorkspaceIdState(currentId)
+      
+      // Load all workspaces
+      const workspaces = await loadAllWorkspaces()
+      setAllWorkspaces(workspaces)
+      
+      // Set current workspace
+      if (currentId) {
+        const current = workspaces.find(w => w.id === currentId)
+        setCurrentWorkspace(current || null)
+      }
+      
+    } catch (error) {
+      console.error('Failed to initialize workspaces:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [loadAllWorkspaces])
+
+  // Initialize data on mount
+  useEffect(() => {
+    initializeWorkspaces()
   }, [])
 
   /**
@@ -207,6 +207,12 @@ export function useEnhancedWorkspaceManager() {
       setCurrentWorkspace(unifiedWorkspace)
       
       console.log('✅ Created local workspace:', workspaceId)
+      console.log('✅ Enhanced Manager: Current workspace set to:', unifiedWorkspace)
+      console.log('✅ Enhanced Manager: State after creation:', {
+        currentWorkspaceId: workspaceId,
+        currentWorkspace: unifiedWorkspace.name,
+        allWorkspacesCount: allWorkspaces.length + 1
+      })
       return workspaceId
     } catch (error) {
       console.error('Failed to create local workspace:', error)

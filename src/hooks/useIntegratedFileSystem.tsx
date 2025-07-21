@@ -240,6 +240,13 @@ function updateFileInTree(
 export function useIntegratedFileSystem(): IntegratedFileSystemState & IntegratedFileSystemActions {
   const { currentWorkspace, hasGitSupport } = useEnhancedWorkspaceManager()
   
+  console.log('🔄 IntegratedFS: Hook called with workspace:', {
+    currentWorkspaceId: currentWorkspace?.id,
+    currentWorkspaceName: currentWorkspace?.name,
+    currentWorkspaceType: currentWorkspace?.type,
+    hasGitSupport
+  })
+  
   // Simple local file system 
   const localFS = useSimpleLocalFS(currentWorkspace)
   
