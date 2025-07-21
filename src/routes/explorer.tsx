@@ -11,7 +11,7 @@ import { useIntegratedFileSystem, useWorkspaceActions } from '../hooks/useIntegr
 import { useEnhancedWorkspaceManager } from '../hooks/useEnhancedWorkspaceManager'
 import { EnhancedExplorerHeader } from '../components/git/EnhancedExplorerHeader'
 import { ExplorerMobileNavigation } from '@/components/shared/ExplorerMobileNavigation'
-import { ExplorerFileTreePanels } from '@/components/shared/ExplorerFileTreePanels'
+import { FileTree } from '@/components/shared/FileTree'
 import { ExplorerEditorSection } from '@/components/shared/ExplorerEditorSection'
 import { WorkspaceWelcome } from '@/components/shared/WorkspaceWelcome'
 import { GitWorkspaceCreator } from '../components/git/GitWorkspaceCreator'
@@ -267,10 +267,10 @@ function Explorer() {
           {/* File Tree Panel */}
           {(isDesktop || activeTab === 'files') && !fileTreeCollapsed && (
             <div className="w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col">
-              <ExplorerFileTreePanels
-                files={files}
-                currentFile={currentFile}
-                onSelectFile={selectFile}
+              <FileTree
+                items={files}
+                selectedFile={currentFile?.path}
+                onFileSelect={selectFile}
                 onCreateFile={createFile}
                 onCreateFolder={createFolder}
                 onDeleteItem={deleteItem}

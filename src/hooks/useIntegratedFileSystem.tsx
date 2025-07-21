@@ -69,13 +69,24 @@ export function useIntegratedFileSystem(): IntegratedFileSystemState & Integrate
 
   // Auto-load workspace when it changes
   useEffect(() => {
+    console.log('🔄 IntegratedFS: Workspace changed:', {
+      currentWorkspace: currentWorkspace?.id,
+      activeSystem,
+      hasLocalFS: !!localFS,
+      hasGitFS: !!gitFS
+    })
+    
     if (currentWorkspace && activeSystem) {
       if (activeSystem === 'git') {
+        console.log('🔄 IntegratedFS: Loading Git workspace:', currentWorkspace.id)
         gitFS.loadGitWorkspace(currentWorkspace.id)
+      } else if (activeSystem === 'local') {
+        // For local workspaces, we need to trigger the useFileSystem to load the workspace
+        console.log('🔄 IntegratedFS: Loading local workspace:', currentWorkspace.id)
+        localFS.joinWorkspace(currentWorkspace.id)
       }
-      // Local workspaces are automatically loaded by useFileSystem
     }
-  }, [currentWorkspace, activeSystem])
+  }, [currentWorkspace, activeSystem, gitFS, localFS])
 
   /**
    * Load a workspace (auto-detects type)
@@ -114,7 +125,7 @@ export function useIntegratedFileSystem(): IntegratedFileSystemState & Integrate
     }
 
     if (activeSystem === 'git') {
-      return {
+      const state = {
         ...baseState,
         files: gitFS.files,
         currentFile: gitFS.currentFile,
@@ -125,8 +136,14 @@ export function useIntegratedFileSystem(): IntegratedFileSystemState & Integrate
         syncStatus: gitFS.syncStatus,
         error: gitFS.error
       }
+      console.log('🔄 IntegratedFS: Git state:', {
+        filesCount: state.files.length,
+        currentFile: state.currentFile?.name,
+        isLoaded: state.isLoaded
+      })
+      return state
     } else if (activeSystem === 'local') {
-      return {
+      const state = {
         ...baseState,
         files: localFS.files,
         currentFile: localFS.currentFile,
@@ -135,7 +152,19 @@ export function useIntegratedFileSystem(): IntegratedFileSystemState & Integrate
         hasUnsavedChanges: localFS.hasUnsavedChanges,
         syncStatus: null
       }
+      console.log('🔄 IntegratedFS: Local state:', {
+        filesCount: state.files.length,
+        currentFile: state.currentFile?.name,
+        isLoaded: state.isLoaded,
+        localFSState: {
+          files: localFS.files.length,
+          isLoaded: localFS.isLoaded,
+          currentWorkspaceId: localFS.currentWorkspaceId
+        }
+      })
+      return state
     } else {
+      console.log('🔄 IntegratedFS: No active system')
       return {
         ...baseState,
         files: [],

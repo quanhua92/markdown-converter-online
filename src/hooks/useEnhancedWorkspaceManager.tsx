@@ -189,11 +189,22 @@ export function useEnhancedWorkspaceManager() {
       // Save to legacy storage
       await StorageService.saveItem(WORKSPACE_PREFIX + workspaceId, workspace)
       
-      // Join the new workspace
-      await joinWorkspace(workspaceId)
+      // Create unified workspace representation
+      const unifiedWorkspace: UnifiedWorkspace = {
+        id: workspaceId,
+        name: workspace.name,
+        type: 'local',
+        createdAt: workspace.createdAt,
+        lastModified: workspace.lastModified
+      }
       
-      // Refresh workspace list
-      await refreshWorkspaces()
+      // Add to workspace list immediately
+      setAllWorkspaces(prev => [...prev, unifiedWorkspace])
+      
+      // Set as current workspace
+      await setCurrentWorkspaceId(workspaceId)
+      setCurrentWorkspaceIdState(workspaceId)
+      setCurrentWorkspace(unifiedWorkspace)
       
       console.log('✅ Created local workspace:', workspaceId)
       return workspaceId
@@ -201,7 +212,7 @@ export function useEnhancedWorkspaceManager() {
       console.error('Failed to create local workspace:', error)
       throw error
     }
-  }, [joinWorkspace])
+  }, [])
 
   /**
    * Create a new Git workspace
@@ -218,11 +229,24 @@ export function useEnhancedWorkspaceManager() {
     try {
       const workspace = await gitWorkspaceService.createGitWorkspace(name, repository, branch)
       
-      // Join the new workspace
-      await joinWorkspace(workspace.id)
+      // Create unified workspace representation
+      const unifiedWorkspace: UnifiedWorkspace = {
+        id: workspace.id,
+        name: workspace.name,
+        type: 'git',
+        createdAt: workspace.createdAt,
+        lastModified: workspace.lastModified,
+        repositoryUrl: workspace.repositoryUrl,
+        currentBranch: workspace.currentBranch
+      }
       
-      // Refresh workspace list
-      await refreshWorkspaces()
+      // Add to workspace list immediately
+      setAllWorkspaces(prev => [...prev, unifiedWorkspace])
+      
+      // Set as current workspace
+      await setCurrentWorkspaceId(workspace.id)
+      setCurrentWorkspaceIdState(workspace.id)
+      setCurrentWorkspace(unifiedWorkspace)
       
       console.log('✅ Created Git workspace:', workspace.id)
       return workspace.id
@@ -230,7 +254,7 @@ export function useEnhancedWorkspaceManager() {
       console.error('Failed to create Git workspace:', error)
       throw error
     }
-  }, [gitWorkspaceService, joinWorkspace])
+  }, [gitWorkspaceService])
 
   /**
    * Delete a workspace
