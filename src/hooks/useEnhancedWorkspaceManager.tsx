@@ -209,18 +209,12 @@ export function useEnhancedWorkspaceManager() {
       setCurrentWorkspace(unifiedWorkspace)
       
       console.log('✅ Created local workspace:', workspaceId)
-      console.log('✅ Enhanced Manager: Current workspace set to:', unifiedWorkspace)
-      console.log('✅ Enhanced Manager: State after creation:', {
-        currentWorkspaceId: workspaceId,
-        currentWorkspace: unifiedWorkspace.name,
-        allWorkspacesCount: allWorkspaces.length + 1
-      })
       return workspaceId
     } catch (error) {
       console.error('Failed to create local workspace:', error)
       throw error
     }
-  }, [])
+  }, [setAllWorkspaces, setCurrentWorkspaceIdState, setCurrentWorkspace])
 
   /**
    * Create a new Git workspace
@@ -432,6 +426,12 @@ export function useEnhancedWorkspaceManager() {
     renameWorkspace,
     refreshWorkspaces,
     getWorkspace,
+    
+    // State setters (for direct workspace management)
+    setAllWorkspaces,
+    setCurrentWorkspaceIdState,
+    setCurrentWorkspace,
+    setCurrentWorkspaceId,
     
     // Utilities
     hasGitSupport: isAuthenticated && !!gitWorkspaceService

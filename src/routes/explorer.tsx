@@ -7,7 +7,7 @@ import {
   debounce
 } from '@/components/shared'
 import type { FileSystemItem } from '@/components/shared/FileTree'
-import { useIntegratedFileSystem, useWorkspaceActions } from '../hooks/useIntegratedFileSystem'
+import { StorageService } from '../db/storage'
 import { useEnhancedWorkspaceManager } from '../hooks/useEnhancedWorkspaceManager'
 import { EnhancedExplorerHeader } from '../components/git/EnhancedExplorerHeader'
 import { ExplorerMobileNavigation } from '@/components/shared/ExplorerMobileNavigation'
@@ -16,7 +16,7 @@ import { ExplorerEditorSection } from '@/components/shared/ExplorerEditorSection
 import { WorkspaceWelcome } from '@/components/shared/WorkspaceWelcome'
 import { GitWorkspaceCreator } from '../components/git/GitWorkspaceCreator'
 import { GitStatus } from '../components/git/GitStatus'
-import { folderTemplates, initializeTemplateStructure } from '@/components/shared/folderTemplates'
+import { folderTemplates } from '@/components/shared/folderTemplates'
 import type { GitRepository } from '../types/git'
 
 export const Route = createFileRoute('/explorer')({
@@ -40,62 +40,153 @@ function Explorer() {
     deleteWorkspace,
     renameWorkspace,
     refreshWorkspaces,
-    hasGitSupport
+    hasGitSupport,
+    setAllWorkspaces,
+    setCurrentWorkspaceIdState,
+    setCurrentWorkspace,
+    setCurrentWorkspaceId
   } = useEnhancedWorkspaceManager()
 
-  // Integrated file system
-  const {
-    files,
-    currentFile,
-    isLoaded,
-    isLoading,
-    hasUnsavedChanges,
-    workspaceType,
-    selectFile,
-    closeFile,
-    updateFileContent,
-    createFile,
-    createFolder,
-    deleteItem,
-    renameItem,
-    toggleFolder,
-    saveWorkspace,
-    createLocalWorkspace: createLocalWorkspaceFS,
-    createGitWorkspace: createGitWorkspaceFS
-  } = useIntegratedFileSystem()
+  // Simple file system state for current workspace
+  const [files, setFiles] = useState<FileSystemItem[]>([])
+  const [currentFile, setCurrentFile] = useState<FileSystemItem | null>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  // Git-specific actions
-  const {
-    repositoryUrl,
-    currentBranch,
-    canCommit,
-    canSync,
-    syncStatus,
-    isSyncing,
-    commitChanges,
-    syncWithRemote,
-    switchBranch
-  } = useWorkspaceActions()
+  // Load files when workspace changes
+  useEffect(() => {
+    if (!currentWorkspace) {
+      setFiles([])
+      setCurrentFile(null)
+      return
+    }
+
+    if (currentWorkspace.type === 'local') {
+      loadLocalWorkspaceFiles(currentWorkspace.id)
+    }
+  }, [currentWorkspace?.id])
+
+  const loadLocalWorkspaceFiles = async (workspaceId: string) => {
+    try {
+      const workspaceKey = `markdown-explorer-v2-workspace-${workspaceId}`
+      const workspaceData = await StorageService.loadItem(workspaceKey)
+      
+      if (workspaceData && workspaceData.files) {
+        setFiles(workspaceData.files)
+        if (workspaceData.currentFilePath) {
+          const currentFile = findFileByPath(workspaceData.files, workspaceData.currentFilePath)
+          setCurrentFile(currentFile)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load workspace files:', error)
+    }
+  }
+
+  const findFileByPath = (files: FileSystemItem[], path: string): FileSystemItem | null => {
+    for (const file of files) {
+      if (file.path === path) return file
+      if (file.children) {
+        const found = findFileByPath(file.children, path)
+        if (found) return found
+      }
+    }
+    return null
+  }
+
+  // Simple file operations
+  const selectFile = useCallback((item: FileSystemItem) => {
+    setCurrentFile(item)
+  }, [])
+
+  const closeFile = useCallback(() => {
+    setCurrentFile(null)
+  }, [])
+
+  const updateFileContent = useCallback((path: string, content: string) => {
+    setFiles(prev => updateFileInTree(prev, path, (file) => ({ ...file, content })))
+    setHasUnsavedChanges(true)
+  }, [])
+
+  const updateFileInTree = (files: FileSystemItem[], path: string, updater: (file: FileSystemItem) => FileSystemItem): FileSystemItem[] => {
+    return files.map(file => {
+      if (file.path === path) {
+        return updater(file)
+      }
+      if (file.children) {
+        return { ...file, children: updateFileInTree(file.children, path, updater) }
+      }
+      return file
+    })
+  }
+
+  // Placeholder implementations for file operations
+  const createFile = useCallback((parentPath: string, name: string) => {
+    // TODO: Implement file creation
+    console.log('Create file:', name, 'in', parentPath)
+  }, [])
+
+  const createFolder = useCallback((parentPath: string, name: string) => {
+    // TODO: Implement folder creation
+    console.log('Create folder:', name, 'in', parentPath)
+  }, [])
+
+  const deleteItem = useCallback((path: string) => {
+    // TODO: Implement item deletion
+    console.log('Delete item:', path)
+  }, [])
+
+  const renameItem = useCallback((item: FileSystemItem, newName: string) => {
+    // TODO: Implement item rename
+    console.log('Rename item:', item.name, 'to', newName)
+  }, [])
+
+  const toggleFolder = useCallback((path: string) => {
+    setFiles(prev => updateFileInTree(prev, path, file => ({ 
+      ...file, 
+      isExpanded: !file.isExpanded 
+    })))
+  }, [])
 
   // Local state
   const [showGitWorkspaceCreator, setShowGitWorkspaceCreator] = useState(false)
   const [fileTreeCollapsed, setFileTreeCollapsed] = useState(false)
 
   // Auto-save for local workspaces
+  const saveWorkspace = useCallback(async () => {
+    if (!currentWorkspace || currentWorkspace.type !== 'local') return
+    
+    try {
+      const workspaceKey = `markdown-explorer-v2-workspace-${currentWorkspace.id}`
+      const workspaceData = {
+        id: currentWorkspace.id,
+        name: currentWorkspace.name,
+        files,
+        currentFilePath: currentFile?.path,
+        createdAt: currentWorkspace.createdAt,
+        lastModified: new Date().toISOString()
+      }
+      
+      await StorageService.saveItem(workspaceKey, workspaceData)
+      setHasUnsavedChanges(false)
+    } catch (error) {
+      console.error('Failed to save workspace:', error)
+    }
+  }, [currentWorkspace, files, currentFile])
+
   const debouncedSave = useCallback(
     debounce(() => {
-      if (workspaceType === 'local' && saveWorkspace) {
+      if (currentWorkspace?.type === 'local' && hasUnsavedChanges) {
         saveWorkspace()
       }
     }, 1000),
-    [workspaceType, saveWorkspace]
+    [currentWorkspace?.type, hasUnsavedChanges, saveWorkspace]
   )
 
   useEffect(() => {
-    if (workspaceType === 'local' && hasUnsavedChanges) {
+    if (currentWorkspace?.type === 'local' && hasUnsavedChanges) {
       debouncedSave()
     }
-  }, [workspaceType, hasUnsavedChanges, debouncedSave])
+  }, [currentWorkspace?.type, hasUnsavedChanges, debouncedSave])
 
   // Handle workspace operations
   const handleJoinWorkspace = useCallback(async (workspaceId: string) => {
@@ -144,46 +235,67 @@ function Explorer() {
 
   const handleInitFromTemplate = useCallback(async (templateKey: string) => {
     try {
-      const template = folderTemplates.find(t => t.id === templateKey)
+      const template = folderTemplates[templateKey]
       if (!template) {
         throw new Error('Template not found')
       }
 
       const workspaceName = `${template.name} Workspace`
-      const workspaceId = await createLocalWorkspace(workspaceName)
       
-      // Initialize template structure would need to be adapted for the new system
+      // Create workspace with template structure
+      const workspaceId = 'workspace-' + Date.now()
+      const templateFiles = template.structure.map(item => ({
+        ...item,
+        id: generateId()
+      }))
+      
+      const workspace = {
+        id: workspaceId,
+        name: workspaceName,
+        files: templateFiles,
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString()
+      }
+      
+      // Save to storage
+      await StorageService.saveItem(`markdown-explorer-v2-workspace-${workspaceId}`, workspace)
+      
+      // Update enhanced workspace manager state
+      const unifiedWorkspace = {
+        id: workspaceId,
+        name: workspaceName,
+        type: 'local' as const,
+        createdAt: workspace.createdAt,
+        lastModified: workspace.lastModified
+      }
+      
+      // Add to workspace list immediately
+      setAllWorkspaces(prev => [...prev, unifiedWorkspace])
+      
+      // Set as current workspace
+      await setCurrentWorkspaceId(workspaceId)
+      setCurrentWorkspaceIdState(workspaceId)
+      setCurrentWorkspace(unifiedWorkspace)
+      
       toast.success(`Workspace created from ${template.name} template`)
     } catch (error) {
       console.error('Failed to create workspace from template:', error)
       toast.error('Failed to create workspace from template')
     }
-  }, [createLocalWorkspace])
+  }, [setAllWorkspaces])
 
-  // Handle Git operations
+  const generateId = () => {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2)
+  }
+
+  // Placeholder Git operations (TODO: Re-implement with enhanced workspace manager)
   const handleCommitChanges = useCallback(async (message: string) => {
-    if (!commitChanges) return
-    
-    try {
-      await commitChanges(message)
-      toast.success('Changes committed successfully')
-    } catch (error) {
-      console.error('Failed to commit changes:', error)
-      toast.error('Failed to commit changes')
-    }
-  }, [commitChanges])
+    console.log('TODO: Implement Git commit:', message)
+  }, [])
 
   const handleSyncWithRemote = useCallback(async () => {
-    if (!syncWithRemote) return
-    
-    try {
-      await syncWithRemote()
-      toast.success('Synced with remote repository')
-    } catch (error) {
-      console.error('Failed to sync with remote:', error)
-      toast.error('Failed to sync with remote')
-    }
-  }, [syncWithRemote])
+    console.log('TODO: Implement Git sync')
+  }, [])
 
   // Handle folder toggling
   const handleToggleFolder = useCallback((path: string) => {
@@ -191,7 +303,7 @@ function Explorer() {
   }, [toggleFolder])
 
   // Render workspace welcome if no workspace is selected
-  if (!currentWorkspaceId || !isLoaded) {
+  if (!currentWorkspaceId) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {workspaceLoading ? (
@@ -218,8 +330,8 @@ function Explorer() {
     )
   }
 
-  // Loading state
-  if (isLoading) {
+  // Loading state  
+  if (workspaceLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -236,12 +348,12 @@ function Explorer() {
         {/* Header */}
         <EnhancedExplorerHeader
           workspaceName={currentWorkspace?.name || 'Unknown Workspace'}
-          workspaceType={workspaceType}
-          repositoryUrl={repositoryUrl}
-          currentBranch={currentBranch}
-          syncStatus={syncStatus}
+          workspaceType={currentWorkspace?.type || 'local'}
+          repositoryUrl={currentWorkspace?.repositoryUrl}
+          currentBranch={currentWorkspace?.currentBranch}
+          syncStatus={null}
           hasUnsavedChanges={hasUnsavedChanges}
-          isSyncing={isSyncing}
+          isSyncing={false}
           onLeaveWorkspace={leaveWorkspace}
           onSyncWithRemote={handleSyncWithRemote}
           fileTreeCollapsed={fileTreeCollapsed}
@@ -279,18 +391,18 @@ function Explorer() {
               />
               
               {/* Git Status Panel */}
-              {workspaceType === 'git' && (
+              {currentWorkspace?.type === 'git' && (
                 <div className="border-t border-gray-200 dark:border-gray-700 p-4">
                   <GitStatus
                     workspaceName={currentWorkspace?.name || ''}
-                    repositoryUrl={repositoryUrl}
-                    currentBranch={currentBranch}
-                    syncStatus={syncStatus}
+                    repositoryUrl={currentWorkspace?.repositoryUrl}
+                    currentBranch={currentWorkspace?.currentBranch}
+                    syncStatus={null}
                     hasUnsavedChanges={hasUnsavedChanges}
-                    isSyncing={isSyncing || false}
+                    isSyncing={false}
                     onCommit={handleCommitChanges}
                     onSync={handleSyncWithRemote}
-                    onSwitchBranch={switchBranch}
+                    onSwitchBranch={() => console.log('TODO: Switch branch')}
                   />
                 </div>
               )}

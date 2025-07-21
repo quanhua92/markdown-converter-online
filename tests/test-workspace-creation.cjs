@@ -19,7 +19,7 @@ async function testWorkspaceCreation() {
   // Listen for console messages
   page.on('console', msg => {
     const text = msg.text();
-    if (text.includes('Created local workspace') || text.includes('Workspace created') || text.includes('Failed')) {
+    if (text.includes('Explorer') || text.includes('Enhanced Manager') || text.includes('Created local workspace') || text.includes('Workspace created') || text.includes('Failed')) {
       console.log(`🔍 ${text}`);
     }
   });
