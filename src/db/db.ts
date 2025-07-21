@@ -16,10 +16,6 @@ export class MarkdownDatabase extends Dexie {
     this.version(1).stores({
       storage: '++id, &key, timestamp'
     });
-
-    this.on('error', (error) => {
-      console.error('Uncaught Dexie error:', error);
-    });
   }
 }
 
