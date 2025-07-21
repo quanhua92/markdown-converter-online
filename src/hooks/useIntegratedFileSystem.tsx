@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useEnhancedWorkspaceManager } from './useEnhancedWorkspaceManager'
 import { useGitFileSystem } from './useGitFileSystem'
-import { useFileSystem } from '../components/shared/useFileSystem'
+// import { useFileSystem } from '../components/shared/useFileSystem' // Removed to avoid dual workspace managers
 import type { FileSystemItem } from '../components/shared/FileTree'
 import type { GitRepository, GitSyncStatus } from '../types/git'
+import { StorageService } from '../db/storage'
 
 interface IntegratedFileSystemState {
   files: FileSystemItem[]
@@ -45,11 +46,202 @@ interface IntegratedFileSystemActions {
 /**
  * Integrated file system hook that automatically handles both local and Git workspaces
  */
+// Simple local file system state for integrated system
+interface LocalFileSystemState {
+  files: FileSystemItem[]
+  currentFile: FileSystemItem | null
+  isLoaded: boolean
+  hasUnsavedChanges: boolean
+}
+
+// Create a simple local file system hook that works with enhanced workspace manager
+function useSimpleLocalFS(currentWorkspace: any): LocalFileSystemState & {
+  selectFile: (item: FileSystemItem) => void
+  closeFile: () => void
+  updateFileContent: (path: string, content: string) => void
+  createFile: (parentPath: string, name: string) => void
+  createFolder: (parentPath: string, name: string) => void
+  deleteItem: (path: string) => void
+  renameItem: (item: FileSystemItem, newName: string) => void
+  toggleFolder: (path: string) => void
+  saveWorkspace: () => void
+  joinWorkspace: (workspaceId: string) => void
+} {
+  const [files, setFiles] = useState<FileSystemItem[]>([])
+  const [currentFile, setCurrentFile] = useState<FileSystemItem | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  // Load workspace files when workspace changes
+  useEffect(() => {
+    const loadWorkspaceFiles = async () => {
+      if (!currentWorkspace) {
+        setFiles([])
+        setCurrentFile(null)
+        setIsLoaded(true)
+        return
+      }
+
+      try {
+        console.log('🔄 SimpleLocalFS: Loading workspace files for:', currentWorkspace.id)
+        const workspaceKey = `markdown-explorer-v2-workspace-${currentWorkspace.id}`
+        const workspaceData = await StorageService.loadItem(workspaceKey)
+        
+        if (workspaceData && workspaceData.files) {
+          console.log('✅ SimpleLocalFS: Loaded files:', workspaceData.files.length)
+          setFiles(workspaceData.files)
+          if (workspaceData.currentFilePath) {
+            const currentFile = findFileByPath(workspaceData.files, workspaceData.currentFilePath)
+            setCurrentFile(currentFile)
+          }
+        } else {
+          console.log('⚠️ SimpleLocalFS: No files found, using default')
+          // Set default files
+          const defaultFiles = [
+            {
+              id: 'welcome',
+              name: 'Welcome.md',
+              type: 'file' as const,
+              path: '/Welcome.md',
+              content: '# Welcome to your workspace!\n\nStart editing this file or create new ones.'
+            }
+          ]
+          setFiles(defaultFiles)
+        }
+        setIsLoaded(true)
+      } catch (error) {
+        console.error('❌ SimpleLocalFS: Failed to load workspace files:', error)
+        setFiles([])
+        setIsLoaded(true)
+      }
+    }
+
+    loadWorkspaceFiles()
+  }, [currentWorkspace?.id])
+
+  const findFileByPath = (files: FileSystemItem[], path: string): FileSystemItem | null => {
+    for (const file of files) {
+      if (file.path === path) return file
+      if (file.children) {
+        const found = findFileByPath(file.children, path)
+        if (found) return found
+      }
+    }
+    return null
+  }
+
+  const selectFile = useCallback((item: FileSystemItem) => {
+    console.log('📄 SimpleLocalFS: Selecting file:', item.name)
+    setCurrentFile(item)
+  }, [])
+
+  const closeFile = useCallback(() => {
+    setCurrentFile(null)
+  }, [])
+
+  const updateFileContent = useCallback((path: string, content: string) => {
+    console.log('✏️ SimpleLocalFS: Updating file content:', path)
+    setFiles(prev => updateFileInTree(prev, path, (file) => ({ ...file, content })))
+    setHasUnsavedChanges(true)
+  }, [])
+
+  const createFile = useCallback((parentPath: string, name: string) => {
+    console.log('📄 SimpleLocalFS: Creating file:', name, 'in', parentPath)
+    // Implementation would go here
+  }, [])
+
+  const createFolder = useCallback((parentPath: string, name: string) => {
+    console.log('📁 SimpleLocalFS: Creating folder:', name, 'in', parentPath)
+    // Implementation would go here
+  }, [])
+
+  const deleteItem = useCallback((path: string) => {
+    console.log('🗑️ SimpleLocalFS: Deleting item:', path)
+    // Implementation would go here
+  }, [])
+
+  const renameItem = useCallback((item: FileSystemItem, newName: string) => {
+    console.log('✏️ SimpleLocalFS: Renaming item:', item.name, 'to', newName)
+    // Implementation would go here
+  }, [])
+
+  const toggleFolder = useCallback((path: string) => {
+    console.log('📁 SimpleLocalFS: Toggling folder:', path)
+    setFiles(prev => updateFileInTree(prev, path, (folder) => ({ 
+      ...folder, 
+      isExpanded: !folder.isExpanded 
+    })))
+  }, [])
+
+  const saveWorkspace = useCallback(async () => {
+    if (!currentWorkspace) return
+    
+    try {
+      console.log('💾 SimpleLocalFS: Saving workspace:', currentWorkspace.id)
+      const workspaceKey = `markdown-explorer-v2-workspace-${currentWorkspace.id}`
+      const workspaceData = {
+        id: currentWorkspace.id,
+        name: currentWorkspace.name,
+        files,
+        currentFilePath: currentFile?.path,
+        createdAt: currentWorkspace.createdAt,
+        lastModified: new Date().toISOString()
+      }
+      await StorageService.saveItem(workspaceKey, workspaceData)
+      setHasUnsavedChanges(false)
+      console.log('✅ SimpleLocalFS: Workspace saved')
+    } catch (error) {
+      console.error('❌ SimpleLocalFS: Failed to save workspace:', error)
+    }
+  }, [currentWorkspace, files, currentFile])
+
+  const joinWorkspace = useCallback((workspaceId: string) => {
+    console.log('🔄 SimpleLocalFS: Join workspace called:', workspaceId)
+    // This will trigger the useEffect above through currentWorkspace change
+  }, [])
+
+  return {
+    files,
+    currentFile,
+    isLoaded,
+    hasUnsavedChanges,
+    selectFile,
+    closeFile,
+    updateFileContent,
+    createFile,
+    createFolder,
+    deleteItem,
+    renameItem,
+    toggleFolder,
+    saveWorkspace,
+    joinWorkspace
+  }
+}
+
+function updateFileInTree(
+  files: FileSystemItem[], 
+  targetPath: string, 
+  updater: (file: FileSystemItem) => FileSystemItem
+): FileSystemItem[] {
+  return files.map(file => {
+    if (file.path === targetPath) {
+      return updater(file)
+    }
+    if (file.children) {
+      return {
+        ...file,
+        children: updateFileInTree(file.children, targetPath, updater)
+      }
+    }
+    return file
+  })
+}
+
 export function useIntegratedFileSystem(): IntegratedFileSystemState & IntegratedFileSystemActions {
   const { currentWorkspace, hasGitSupport } = useEnhancedWorkspaceManager()
   
-  // Local file system hook
-  const localFS = useFileSystem()
+  // Simple local file system 
+  const localFS = useSimpleLocalFS(currentWorkspace)
   
   // Git file system hook
   const gitFS = useGitFileSystem()
