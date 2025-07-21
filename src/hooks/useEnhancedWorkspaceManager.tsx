@@ -120,6 +120,8 @@ export function useEnhancedWorkspaceManager() {
       if (currentId) {
         const current = workspaces.find(w => w.id === currentId)
         setCurrentWorkspace(current || null)
+      } else {
+        setCurrentWorkspace(null)
       }
       
     } catch (error) {

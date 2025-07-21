@@ -19,7 +19,7 @@ async function testWorkspaceCreation() {
   // Listen for console messages
   page.on('console', msg => {
     const text = msg.text();
-    if (text.includes('Enhanced Manager') || text.includes('IntegratedFS') || text.includes('SimpleLocalFS')) {
+    if (text.includes('Created local workspace') || text.includes('Workspace created') || text.includes('Failed')) {
       console.log(`🔍 ${text}`);
     }
   });
@@ -56,18 +56,60 @@ async function testWorkspaceCreation() {
     if (hasWelcomeScreen) {
       console.log('📝 Click Create New Workspace...');
       await page.click('text=Create New Workspace');
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
       
-      console.log('📝 Fill workspace name...');
-      await page.fill('input[type="text"]', 'Enhanced Test');
+      // Take screenshot after clicking
+      await page.screenshot({ path: 'tests/screenshots/after-click.png' });
+      
+      // Check if input is visible (try multiple selectors)
+      const inputText = await page.locator('input[type="text"]').isVisible();
+      const inputGeneric = await page.locator('input').isVisible();
+      const inputByPlaceholder = await page.locator('input[placeholder*="Project"]').isVisible();
+      
+      console.log('📊 Input field visible (type=text):', inputText);
+      console.log('📊 Input field visible (generic):', inputGeneric);
+      console.log('📊 Input field visible (placeholder):', inputByPlaceholder);
+      
+      if (inputByPlaceholder) {
+        console.log('📝 Fill workspace name...');
+        await page.fill('input[placeholder*="Project"]', 'Enhanced Test');
+      } else if (inputGeneric) {
+        console.log('📝 Fill workspace name (generic input)...');
+        await page.fill('input', 'Enhanced Test');
+      } else {
+        console.log('❌ Input field not found, dialog may not have opened');
+      }
       await page.waitForTimeout(500);
       
       console.log('✅ Submit workspace creation...');
-      await page.click('button[type="submit"]');
+      
+      // Try different button selectors
+      const submitButton = await page.locator('button[type="submit"]').isVisible();
+      const createButton = await page.locator('text=Create Workspace').isVisible();
+      
+      console.log('📊 Submit button visible:', submitButton);
+      console.log('📊 Create button visible:', createButton);
+      
+      if (createButton) {
+        await page.click('text=Create Workspace');
+      } else if (submitButton) {
+        await page.click('button[type="submit"]');
+      } else {
+        console.log('❌ No submit button found');
+      }
       
       // Wait for workspace creation
       console.log('⏳ Waiting for workspace creation...');
-      await page.waitForTimeout(5000);
+      await page.waitForTimeout(2000);
+      
+      // Try to wait for the file tree to appear (indicates success)
+      console.log('🔍 Waiting for file tree or error...');
+      try {
+        await page.waitForSelector('text=Welcome.md', { timeout: 8000 });
+        console.log('✅ File tree appeared!');
+      } catch (e) {
+        console.log('⚠️ No file tree found, checking for other indicators...');
+      }
       
       // Check if we see the file tree
       const hasFileTree = await page.locator('text=Welcome.md').isVisible();
