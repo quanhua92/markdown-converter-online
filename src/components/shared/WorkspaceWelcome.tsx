@@ -17,7 +17,9 @@ import {
   FileArchive, 
   Sparkles,
   Folder,
-  Briefcase
+  Briefcase,
+  Github,
+  GitBranch
 } from 'lucide-react'
 import { TemplateQuickActions } from './TemplateSelector'
 
@@ -32,6 +34,7 @@ interface WorkspaceWelcomeProps {
   onCreateWorkspace: (name: string) => void
   onImportFromZip: (file: File) => void
   onInitFromTemplate: (templateKey: string) => void
+  onCreateGitWorkspace?: () => void
 }
 
 export function WorkspaceWelcome({
@@ -39,7 +42,8 @@ export function WorkspaceWelcome({
   onJoinWorkspace,
   onCreateWorkspace, 
   onImportFromZip,
-  onInitFromTemplate
+  onInitFromTemplate,
+  onCreateGitWorkspace
 }: WorkspaceWelcomeProps) {
   const [showJoinDialog, setShowJoinDialog] = useState(false)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
@@ -82,7 +86,7 @@ export function WorkspaceWelcome({
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Join Existing Workspace */}
             <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 hover:border-blue-200 dark:hover:border-blue-800"
                   onClick={() => setShowJoinDialog(true)}
@@ -113,6 +117,29 @@ export function WorkspaceWelcome({
                 </p>
               </CardContent>
             </Card>
+
+            {/* Create Git Workspace */}
+            {onCreateGitWorkspace && (
+              <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 hover:border-indigo-200 dark:hover:border-indigo-800"
+                    onClick={onCreateGitWorkspace}
+                    data-testid="create-git-workspace-card">
+                <CardContent className="p-6 text-center">
+                  <div className="relative">
+                    <Github className="w-12 h-12 text-indigo-600 dark:text-indigo-400 mx-auto mb-4" />
+                    <GitBranch className="w-6 h-6 text-indigo-500 absolute -top-1 -right-1" />
+                  </div>
+                  <h3 className="font-semibold text-lg mb-2">Create Git Workspace</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Connect to a GitHub repository for collaborative editing
+                  </p>
+                  <div className="mt-3">
+                    <span className="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded">
+                      Requires GitHub
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Import from ZIP */}
             <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 hover:border-purple-200 dark:hover:border-purple-800"

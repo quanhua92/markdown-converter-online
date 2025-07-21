@@ -13,6 +13,7 @@ import { Route as PrintRouteImport } from './routes/print'
 import { Route as ExplorerRouteImport } from './routes/explorer'
 import { Route as DeploymentRouteImport } from './routes/deployment'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthGithubCallbackRouteImport } from './routes/auth/github/callback'
 
 const PrintRoute = PrintRouteImport.update({
   id: '/print',
@@ -34,18 +35,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthGithubCallbackRoute = AuthGithubCallbackRouteImport.update({
+  id: '/auth/github/callback',
+  path: '/auth/github/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/deployment': typeof DeploymentRoute
   '/explorer': typeof ExplorerRoute
   '/print': typeof PrintRoute
+  '/auth/github/callback': typeof AuthGithubCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/deployment': typeof DeploymentRoute
   '/explorer': typeof ExplorerRoute
   '/print': typeof PrintRoute
+  '/auth/github/callback': typeof AuthGithubCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,25 @@ export interface FileRoutesById {
   '/deployment': typeof DeploymentRoute
   '/explorer': typeof ExplorerRoute
   '/print': typeof PrintRoute
+  '/auth/github/callback': typeof AuthGithubCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/deployment' | '/explorer' | '/print'
+  fullPaths:
+    | '/'
+    | '/deployment'
+    | '/explorer'
+    | '/print'
+    | '/auth/github/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/deployment' | '/explorer' | '/print'
-  id: '__root__' | '/' | '/deployment' | '/explorer' | '/print'
+  to: '/' | '/deployment' | '/explorer' | '/print' | '/auth/github/callback'
+  id:
+    | '__root__'
+    | '/'
+    | '/deployment'
+    | '/explorer'
+    | '/print'
+    | '/auth/github/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +87,7 @@ export interface RootRouteChildren {
   DeploymentRoute: typeof DeploymentRoute
   ExplorerRoute: typeof ExplorerRoute
   PrintRoute: typeof PrintRoute
+  AuthGithubCallbackRoute: typeof AuthGithubCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/github/callback': {
+      id: '/auth/github/callback'
+      path: '/auth/github/callback'
+      fullPath: '/auth/github/callback'
+      preLoaderRoute: typeof AuthGithubCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +135,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeploymentRoute: DeploymentRoute,
   ExplorerRoute: ExplorerRoute,
   PrintRoute: PrintRoute,
+  AuthGithubCallbackRoute: AuthGithubCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
