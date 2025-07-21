@@ -53,7 +53,7 @@ This guide covers the architecture, development, and deployment details of the M
 - **Sonner**: Toast notifications
 - **Lucide React**: Icon library
 - **TanStack Router**: File-based routing with type safety
-- **localStorage API**: Client-side file system persistence
+- **IndexedDB (Dexie.js)**: Client-side persistence with migration from localStorage
 
 #### Backend
 - **Node.js 18**: LTS runtime environment
@@ -146,6 +146,10 @@ npm install -g @marp-team/marp-cli
 markdown-converter-online/
 ├── src/                          # Frontend React application
 │   ├── components/               # Reusable UI components
+│   ├── db/                       # IndexedDB storage layer
+│   │   ├── db.ts                 # Database configuration
+│   │   ├── storage.ts            # Storage service wrapper
+│   │   └── migration.ts          # Migration logic
 │   ├── App.tsx                   # Main application component
 │   ├── main.tsx                  # Application entry point
 │   └── styles.css                # Global styles and Tailwind
@@ -269,10 +273,80 @@ GET /api/download/:filename
 
 ## Frontend Architecture
 
+### Storage Architecture (IndexedDB Migration)
+
+#### Overview
+The application has migrated from localStorage to IndexedDB using Dexie.js for improved performance, larger storage capacity, and better error handling.
+
+#### Database Schema
+```typescript
+interface StorageItem {
+  id?: number;
+  key: string;
+  value: any;
+  timestamp: number;
+}
+
+// Database Configuration
+{
+  storage: '++id, &key, timestamp'
+}
+```
+
+#### Storage Service Features
+- **Async Operations**: All storage operations are asynchronous
+- **Error Handling**: Comprehensive error handling with graceful degradation
+- **JSON Serialization**: Automatic serialization/deserialization
+- **Quota Management**: Handles storage quota exceeded errors
+- **Database Health Checks**: Ensures database availability before operations
+
+#### Migration System
+**Automated Migration Dialog**: When localStorage data is detected, users see a migration dialog with:
+- Real-time progress bar showing migration status
+- Console-like interface with timestamped logs
+- Error handling and recovery mechanisms
+- Visual feedback during the entire migration process
+
+**Migration Features**:
+```typescript
+interface MigrationProgress {
+  total: number;
+  current: number;
+  currentKey?: string;
+  status: 'starting' | 'migrating' | 'completed' | 'error';
+  message: string;
+  errors: string[];
+}
+```
+
+#### Storage Service API
+```typescript
+class StorageService {
+  static async saveItem(key: string, value: any): Promise<void>
+  static async loadItem(key: string): Promise<any>
+  static async removeItem(key: string): Promise<void>
+  static async getAllItems(): Promise<Array<{key: string, value: any}>>
+  static async getAllKeys(): Promise<string[]>
+  static async clear(): Promise<void>
+  static async getStorageInfo(): Promise<{
+    itemCount: number;
+    estimatedSize: number;
+    keys: string[];
+  }>
+}
+```
+
+#### Browser Compatibility
+- **IndexedDB Detection**: Checks for IndexedDB availability before operations
+- **Graceful Degradation**: Falls back gracefully when IndexedDB is unavailable
+- **Cross-browser Support**: Works across all modern browsers
+- **Error Recovery**: Handles database initialization failures
+
 ### State Management
 - **React Hooks**: Local component state
 - **Context**: Theme management
-- **LocalStorage**: Preference persistence and workspace isolation
+- **IndexedDB**: Robust client-side persistence with Dexie.js
+- **Migration System**: Automated localStorage to IndexedDB migration
 - **Workspace Sessions**: Sign-in/sign-out workflow for multi-workspace management
 
 ### Component Structure
@@ -337,9 +411,25 @@ enum WorkspaceState {
 }
 ```
 
-#### Data Isolation Strategy
+#### Data Storage Evolution
+
+**IndexedDB Storage (v3 - Current)**:
 ```typescript
-// localStorage Structure (v2 - Current)
+// IndexedDB Storage via Dexie.js
+Database: MarkdownFilesDB
+Table: storage (++id, &key, timestamp)
+
+// Storage Keys (maintained for compatibility)
+{
+  "markdown-explorer-v2-current-workspace": "workspace_id",
+  "markdown-explorer-v2-workspace-{id}": WorkspaceData,
+  "theme": "dark" | "light",
+  "markdownDraft": string
+}
+```
+
+**localStorage Structure (v2 - Legacy)**:
+```typescript
 {
   "markdown-explorer-v2-current-workspace": "workspace_id",
   "markdown-explorer-v2-workspace-{id}": WorkspaceData
@@ -351,6 +441,7 @@ enum WorkspaceState {
   "markdown-explorer-workspace-default": WorkspaceData,
   "markdown-explorer-workspace-{id}": WorkspaceData
 }
+```
 
 interface WorkspaceData {
   id: string
@@ -362,34 +453,57 @@ interface WorkspaceData {
 }
 ```
 
-#### Storage Migration (v1 → v2)
+#### Storage Migration (localStorage → IndexedDB)
 
-**Recent Changes (January 2025)**:
-- **Problem**: Legacy system automatically created a 'default' workspace that persisted through localStorage.clear()
-- **Solution**: Migrated to v2 storage prefix to avoid legacy workspace data
-- **Impact**: Users now start with no workspace and must explicitly create one
-- **Benefits**: 
-  - Eliminates unwanted default workspace behavior
-  - Provides clean welcome screen experience
-  - Ensures explicit workspace creation workflow
-  - Avoids data conflicts with previous versions
+**IndexedDB Migration (v3 - January 2025)**:
+- **Enhancement**: Migrated from localStorage to IndexedDB for better performance and larger storage capacity
+- **Migration Dialog**: Interactive migration process with progress tracking and console output
+- **Backward Compatibility**: Maintains v2 storage key structure for seamless transition
+- **Benefits**:
+  - **Performance**: Faster operations with larger datasets
+  - **Capacity**: No 10MB localStorage limit
+  - **Reliability**: Better error handling and recovery
+  - **Async Operations**: Non-blocking storage operations
+  - **Future-proof**: Structured database for advanced features
 
-**Migration Details**:
+**Migration Process**:
+```typescript
+// Automated Migration Flow
+1. Detect localStorage data on app startup
+2. Show migration dialog with progress tracking
+3. Migrate all localStorage items to IndexedDB
+4. Preserve data structure and keys
+5. Mark migration as completed
+6. Continue with IndexedDB operations
+
+// Migration Progress Tracking
+- Real-time progress bar
+- Console-like interface with timestamps
+- Error handling and recovery
+- Item-by-item migration logging
+```
+
+**Storage Evolution Timeline**:
 ```typescript
 // v1 Storage Keys (Legacy - Deprecated)
 const CURRENT_WORKSPACE_KEY = 'markdown-explorer-current-workspace'
 const WORKSPACE_PREFIX = 'markdown-explorer-workspace-'
 
-// v2 Storage Keys (Current)
+// v2 Storage Keys (localStorage - Previous)
 const CURRENT_WORKSPACE_KEY = 'markdown-explorer-v2-current-workspace'
 const WORKSPACE_PREFIX = 'markdown-explorer-v2-workspace-'
+
+// v3 Storage (IndexedDB - Current)
+// Same keys as v2, but stored in IndexedDB via Dexie.js
+Database: MarkdownFilesDB
+Table: storage
 ```
 
-**Breaking Changes**:
-- No automatic workspace creation
-- Users must explicitly create first workspace
-- Legacy workspaces are ignored (not migrated)
-- Welcome screen is now the default state
+**Migration Features**:
+- **Zero Data Loss**: All localStorage data is preserved during migration
+- **Error Recovery**: Handles partial failures and invalid data gracefully
+- **User Control**: Clear visual feedback and manual continuation
+- **Performance Monitoring**: Track migration progress and completion time
 
 #### UI Design Principles
 - **Welcome Screen**: Full-screen onboarding when no workspace is active
@@ -463,9 +577,9 @@ Each template creates a single markdown file with rich content:
 - **Integration Tests**: API endpoint testing
 - **E2E Tests**: Full conversion workflows
 
-### Essential Test Suite (v2.2 Streamlined)
+### Essential Test Suite (v3 Enhanced)
 
-The test suite has been optimized from 21 tests to 5 essential tests covering core functionality:
+The test suite includes comprehensive testing for the new IndexedDB migration system plus core functionality:
 
 #### 1. Template Functionality Test (`test-template-functionality.cjs`)
 **NEW in v2.2** - Comprehensive testing of the new template system:
@@ -509,12 +623,47 @@ The test suite has been optimized from 21 tests to 5 essential tests covering co
 - Text readability across UI elements
 - Accessibility standards verification
 
-### Test Infrastructure Improvements (v2.2)
-- **76% test reduction**: From 21 tests to 5 essential tests
-- **Improved maintainability**: Focused test suite easier to maintain
-- **Enhanced documentation**: Clear test descriptions and usage examples
-- **Better error handling**: Comprehensive failure reporting
-- **Visual validation**: Strategic screenshot capture for manual review
+#### 6. IndexedDB Migration Tests (`test-indexeddb-migration.cjs`)
+**NEW in v3** - Comprehensive testing of the IndexedDB migration system:
+- Migration detection when localStorage contains data
+- Migration dialog appearance and functionality
+- Progress tracking with console interface
+- Data integrity preservation during migration
+- Error handling for failed migrations
+- Prevention of duplicate migrations
+- Complex data structure migration (nested objects, special characters)
+
+**Technical details**:
+- Tests migration dialog UI components (progress bar, console, buttons)
+- Validates complete data transfer from localStorage to IndexedDB
+- Verifies error scenarios and graceful degradation
+- Ensures migration completion marking prevents re-migration
+
+#### 7. IndexedDB Workflow Tests (`test-indexeddb-workflows.cjs`)
+**NEW in v3** - Testing IndexedDB operations and workflows:
+- Workspace creation and persistence with IndexedDB
+- Data loading from IndexedDB on page refresh
+- Large file handling (1MB+ content)
+- Concurrent workspace operations
+- Theme persistence across sessions
+- Draft auto-save functionality
+- Storage quota error handling
+- Browser compatibility testing
+
+**Technical details**:
+- Tests async storage operations in real browser environment
+- Validates IndexedDB performance with large datasets
+- Ensures proper error handling for storage failures
+- Verifies cross-session data persistence
+
+### Test Infrastructure Improvements (v3)
+- **Enhanced Coverage**: Added comprehensive IndexedDB testing (2 new test files)
+- **Migration Testing**: Full coverage of localStorage to IndexedDB migration
+- **Async Operations**: Tests for all async storage operations
+- **Error Scenarios**: Comprehensive error handling and edge case testing
+- **Performance Testing**: Large dataset and concurrent operation testing
+- **Visual Validation**: Strategic screenshot capture for manual review
+- **Browser Compatibility**: Cross-browser IndexedDB functionality testing
 
 ### Removed Test Categories (v2.2 Cleanup)
 - Debug utilities (2 files): Too specific for general testing
@@ -525,8 +674,8 @@ The test suite has been optimized from 21 tests to 5 essential tests covering co
 
 ### Running Tests
 ```bash
-# Essential test suite (recommended)
-for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-welcome.cjs test-delete-functionality.cjs test-readability.cjs; do
+# Complete test suite (recommended)
+for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-welcome.cjs test-delete-functionality.cjs test-readability.cjs test-indexeddb-migration.cjs test-indexeddb-workflows.cjs; do
   echo "🧪 Running tests/$test..."
   node "tests/$test"
   echo "✅ Completed tests/$test"
@@ -534,11 +683,16 @@ for test in test-template-functionality.cjs test-dark-mode.cjs test-workspace-we
 done
 
 # Individual test execution
-node tests/test-template-functionality.cjs  # New template system
+node tests/test-template-functionality.cjs  # Template system
 node tests/test-dark-mode.cjs              # UI theming
 node tests/test-workspace-welcome.cjs      # Workspace management
 node tests/test-delete-functionality.cjs   # File operations
 node tests/test-readability.cjs            # Accessibility
+node tests/test-indexeddb-migration.cjs    # IndexedDB migration
+node tests/test-indexeddb-workflows.cjs    # IndexedDB operations
+
+# Migration-specific testing
+node tests/test-migration-dialog-manual.cjs # Manual migration dialog test
 ```
 - **Docker Tests**: Container build verification
 

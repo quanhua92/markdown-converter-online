@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { FileSystemItem } from './FileTree'
 import { useWorkspaceManager } from './useWorkspaceManager'
+import { StorageService } from '../../db/storage'
 
 // Add timeout to window for folder toggle debouncing
 declare global {
@@ -25,21 +26,21 @@ function createPath(parentPath: string, name: string): string {
   return `${parentPath}/${name}`
 }
 
-function getInitialFiles(): FileSystemItem[] {
+async function getInitialFiles(): Promise<FileSystemItem[]> {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = await StorageService.loadItem(STORAGE_KEY)
     if (stored) {
-      return JSON.parse(stored)
+      return stored
     }
     
     // Check if we have any indication that this should be a fresh start
-    // If localStorage was explicitly cleared, don't show default files
+    // If storage was explicitly cleared, don't show default files
     const hasBeenCleared = sessionStorage.getItem('explorer-cleared')
     if (hasBeenCleared) {
       return []
     }
   } catch (error) {
-    console.warn('Failed to load files from localStorage:', error)
+    console.warn('Failed to load files from storage:', error)
   }
   
   // Default structure with sample files
@@ -97,11 +98,11 @@ Happy writing! 🚀`
   ]
 }
 
-function saveFiles(files: FileSystemItem[]): void {
+async function saveFiles(files: FileSystemItem[]): Promise<void> {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(files))
+    await StorageService.saveItem(STORAGE_KEY, files)
   } catch (error) {
-    console.warn('Failed to save files to localStorage:', error)
+    console.warn('Failed to save files to storage:', error)
   }
 }
 
@@ -161,6 +162,7 @@ export function useFileSystem() {
     currentWorkspaceId,
     workspaceData,
     workspaces,
+    isLoading: workspaceLoading,
     joinWorkspace,
     leaveWorkspace,
     createWorkspace,
@@ -181,33 +183,42 @@ export function useFileSystem() {
 
   // Initialize files from workspace data
   useEffect(() => {
-    if (workspaceData) {
-      // Only use getInitialFiles() if the workspace has no files at all
-      const filesToUse = workspaceData.files.length > 0 ? workspaceData.files : getInitialFiles()
-      setFiles(filesToUse)
-      
-      // Set current file from workspace or find default
-      if (workspaceData.currentFilePath) {
-        const savedCurrentFile = findItemByPath(filesToUse, workspaceData.currentFilePath)
-        if (savedCurrentFile) {
-          setCurrentFile(savedCurrentFile)
+    const initializeFiles = async () => {
+      if (workspaceData) {
+        try {
+          // Only use getInitialFiles() if the workspace has no files at all
+          const filesToUse = workspaceData.files.length > 0 ? workspaceData.files : await getInitialFiles()
+          setFiles(filesToUse)
+          
+          // Set current file from workspace or find default
+          if (workspaceData.currentFilePath) {
+            const savedCurrentFile = findItemByPath(filesToUse, workspaceData.currentFilePath)
+            if (savedCurrentFile) {
+              setCurrentFile(savedCurrentFile)
+            }
+          } else {
+            // Set the first file as current from the actual files we're using
+            const firstFile = findItemByPath(filesToUse, '/Welcome.md')
+            if (firstFile) {
+              setCurrentFile(firstFile)
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to initialize files:', error)
+          setFiles([])
+          setCurrentFile(null)
         }
-      } else {
-        // Set the first file as current from the actual files we're using
-        const firstFile = findItemByPath(filesToUse, '/Welcome.md')
-        if (firstFile) {
-          setCurrentFile(firstFile)
-        }
+        setIsLoaded(true)
+      } else if (!workspaceLoading) {
+        // No workspace and not loading - clear files and set loaded
+        setFiles([])
+        setCurrentFile(null)
+        setIsLoaded(true)
       }
-      
-      setIsLoaded(true)
-    } else {
-      // No workspace - clear files and set loaded
-      setFiles([])
-      setCurrentFile(null)
-      setIsLoaded(true)
     }
-  }, [workspaceData])
+    
+    initializeFiles()
+  }, [workspaceData, workspaceLoading])
 
   // Manual save function - COMPLETELY NO AUTO-SAVE
   const saveWorkspace = useCallback(() => {
@@ -340,10 +351,14 @@ export function useFileSystem() {
     setHasUnsavedChanges(true) // Mark as unsaved when toggling folders
   }, [])
 
-  const clearAll = useCallback(() => {
+  const clearAll = useCallback(async () => {
     setFiles([])
     setCurrentFile(null)
-    localStorage.removeItem(STORAGE_KEY)
+    try {
+      await StorageService.removeItem(STORAGE_KEY)
+    } catch (error) {
+      console.warn('Failed to clear storage:', error)
+    }
   }, [])
 
   const initializeFromTemplate = useCallback((templateItems: FileSystemItem[]) => {
@@ -373,20 +388,30 @@ export function useFileSystem() {
     setFiles(prevFiles => [...prevFiles, ...templateItems])
   }, [])
 
-  // Workspace functions without auto-save for debugging
-  const joinWorkspaceWithoutSave = useCallback((workspaceId: string) => {
-    // Removed auto-save to debug infinite loop
-    joinWorkspace(workspaceId)
+  // Async workspace functions
+  const joinWorkspaceAsync = useCallback(async (workspaceId: string) => {
+    try {
+      await joinWorkspace(workspaceId)
+    } catch (error) {
+      console.error('Failed to join workspace:', error)
+    }
   }, [joinWorkspace])
 
-  const leaveWorkspaceWithoutSave = useCallback(() => {
-    // Removed auto-save to debug infinite loop
-    leaveWorkspace()
+  const leaveWorkspaceAsync = useCallback(async () => {
+    try {
+      await leaveWorkspace()
+    } catch (error) {
+      console.error('Failed to leave workspace:', error)
+    }
   }, [leaveWorkspace])
 
-  const createWorkspaceWithoutSave = useCallback((name: string) => {
-    // Removed auto-save to debug infinite loop
-    return createWorkspace(name)
+  const createWorkspaceAsync = useCallback(async (name: string) => {
+    try {
+      return await createWorkspace(name)
+    } catch (error) {
+      console.error('Failed to create workspace:', error)
+      throw error
+    }
   }, [createWorkspace])
 
   return {
@@ -411,9 +436,9 @@ export function useFileSystem() {
     currentWorkspaceId,
     currentWorkspaceName: workspaceData?.name || 'Default Workspace',
     workspaces,
-    joinWorkspace: joinWorkspaceWithoutSave,
-    leaveWorkspace: leaveWorkspaceWithoutSave,
-    createWorkspace: createWorkspaceWithoutSave,
+    joinWorkspace: joinWorkspaceAsync,
+    leaveWorkspace: leaveWorkspaceAsync,
+    createWorkspace: createWorkspaceAsync,
     deleteWorkspace,
     renameWorkspace,
     createWorkspaceFromTemplate,

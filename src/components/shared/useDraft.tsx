@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { debounce } from './utils'
+import { StorageService } from '../../db/storage'
 
 type DraftSaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -7,29 +8,33 @@ export function useDraft() {
   const [markdown, setMarkdown] = useState('')
   const [draftSaveStatus, setDraftSaveStatus] = useState<DraftSaveStatus>('idle')
 
-  // Load draft from localStorage on mount
+  // Load draft from storage on mount
   useEffect(() => {
-    try {
-      const savedDraft = localStorage.getItem('markdownDraft')
-      if (savedDraft && savedDraft.trim()) {
-        setMarkdown(savedDraft)
-        setDraftSaveStatus('saved')
+    const loadDraft = async () => {
+      try {
+        const savedDraft = await StorageService.loadItem('markdownDraft')
+        if (savedDraft && savedDraft.trim()) {
+          setMarkdown(savedDraft)
+          setDraftSaveStatus('saved')
+        }
+      } catch (error) {
+        console.warn('Failed to load draft from storage:', error)
+        setDraftSaveStatus('error')
       }
-    } catch (error) {
-      console.warn('Failed to load draft from localStorage:', error)
-      setDraftSaveStatus('error')
     }
+    
+    loadDraft()
   }, [])
 
   // Debounced draft save
   const saveDraft = useCallback(
-    debounce((content: string) => {
+    debounce(async (content: string) => {
       try {
         setDraftSaveStatus('saving')
         if (content.trim()) {
-          localStorage.setItem('markdownDraft', content)
+          await StorageService.saveItem('markdownDraft', content)
         } else {
-          localStorage.removeItem('markdownDraft')
+          await StorageService.removeItem('markdownDraft')
         }
         setDraftSaveStatus('saved')
         
@@ -55,14 +60,14 @@ export function useDraft() {
     }
   }, [markdown])
 
-  const clearDraft = () => {
+  const clearDraft = async () => {
     setMarkdown('')
-    // Clear draft from localStorage
+    // Clear draft from storage
     try {
-      localStorage.removeItem('markdownDraft')
+      await StorageService.removeItem('markdownDraft')
       setDraftSaveStatus('idle')
     } catch (error) {
-      console.warn('Failed to clear draft from localStorage:', error)
+      console.warn('Failed to clear draft from storage:', error)
     }
   }
 

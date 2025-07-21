@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { FileSystemItem } from './FileTree'
+import { StorageService } from '../../db/storage'
 
 // Enhanced workspace manager with no-workspace state support
 // Supports: no workspace state, multiple workspaces, import from zip
@@ -36,34 +37,37 @@ function getDefaultFiles(): FileSystemItem[] {
   ]
 }
 
-function getAllWorkspacesFromStorage(): WorkspaceData[] {
+async function getAllWorkspacesFromStorage(): Promise<WorkspaceData[]> {
   const workspaces: WorkspaceData[] = []
   
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (key && key.startsWith(WORKSPACE_PREFIX)) {
-      try {
-        const stored = localStorage.getItem(key)
-        if (stored) {
-          const workspace = JSON.parse(stored)
-          workspaces.push(workspace)
+  try {
+    const allItems = await StorageService.getAllItems()
+    
+    for (const item of allItems) {
+      if (item.key.startsWith(WORKSPACE_PREFIX)) {
+        try {
+          const workspace = item.value
+          if (workspace && typeof workspace === 'object') {
+            workspaces.push(workspace)
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to load workspace from key:', item.key, error)
         }
-      } catch (error) {
-        console.warn('⚠️ Failed to load workspace from key:', key, error)
       }
     }
+  } catch (error) {
+    console.warn('⚠️ Failed to get all workspaces:', error)
   }
   
   return workspaces.sort((a, b) => new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime())
 }
 
-function loadWorkspaceData(workspaceId: string): WorkspaceData | null {
+async function loadWorkspaceData(workspaceId: string): Promise<WorkspaceData | null> {
   try {
-    const stored = localStorage.getItem(WORKSPACE_PREFIX + workspaceId)
+    const stored = await StorageService.loadItem(WORKSPACE_PREFIX + workspaceId)
     if (stored) {
-      const parsed = JSON.parse(stored)
       console.log('📂 useWorkspaceManager: Loaded workspace', workspaceId)
-      return parsed
+      return stored
     }
   } catch (error) {
     console.warn('⚠️ useWorkspaceManager: Workspace load failed:', workspaceId, error)
@@ -71,34 +75,34 @@ function loadWorkspaceData(workspaceId: string): WorkspaceData | null {
   return null
 }
 
-function saveWorkspaceData(workspace: WorkspaceData): void {
+async function saveWorkspaceData(workspace: WorkspaceData): Promise<void> {
   try {
     const updatedWorkspace = {
       ...workspace,
       lastModified: new Date().toISOString()
     }
-    localStorage.setItem(WORKSPACE_PREFIX + workspace.id, JSON.stringify(updatedWorkspace))
+    await StorageService.saveItem(WORKSPACE_PREFIX + workspace.id, updatedWorkspace)
     console.log('✅ useWorkspaceManager: Saved workspace', workspace.id)
   } catch (error) {
     console.warn('⚠️ useWorkspaceManager: Workspace save failed:', workspace.id, error)
   }
 }
 
-function getCurrentWorkspaceId(): string | null {
+async function getCurrentWorkspaceId(): Promise<string | null> {
   try {
-    return localStorage.getItem(CURRENT_WORKSPACE_KEY)
+    return await StorageService.loadItem(CURRENT_WORKSPACE_KEY)
   } catch (error) {
     console.warn('⚠️ useWorkspaceManager: Failed to get current workspace ID:', error)
     return null
   }
 }
 
-function setCurrentWorkspaceId(workspaceId: string | null): void {
+async function setCurrentWorkspaceId(workspaceId: string | null): Promise<void> {
   try {
     if (workspaceId) {
-      localStorage.setItem(CURRENT_WORKSPACE_KEY, workspaceId)
+      await StorageService.saveItem(CURRENT_WORKSPACE_KEY, workspaceId)
     } else {
-      localStorage.removeItem(CURRENT_WORKSPACE_KEY)
+      await StorageService.removeItem(CURRENT_WORKSPACE_KEY)
     }
     console.log('📝 useWorkspaceManager: Set current workspace to', workspaceId)
   } catch (error) {
@@ -110,75 +114,116 @@ export function useWorkspaceManager() {
   console.log('🚀 useWorkspaceManager: Hook called')
   
   // State management
-  const [currentWorkspaceId, setCurrentWorkspaceIdState] = useState<string | null>(() => getCurrentWorkspaceId())
-  const [workspaceData, setWorkspaceData] = useState<WorkspaceData | null>(() => {
-    const id = getCurrentWorkspaceId()
-    return id ? loadWorkspaceData(id) : null
-  })
-  const [workspaces, setWorkspaces] = useState<WorkspaceData[]>(() => getAllWorkspacesFromStorage())
+  const [currentWorkspaceId, setCurrentWorkspaceIdState] = useState<string | null>(null)
+  const [workspaceData, setWorkspaceData] = useState<WorkspaceData | null>(null)
+  const [workspaces, setWorkspaces] = useState<WorkspaceData[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  // Initialize data on mount
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        setIsLoading(true)
+        const currentId = await getCurrentWorkspaceId()
+        setCurrentWorkspaceIdState(currentId)
+        
+        if (currentId) {
+          const workspace = await loadWorkspaceData(currentId)
+          setWorkspaceData(workspace)
+        }
+        
+        const allWorkspaces = await getAllWorkspacesFromStorage()
+        setWorkspaces(allWorkspaces)
+      } catch (error) {
+        console.warn('⚠️ Failed to initialize workspace data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    initializeData()
+  }, [])
 
   // Update workspaces list when needed
-  const refreshWorkspaces = useCallback(() => {
-    setWorkspaces(getAllWorkspacesFromStorage())
+  const refreshWorkspaces = useCallback(async () => {
+    try {
+      const allWorkspaces = await getAllWorkspacesFromStorage()
+      setWorkspaces(allWorkspaces)
+    } catch (error) {
+      console.warn('⚠️ Failed to refresh workspaces:', error)
+    }
   }, [])
 
   // Join an existing workspace
-  const joinWorkspace = useCallback((workspaceId: string) => {
+  const joinWorkspace = useCallback(async (workspaceId: string) => {
     console.log('📝 useWorkspaceManager: joinWorkspace called:', workspaceId)
-    const workspace = loadWorkspaceData(workspaceId)
-    if (workspace) {
-      setCurrentWorkspaceIdState(workspaceId)
-      setCurrentWorkspaceId(workspaceId)
-      setWorkspaceData(workspace)
-      console.log('✅ useWorkspaceManager: Switched to workspace', workspaceId)
-    } else {
-      console.warn('⚠️ useWorkspaceManager: Workspace not found:', workspaceId)
+    try {
+      const workspace = await loadWorkspaceData(workspaceId)
+      if (workspace) {
+        setCurrentWorkspaceIdState(workspaceId)
+        await setCurrentWorkspaceId(workspaceId)
+        setWorkspaceData(workspace)
+        console.log('✅ useWorkspaceManager: Switched to workspace', workspaceId)
+      } else {
+        console.warn('⚠️ useWorkspaceManager: Workspace not found:', workspaceId)
+      }
+    } catch (error) {
+      console.warn('⚠️ useWorkspaceManager: Failed to join workspace:', workspaceId, error)
     }
   }, [])
   
   // Leave current workspace (go to no-workspace state)
-  const leaveWorkspace = useCallback(() => {
+  const leaveWorkspace = useCallback(async () => {
     console.log('📝 useWorkspaceManager: leaveWorkspace called')
-    setCurrentWorkspaceIdState(null)
-    setCurrentWorkspaceId(null)
-    setWorkspaceData(null)
-    console.log('✅ useWorkspaceManager: Left workspace, now in no-workspace state')
+    try {
+      setCurrentWorkspaceIdState(null)
+      await setCurrentWorkspaceId(null)
+      setWorkspaceData(null)
+      console.log('✅ useWorkspaceManager: Left workspace, now in no-workspace state')
+    } catch (error) {
+      console.warn('⚠️ useWorkspaceManager: Failed to leave workspace:', error)
+    }
   }, [])
   
   // Create a new workspace
-  const createWorkspace = useCallback((name: string) => {
+  const createWorkspace = useCallback(async (name: string) => {
     console.log('📝 useWorkspaceManager: createWorkspace called:', name)
-    const newId = 'workspace-' + Date.now()
-    const newWorkspace: WorkspaceData = {
-      id: newId,
-      name: name.trim(),
-      files: getDefaultFiles(),
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString()
+    try {
+      const newId = 'workspace-' + Date.now()
+      const newWorkspace: WorkspaceData = {
+        id: newId,
+        name: name.trim(),
+        files: getDefaultFiles(),
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString()
+      }
+      
+      await saveWorkspaceData(newWorkspace)
+      setCurrentWorkspaceIdState(newId)
+      await setCurrentWorkspaceId(newId)
+      setWorkspaceData(newWorkspace)
+      await refreshWorkspaces()
+      
+      console.log('✅ useWorkspaceManager: Created and joined workspace', newId)
+      return newId
+    } catch (error) {
+      console.warn('⚠️ useWorkspaceManager: Failed to create workspace:', name, error)
+      throw error
     }
-    
-    saveWorkspaceData(newWorkspace)
-    setCurrentWorkspaceIdState(newId)
-    setCurrentWorkspaceId(newId)
-    setWorkspaceData(newWorkspace)
-    refreshWorkspaces()
-    
-    console.log('✅ useWorkspaceManager: Created and joined workspace', newId)
-    return newId
   }, [refreshWorkspaces])
   
   // Delete a workspace
-  const deleteWorkspace = useCallback((workspaceId: string) => {
+  const deleteWorkspace = useCallback(async (workspaceId: string) => {
     console.log('📝 useWorkspaceManager: deleteWorkspace called:', workspaceId)
     try {
-      localStorage.removeItem(WORKSPACE_PREFIX + workspaceId)
+      await StorageService.removeItem(WORKSPACE_PREFIX + workspaceId)
       
       // If we're deleting the current workspace, leave it
       if (currentWorkspaceId === workspaceId) {
-        leaveWorkspace()
+        await leaveWorkspace()
       }
       
-      refreshWorkspaces()
+      await refreshWorkspaces()
       console.log('✅ useWorkspaceManager: Deleted workspace', workspaceId)
     } catch (error) {
       console.warn('⚠️ useWorkspaceManager: Failed to delete workspace:', workspaceId, error)
@@ -186,74 +231,88 @@ export function useWorkspaceManager() {
   }, [currentWorkspaceId, leaveWorkspace, refreshWorkspaces])
   
   // Rename a workspace
-  const renameWorkspace = useCallback((workspaceId: string, newName: string) => {
+  const renameWorkspace = useCallback(async (workspaceId: string, newName: string) => {
     console.log('📝 useWorkspaceManager: renameWorkspace called:', workspaceId, newName)
-    const workspace = loadWorkspaceData(workspaceId)
-    if (workspace) {
-      const updatedWorkspace = { ...workspace, name: newName.trim() }
-      saveWorkspaceData(updatedWorkspace)
-      
-      // Update current workspace data if it's the one being renamed
-      if (currentWorkspaceId === workspaceId) {
-        setWorkspaceData(updatedWorkspace)
+    try {
+      const workspace = await loadWorkspaceData(workspaceId)
+      if (workspace) {
+        const updatedWorkspace = { ...workspace, name: newName.trim() }
+        await saveWorkspaceData(updatedWorkspace)
+        
+        // Update current workspace data if it's the one being renamed
+        if (currentWorkspaceId === workspaceId) {
+          setWorkspaceData(updatedWorkspace)
+        }
+        
+        await refreshWorkspaces()
+        console.log('✅ useWorkspaceManager: Renamed workspace', workspaceId)
       }
-      
-      refreshWorkspaces()
-      console.log('✅ useWorkspaceManager: Renamed workspace', workspaceId)
+    } catch (error) {
+      console.warn('⚠️ useWorkspaceManager: Failed to rename workspace:', workspaceId, error)
     }
   }, [currentWorkspaceId, refreshWorkspaces])
   
   // Create workspace from template
-  const createWorkspaceFromTemplate = useCallback((name: string, templateFiles: FileSystemItem[]) => {
+  const createWorkspaceFromTemplate = useCallback(async (name: string, templateFiles: FileSystemItem[]) => {
     console.log('📝 useWorkspaceManager: createWorkspaceFromTemplate called:', name)
-    const newId = 'workspace-' + Date.now()
-    const newWorkspace: WorkspaceData = {
-      id: newId,
-      name: name.trim(),
-      files: templateFiles,
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString()
+    try {
+      const newId = 'workspace-' + Date.now()
+      const newWorkspace: WorkspaceData = {
+        id: newId,
+        name: name.trim(),
+        files: templateFiles,
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString()
+      }
+      
+      await saveWorkspaceData(newWorkspace)
+      setCurrentWorkspaceIdState(newId)
+      await setCurrentWorkspaceId(newId)
+      setWorkspaceData(newWorkspace)
+      await refreshWorkspaces()
+      
+      console.log('✅ useWorkspaceManager: Created workspace from template', newId)
+      return newId
+    } catch (error) {
+      console.warn('⚠️ useWorkspaceManager: Failed to create workspace from template:', name, error)
+      throw error
     }
-    
-    saveWorkspaceData(newWorkspace)
-    setCurrentWorkspaceIdState(newId)
-    setCurrentWorkspaceId(newId)
-    setWorkspaceData(newWorkspace)
-    refreshWorkspaces()
-    
-    console.log('✅ useWorkspaceManager: Created workspace from template', newId)
-    return newId
   }, [refreshWorkspaces])
 
   // Import workspace from ZIP
   const importWorkspaceFromZip = useCallback(async (name: string, file: File): Promise<string> => {
     console.log('📝 useWorkspaceManager: importWorkspaceFromZip called:', name)
     
-    // TODO: Implement ZIP extraction logic
-    // For now, create empty workspace
-    const newId = 'workspace-' + Date.now()
-    const newWorkspace: WorkspaceData = {
-      id: newId,
-      name: name + ' (Imported)',
-      files: [{
-        id: 'imported-readme',
-        name: 'README.md',
-        type: 'file',
-        path: '/README.md',
-        content: `# ${name}\n\nThis workspace was imported from: ${file.name}\n\n_ZIP import functionality coming soon..._`
-      }],
-      createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString()
+    try {
+      // TODO: Implement ZIP extraction logic
+      // For now, create empty workspace
+      const newId = 'workspace-' + Date.now()
+      const newWorkspace: WorkspaceData = {
+        id: newId,
+        name: name + ' (Imported)',
+        files: [{
+          id: 'imported-readme',
+          name: 'README.md',
+          type: 'file',
+          path: '/README.md',
+          content: `# ${name}\n\nThis workspace was imported from: ${file.name}\n\n_ZIP import functionality coming soon..._`
+        }],
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString()
+      }
+      
+      await saveWorkspaceData(newWorkspace)
+      setCurrentWorkspaceIdState(newId)
+      await setCurrentWorkspaceId(newId)
+      setWorkspaceData(newWorkspace)
+      await refreshWorkspaces()
+      
+      console.log('✅ useWorkspaceManager: Imported workspace from ZIP', newId)
+      return newId
+    } catch (error) {
+      console.warn('⚠️ useWorkspaceManager: Failed to import workspace from ZIP:', name, error)
+      throw error
     }
-    
-    saveWorkspaceData(newWorkspace)
-    setCurrentWorkspaceIdState(newId)
-    setCurrentWorkspaceId(newId)
-    setWorkspaceData(newWorkspace)
-    refreshWorkspaces()
-    
-    console.log('✅ useWorkspaceManager: Imported workspace from ZIP', newId)
-    return newId
   }, [refreshWorkspaces])
   
   // COMPLETELY DISABLED to eliminate infinite loop as per user request
@@ -280,6 +339,7 @@ export function useWorkspaceManager() {
     currentWorkspaceId,
     workspaceData,
     workspaces,
+    isLoading,
     joinWorkspace,
     leaveWorkspace,
     createWorkspace,
