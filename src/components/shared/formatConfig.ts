@@ -1,13 +1,13 @@
 import { Download, FileText, Presentation, File } from 'lucide-react'
 
-// Get API base URL from environment variable, fallback to local development
+// Get API base URL from environment variable, fallback to relative paths for Docker
 const getApiBaseUrl = (): string => {
   // For Vercel deployment, use environment variable
   if (typeof window !== 'undefined') {
     // Client-side: check for runtime config
     return (window as any).__API_BASE_URL__ || ''
   }
-  // Build-time: use Vite environment variable
+  // Build-time: use Vite environment variable, fallback to relative paths for Docker
   return import.meta.env.VITE_API_BASE_URL || ''
 }
 
@@ -17,28 +17,28 @@ export const formatConfig = {
   pptx: { 
     label: 'PowerPoint', 
     icon: Presentation, 
-    endpoint: `${API_BASE_URL}/api/convert/marp`,
+    endpoint: API_BASE_URL ? `${API_BASE_URL}/api/convert/marp` : '/api/convert/marp',
     description: 'Interactive presentation slides',
     badge: 'Popular'
   },
   html: { 
     label: 'HTML', 
     icon: FileText, 
-    endpoint: `${API_BASE_URL}/api/convert/pandoc`,
+    endpoint: API_BASE_URL ? `${API_BASE_URL}/api/convert/pandoc` : '/api/convert/pandoc',
     description: 'Web-ready HTML document',
     badge: 'Fast'
   },
   docx: { 
     label: 'Word', 
     icon: File, 
-    endpoint: `${API_BASE_URL}/api/convert/pandoc`,
+    endpoint: API_BASE_URL ? `${API_BASE_URL}/api/convert/pandoc` : '/api/convert/pandoc',
     description: 'Microsoft Word document',
     badge: 'Standard'
   },
   pdf: { 
     label: 'PDF', 
     icon: FileText, 
-    endpoint: `${API_BASE_URL}/api/convert/pandoc`,
+    endpoint: API_BASE_URL ? `${API_BASE_URL}/api/convert/pandoc` : '/api/convert/pandoc',
     description: 'Portable document format',
     badge: 'Print-ready'
   }

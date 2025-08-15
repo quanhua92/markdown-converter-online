@@ -27,23 +27,11 @@ export function useBackendHealth() {
   const checkHealth = useCallback(async () => {
     const apiBaseUrl = getApiBaseUrl()
     
-    // If no API base URL is configured, backend is not available
-    if (!apiBaseUrl) {
-      setState(prev => ({
-        ...prev,
-        isAvailable: false,
-        isChecking: false,
-        lastChecked: new Date(),
-        error: 'No backend URL configured',
-        apiBaseUrl: null
-      }))
-      return
-    }
-
-    setState(prev => ({ ...prev, isChecking: true, error: null, apiBaseUrl }))
+    setState(prev => ({ ...prev, isChecking: true, error: null, apiBaseUrl: apiBaseUrl || 'relative' }))
 
     try {
-      const healthUrl = `${apiBaseUrl}/api/health`
+      // Use relative path if no API base URL configured (Docker setup)
+      const healthUrl = apiBaseUrl ? `${apiBaseUrl}/api/health` : '/api/health'
       const controller = new AbortController()
       
       // Set timeout for health check
