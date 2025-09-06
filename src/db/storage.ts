@@ -28,13 +28,23 @@ export class StorageService {
     }
     
     try {
-      const item = {
+      // First, try to find existing record
+      const existingItem = await db.storage.get({ key });
+      
+      const item: any = {
         key,
         value: JSON.stringify(value),
         timestamp: Date.now()
       };
       
-      await db.storage.put(item);
+      if (existingItem) {
+        // Update existing record
+        item.id = existingItem.id;
+        await db.storage.put(item);
+      } else {
+        // Insert new record
+        await db.storage.add(item);
+      }
     } catch (error: any) {
       if (error.name === 'QuotaExceededError') {
         const quotaError: StorageError = new Error(`Storage quota exceeded! Cannot save item [${key}]`);
